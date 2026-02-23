@@ -189,19 +189,34 @@ function toggleOnline(){
 }
 
 function escutarCorridas(){
+
+  console.log("🎧 Escutando corridas...");
+
   supabaseClient
-  .channel("rides-channel")
-  .on("postgres_changes",{
-    event:"INSERT",
-    schema:"public",
-    table:"rides"
-  }, payload=>{
-    if(!online) return;
-    if(payload.new.status==="procurando"){
-      mostrarCorrida(payload.new);
-    }
-  })
-  .subscribe();
+    .channel("public:rides")
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "rides"
+      },
+      (payload) => {
+
+        console.log("🚨 Nova corrida recebida:", payload.new);
+
+        if(!online) return;
+
+        if(payload.new.status === "procurando"){
+          mostrarCorrida(payload.new);
+        }
+
+      }
+    )
+    .subscribe((status) => {
+      console.log("📡 Status realtime:", status);
+    });
+
 }
 
 function mostrarCorrida(ride){
@@ -265,3 +280,4 @@ async function enviarProposta(){
 
 </body>
 </html>
+
