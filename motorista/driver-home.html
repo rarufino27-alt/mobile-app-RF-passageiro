@@ -6,18 +6,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/mobile-app-RF/core/supabase.js"></script>
+<script src="../core/supabase.js"></script>
 
 <style>
 body{
   margin:0;
-  background:#111;
+  background:#0f172a;
   font-family:system-ui;
   color:#fff;
 }
 
-/* TOPO */
-.top{
+/* HEADER */
+.header{
   position:absolute;
   top:20px;
   left:20px;
@@ -28,53 +28,51 @@ body{
   z-index:10;
 }
 
-.saldo{
-  background:#2b2b2b;
-  padding:10px 15px;
-  border-radius:20px;
+.status{
+  background:#1e293b;
+  padding:10px 18px;
+  border-radius:30px;
   font-weight:bold;
 }
 
-.menu{
-  font-size:22px;
+.online{
+  background:#22c55e;
 }
 
-/* MAPA FAKE */
 .map{
   height:100vh;
   background:radial-gradient(circle at center,#1f2937,#0f172a);
 }
 
-/* BOTÃO CONECTAR */
+/* BOTÃO ONLINE */
 .footer{
   position:absolute;
-  bottom:20px;
+  bottom:25px;
   left:20px;
   right:20px;
-  text-align:center;
 }
 
 .btn-online{
   background:#facc15;
   color:#000;
   font-weight:bold;
-  padding:18px;
-  border-radius:40px;
+  padding:20px;
+  border-radius:50px;
   border:none;
   width:100%;
   font-size:18px;
 }
 
 /* CARD CORRIDA */
-.card-corrida{
+.card{
   position:absolute;
   bottom:0;
   left:0;
   right:0;
-  background:#1c1c1c;
-  padding:20px;
-  border-top-left-radius:25px;
-  border-top-right-radius:25px;
+  background:#111827;
+  padding:25px;
+  border-top-left-radius:30px;
+  border-top-right-radius:30px;
   display:none;
   animation:slideUp .3s ease;
 }
@@ -85,30 +83,46 @@ body{
 }
 
 .valor{
-  font-size:28px;
-  font-weight:bold;
-  margin-bottom:10px;
+  font-size:32px;
+  font-weight:800;
+  color:#facc15;
 }
 
-.info{
+.rota{
+  margin-top:10px;
   font-size:14px;
-  margin-bottom:6px;
+  opacity:.8;
 }
 
-.btn-aceitar{
+.timer{
+  margin-top:8px;
+  font-size:12px;
+  color:#ef4444;
+}
+
+input{
+  width:100%;
+  padding:15px;
+  border-radius:20px;
+  border:none;
+  margin-top:15px;
+  font-size:16px;
+}
+
+.btn-proposta{
   background:#22c55e;
   border:none;
   padding:15px;
-  border-radius:20px;
+  border-radius:25px;
   width:100%;
-  font-weight:bold;
   margin-top:10px;
+  font-weight:bold;
 }
 
-.btn-oferta{
+.btn-recusar{
   background:#333;
   border:none;
-  padding:15px;
+  padding:12px;
   border-radius:20px;
   width:100%;
   margin-top:8px;
@@ -120,163 +134,134 @@ body{
 
 <div class="map"></div>
 
-<div class="top">
-  <div class="menu">☰</div>
-  <div class="saldo">R$ 0,00</div>
+<div class="header">
+  <div id="statusBadge" class="status">Offline</div>
 </div>
 
 <div class="footer">
   <button class="btn-online" onclick="toggleOnline()" id="btnOnline">
-    Conectar
+    Ficar Online
   </button>
 </div>
 
-<div class="card-corrida" id="cardCorrida">
-  <div class="valor" id="valorCorrida"></div>
-  <div class="info" id="origem"></div>
-  <div class="info" id="destino"></div>
+<div class="card" id="rideCard">
+  <div class="valor" id="rideValue"></div>
+  <div class="rota" id="rideRoute"></div>
+  <div class="timer" id="rideTimer"></div>
 
-  <button class="btn-aceitar" onclick="aceitarCorrida()">
-    Aceitar
+  <input type="number" id="offerInput" placeholder="Enviar proposta (R$)">
+
+  <button class="btn-proposta" onclick="enviarProposta()">
+    Enviar Proposta
   </button>
 
-  <button class="btn-oferta" onclick="ofertar()">
-    Oferecer outro valor
+  <button class="btn-recusar" onclick="fecharCard()">
+    Recusar
   </button>
 </div>
 
 <script>
 
-let online = false;
-let currentRide = null;
-let timerInterval = null;
-let tempoRestante = 15;
+let online=false;
+let currentRide=null;
+let timerInterval;
+let tempo=20;
 
-// AUDIO
-const audioNotificacao = new Audio("../assets/sounds/notificacao.mp3");
+const audio=new Audio("../assets/sounds/notificacao.mp3");
 
 function toggleOnline(){
-
-  online = !online;
-
-  const btn = document.getElementById("btnOnline");
+  online=!online;
+  const badge=document.getElementById("statusBadge");
+  const btn=document.getElementById("btnOnline");
 
   if(online){
-    btn.innerText = "Online";
-    btn.style.background = "#22c55e";
+    badge.innerText="Online";
+    badge.classList.add("online");
+    btn.innerText="Online";
+    btn.style.background="#22c55e";
     escutarCorridas();
   }else{
-    btn.innerText = "Conectar";
-    btn.style.background = "#facc15";
+    badge.innerText="Offline";
+    badge.classList.remove("online");
+    btn.innerText="Ficar Online";
+    btn.style.background="#facc15";
   }
 }
 
 function escutarCorridas(){
-
   supabaseClient
-    .channel("rides-channel")
-    .on("postgres_changes",{
-      event:"INSERT",
-      schema:"public",
-      table:"rides"
-    }, payload => {
-
-      if(!online) return;
-
-      const ride = payload.new;
-
-      if(ride.status === "procurando"){
-        mostrarCorrida(ride);
-      }
-
-    })
-    .subscribe();
+  .channel("rides-channel")
+  .on("postgres_changes",{
+    event:"INSERT",
+    schema:"public",
+    table:"rides"
+  }, payload=>{
+    if(!online) return;
+    if(payload.new.status==="procurando"){
+      mostrarCorrida(payload.new);
+    }
+  })
+  .subscribe();
 }
 
 function mostrarCorrida(ride){
+  currentRide=ride;
 
-  currentRide = ride;
+  document.getElementById("rideValue").innerText=
+    "R$ "+Number(ride.valor_total).toFixed(2);
 
-  document.getElementById("valorCorrida").innerText =
-    "R$ " + Number(ride.valor_total).toFixed(2);
+  document.getElementById("rideRoute").innerText=
+    ride.origem+" → "+ride.destino;
 
-  document.getElementById("origem").innerText =
-    "Origem: " + ride.origem;
+  document.getElementById("rideCard").style.display="block";
 
-  document.getElementById("destino").innerText =
-    "Destino: " + ride.destino;
-
-  document.getElementById("cardCorrida").style.display = "block";
-
-  // 🔊 TOCAR SOM
-  audioNotificacao.play().catch(()=>{});
+  audio.play().catch(()=>{});
 
   iniciarTimer();
 }
 
 function iniciarTimer(){
+  tempo=20;
+  clearInterval(timerInterval);
 
-  tempoRestante = 15;
+  timerInterval=setInterval(()=>{
+    tempo--;
+    document.getElementById("rideTimer").innerText=
+      "Tempo restante: "+tempo+"s";
 
-  const card = document.getElementById("cardCorrida");
-
-  if(timerInterval) clearInterval(timerInterval);
-
-  timerInterval = setInterval(()=>{
-
-    tempoRestante--;
-
-    document.getElementById("valorCorrida").innerText =
-      "R$ " + Number(currentRide.valor_total).toFixed(2)
-      + " • " + tempoRestante + "s";
-
-    if(tempoRestante <= 0){
+    if(tempo<=0){
       clearInterval(timerInterval);
-      esconderCorrida();
+      fecharCard();
     }
-
   },1000);
 }
 
-function esconderCorrida(){
-  document.getElementById("cardCorrida").style.display = "none";
-  currentRide = null;
+function fecharCard(){
+  document.getElementById("rideCard").style.display="none";
+  currentRide=null;
 }
 
-async function aceitarCorrida(){
-
+async function enviarProposta(){
   if(!currentRide) return;
 
-  clearInterval(timerInterval);
+  const valor=document.getElementById("offerInput").value;
+  if(!valor) return alert("Digite um valor.");
 
-  const motoristaId = localStorage.getItem("motorista_id") || "motorista_teste";
+  await supabaseClient
+    .from("propostas")
+    .insert([
+      {
+        ride_id: currentRide.id,
+        motorista_id: localStorage.getItem("motorista_id")||"teste",
+        valor_proposto: Number(valor)
+      }
+    ]);
 
-  const { error } = await supabaseClient
-    .from("rides")
-    .update({
-      status:"aceita",
-      motorista_id: motoristaId
-    })
-    .eq("id", currentRide.id);
-
-  if(error){
-    alert("Erro ao aceitar corrida");
-    return;
-  }
-
-  window.location.href = "motorista-caminho.html";
-}
-
-function ofertar(){
-  const novoValor = prompt("Digite sua oferta:");
-  if(!novoValor) return;
-
-  alert("Oferta enviada (simulação)");
+  alert("Proposta enviada!");
+  fecharCard();
 }
 
 </script>
 
 </body>
 </html>
-
-
