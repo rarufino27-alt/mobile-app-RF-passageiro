@@ -307,13 +307,26 @@ async function enviarProposta(){
   const valor=document.getElementById("offerInput").value;
   if(!valor) return alert("Digite um valor.");
 
+  const motoristaId = localStorage.getItem("motorista_id") || "teste";
+
   const { error } = await supabaseClient
-    .from("propostas")
-    .insert([{
-      ride_id: currentRide.id,
-      motorista_id: localStorage.getItem("motorista_id")||"teste",
+    .from("rides")
+    .update({
+      status: "aceita",
+      motorista_id: motoristaId,
       valor_proposto: Number(valor)
-    }]);
+    })
+    .eq("id", currentRide.id);
+
+  if(error){
+    console.error(error);
+    alert("Erro ao aceitar corrida.");
+    return;
+  }
+
+  alert("Corrida aceita!");
+  fecharCard();
+}
 
   if(error){
     alert("Erro ao enviar proposta.");
