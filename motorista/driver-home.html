@@ -16,7 +16,6 @@ body{
   color:#fff;
 }
 
-/* HEADER */
 .header{
   position:absolute;
   top:20px;
@@ -44,7 +43,6 @@ body{
   background:radial-gradient(circle at center,#1f2937,#0f172a);
 }
 
-/* BOTÃO ONLINE */
 .footer{
   position:absolute;
   bottom:25px;
@@ -63,7 +61,6 @@ body{
   font-size:18px;
 }
 
-/* CARD CORRIDA */
 .card{
   position:absolute;
   bottom:0;
@@ -167,8 +164,26 @@ let currentRide=null;
 let timerInterval=null;
 let tempo=20;
 let rideChannel=null;
+let audio=null;
 
-const audio=new Audio("../assets/sounds/notificacao.mp3");
+function iniciarAudio(){
+  if(!audio){
+    audio = new Audio("../assets/sounds/notificacao.mp3");
+    audio.volume = 1;
+  }
+}
+
+function desbloquearAudio(){
+  if(audio){
+    audio.play()
+      .then(()=>{
+        audio.pause();
+        audio.currentTime=0;
+        console.log("🔓 Áudio desbloqueado");
+      })
+      .catch(()=>{});
+  }
+}
 
 function toggleOnline(){
 
@@ -183,6 +198,9 @@ function toggleOnline(){
     badge.classList.add("online");
     btn.innerText="Online";
     btn.style.background="#22c55e";
+
+    iniciarAudio();
+    desbloquearAudio();
 
     escutarCorridas();
 
@@ -225,8 +243,7 @@ function escutarCorridas(){
         console.log("🚨 Nova corrida:", payload.new);
 
         if(!online) return;
-
-        if(currentRide) return; // evita duplicar card
+        if(currentRide) return;
 
         if(payload.new.status==="procurando"){
           mostrarCorrida(payload.new);
@@ -251,7 +268,10 @@ function mostrarCorrida(ride){
 
   document.getElementById("rideCard").style.display="block";
 
-  audio.play().catch(()=>{});
+  if(audio){
+    audio.currentTime=0;
+    audio.play().catch(()=>{});
+  }
 
   iniciarTimer();
 }
@@ -259,7 +279,6 @@ function mostrarCorrida(ride){
 function iniciarTimer(){
 
   tempo=20;
-
   clearInterval(timerInterval);
 
   timerInterval=setInterval(()=>{
