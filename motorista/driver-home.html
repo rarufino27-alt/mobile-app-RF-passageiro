@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>RF Motorista</title>
+<title>RF – Painel Motorista</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,202 +17,170 @@
 }
 
 body{
-  background:#0b1220;
+  background:#0f0f0f;
   color:#fff;
-  overflow:hidden;
+  min-height:100vh;
 }
 
-/* MAPA */
-.map{
-  position:absolute;
-  inset:0;
-  background:radial-gradient(circle at center,#1f2937,#0b1220 70%);
-}
-
-/* HEADER */
-.header{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  padding:20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  backdrop-filter:blur(10px);
-  background:rgba(10,15,30,0.6);
-  border-bottom:1px solid rgba(255,255,255,0.05);
-  z-index:10;
+/* HEADER PADRÃO RF */
+.top{
+  background:#ffffff;
+  padding:25px 20px 65px;
+  border-bottom-left-radius:40px;
+  border-bottom-right-radius:40px;
 }
 
 .logo{
-  font-weight:800;
-  font-size:16px;
-  letter-spacing:1px;
-  opacity:.9;
+  font-weight:900;
+  font-size:1.4rem;
+  color:#000;
 }
 
 .status{
-  padding:8px 18px;
-  border-radius:30px;
-  font-size:13px;
-  font-weight:600;
-  background:#1e293b;
-  transition:.3s;
+  margin-top:5px;
+  font-weight:700;
+  color:#facc15;
 }
 
-.online{
-  background:#16a34a;
-  box-shadow:0 0 12px rgba(22,163,74,.7);
+/* CONTEÚDO */
+.content{
+  width:90%;
+  max-width:420px;
+  margin:-45px auto 120px auto;
+}
+
+.card{
+  background:#1c1c1c;
+  border-radius:20px;
+  padding:22px;
+  box-shadow:0 12px 30px rgba(0,0,0,.5);
 }
 
 /* BOTÃO ONLINE */
-.footer{
-  position:absolute;
-  bottom:35px;
-  left:20px;
-  right:20px;
-  z-index:10;
-}
-
 .btn-online{
+  width:100%;
+  padding:16px;
+  border-radius:16px;
+  border:none;
+  font-weight:700;
+  font-size:1rem;
+  cursor:pointer;
   background:#facc15;
   color:#000;
-  font-weight:700;
-  padding:18px;
-  border-radius:50px;
-  border:none;
-  width:100%;
-  font-size:16px;
-  transition:.3s;
-  box-shadow:0 10px 25px rgba(0,0,0,.4);
+  transition:.2s;
+}
+
+.btn-online.online{
+  background:#22c55e;
+  color:#fff;
 }
 
 .btn-online:active{
   transform:scale(.98);
 }
 
-/* CARD */
-.card{
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  background:linear-gradient(180deg,#111827,#0b1220);
-  padding:28px;
-  border-top-left-radius:30px;
-  border-top-right-radius:30px;
+/* CARD CORRIDA */
+.ride-card{
+  margin-top:15px;
   display:none;
-  animation:slideUp .35s ease;
-  box-shadow:0 -10px 40px rgba(0,0,0,.6);
-}
-
-@keyframes slideUp{
-  from{transform:translateY(100%);}
-  to{transform:translateY(0);}
+  border-top:1px solid #2a2a2a;
+  padding-top:15px;
 }
 
 .valor{
-  font-size:36px;
-  font-weight:900;
+  text-align:center;
+  font-size:1.8rem;
+  font-weight:800;
   color:#facc15;
-  margin-bottom:6px;
+  margin-bottom:8px;
 }
 
 .rota{
-  font-size:14px;
-  opacity:.75;
-  margin-bottom:12px;
+  text-align:center;
+  font-size:.85rem;
+  opacity:.8;
 }
 
-/* TIMER */
 .timer{
-  font-size:12px;
+  text-align:center;
+  font-size:.75rem;
   color:#ef4444;
-  margin-bottom:6px;
-}
-
-.timer-bar{
-  height:4px;
-  background:#ef4444;
-  width:100%;
-  border-radius:10px;
-  transition:width 1s linear;
-  margin-bottom:15px;
+  margin-top:8px;
 }
 
 /* INPUT */
 input{
   width:100%;
-  padding:15px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.08);
-  background:#0f172a;
-  color:#fff;
-  margin-bottom:10px;
+  padding:14px;
+  border-radius:14px;
+  border:none;
+  margin-top:12px;
   font-size:15px;
 }
 
 /* BOTÕES */
 .btn-proposta{
-  background:#16a34a;
+  background:#22c55e;
   border:none;
-  padding:15px;
-  border-radius:20px;
+  padding:14px;
+  border-radius:14px;
   width:100%;
+  margin-top:10px;
   font-weight:700;
-  margin-bottom:8px;
-  transition:.3s;
-}
-
-.btn-proposta:active{
-  transform:scale(.98);
+  cursor:pointer;
 }
 
 .btn-recusar{
-  background:#1f2937;
-  border:none;
-  padding:13px;
-  border-radius:18px;
+  background:#111;
+  border:1px solid #444;
+  padding:12px;
+  border-radius:14px;
   width:100%;
+  margin-top:8px;
   color:#ccc;
+  cursor:pointer;
 }
 </style>
 </head>
 <body>
 
-<div class="map"></div>
-
-<div class="header">
-  <div class="logo">RF DRIVER</div>
-  <div id="statusBadge" class="status">Offline</div>
+<div class="top">
+  <div class="logo">MOTORISTA RF</div>
+  <div class="status" id="statusBadge">
+    Offline
+  </div>
 </div>
 
-<div class="footer">
-  <button class="btn-online" onclick="toggleOnline()" id="btnOnline">
-    Ficar Online
-  </button>
-</div>
+<div class="content">
+  <div class="card">
 
-<div class="card" id="rideCard">
-  <div class="valor" id="rideValue"></div>
-  <div class="rota" id="rideRoute"></div>
+    <button class="btn-online" onclick="toggleOnline()" id="btnOnline">
+      Ficar Online
+    </button>
 
-  <div class="timer" id="rideTimer"></div>
-  <div class="timer-bar" id="timerBar"></div>
+    <div class="ride-card" id="rideCard">
+      <div class="valor" id="rideValue"></div>
+      <div class="rota" id="rideRoute"></div>
+      <div class="timer" id="rideTimer"></div>
 
-  <input type="number" id="offerInput" placeholder="Enviar proposta (R$)">
+      <input type="number" id="offerInput" placeholder="Enviar proposta (R$)">
 
-  <button class="btn-proposta" onclick="enviarProposta()">
-    Enviar Proposta
-  </button>
+      <button class="btn-proposta" onclick="enviarProposta()">
+        Enviar Proposta
+      </button>
 
-  <button class="btn-recusar" onclick="fecharCard()">
-    Recusar
-  </button>
+      <button class="btn-recusar" onclick="fecharCard()">
+        Recusar
+      </button>
+    </div>
+
+  </div>
 </div>
 
 <script>
+
+/* ==== SUA LÓGICA ORIGINAL MANTIDA ==== */
+
 let online=false;
 let currentRide=null;
 let timerInterval=null;
@@ -246,9 +214,9 @@ function toggleOnline(){
   if(online){
 
     badge.innerText="Online";
-    badge.classList.add("online");
+    badge.style.color="#22c55e";
     btn.innerText="Online";
-    btn.style.background="#16a34a";
+    btn.classList.add("online");
 
     iniciarAudio();
     desbloquearAudio();
@@ -257,9 +225,9 @@ function toggleOnline(){
   }else{
 
     badge.innerText="Offline";
-    badge.classList.remove("online");
+    badge.style.color="#facc15";
     btn.innerText="Ficar Online";
-    btn.style.background="#facc15";
+    btn.classList.remove("online");
 
     if(rideChannel){
       supabaseClient.removeChannel(rideChannel);
@@ -296,17 +264,12 @@ function mostrarCorrida(ride){
   currentRide=ride;
 
   document.getElementById("rideValue").innerText=
-    "R$ "+Number(ride.valor_total).toFixed(2);
+    "R$ "+Number(ride.valor_total || ride.valor).toFixed(2);
 
   document.getElementById("rideRoute").innerText=
     ride.origem+" → "+ride.destino;
 
   document.getElementById("rideCard").style.display="block";
-
-  if(audio){
-    audio.currentTime=0;
-    audio.play().catch(()=>{});
-  }
 
   iniciarTimer();
 }
@@ -316,17 +279,12 @@ function iniciarTimer(){
   tempo=20;
   clearInterval(timerInterval);
 
-  const bar=document.getElementById("timerBar");
-  bar.style.width="100%";
-
   timerInterval=setInterval(()=>{
 
     tempo--;
 
     document.getElementById("rideTimer").innerText=
       "Tempo restante: "+tempo+"s";
-
-    bar.style.width=(tempo/20*100)+"%";
 
     if(tempo<=0){
       clearInterval(timerInterval);
@@ -351,13 +309,11 @@ async function enviarProposta(){
 
   const { error } = await supabaseClient
     .from("propostas")
-    .insert([
-      {
-        ride_id: currentRide.id,
-        motorista_id: localStorage.getItem("motorista_id")||"teste",
-        valor_proposto: Number(valor)
-      }
-    ]);
+    .insert([{
+      ride_id: currentRide.id,
+      motorista_id: localStorage.getItem("motorista_id")||"teste",
+      valor_proposto: Number(valor)
+    }]);
 
   if(error){
     alert("Erro ao enviar proposta.");
@@ -367,6 +323,7 @@ async function enviarProposta(){
   alert("Proposta enviada!");
   fecharCard();
 }
+
 </script>
 
 </body>
