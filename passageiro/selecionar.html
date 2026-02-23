@@ -5,6 +5,7 @@
 <title>RF – Selecionar viagem</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- CAMINHOS CORRETOS PARA GITHUB PAGES -->
 <script src="/mobile-app-RF/core/datamanager.js"></script>
 <script src="/mobile-app-RF/core/dinamico.js"></script>
 <script src="/mobile-app-RF/core/taxas.js"></script>
@@ -24,11 +25,11 @@ body{
   overflow-x:hidden;
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 
 .top{
   background:#ffffff;
-  padding:25px 20px 110px 20px; /* reduzimos um pouco */
+  padding:25px 20px 110px 20px;
   border-bottom-left-radius:40px;
   border-bottom-right-radius:40px;
   position:relative;
@@ -39,7 +40,7 @@ body{
   font-weight:900;
   font-size:1.4rem;
   letter-spacing:1px;
-  color:#000000; /* NOME PRETO */
+  color:#000000;
 }
 
 .titulo-topo{
@@ -48,10 +49,10 @@ body{
   left:20px;
   font-weight:700;
   font-size:1rem;
-  color:#facc15; /* AMARELO */
+  color:#facc15;
 }
 
-/* ================= ROTA ================= */
+/* ROTA */
 
 .rota-box{
   position:relative;
@@ -77,16 +78,16 @@ body{
   color:#999;
 }
 
-/* ================= CONTEÚDO ================= */
+/* CONTEÚDO */
 
 .content{
   width:90%;
   max-width:420px;
   margin:0 auto;
-  padding-bottom:160px; /* espaço real para footer */
+  padding-bottom:160px;
 }
 
-/* ================= CATEGORIA ================= */
+/* CATEGORIA */
 
 .categoria{
   padding:14px;
@@ -125,7 +126,7 @@ body{
   color:#facc15;
 }
 
-/* ================= PAGAMENTO ================= */
+/* PAGAMENTO */
 
 .pagamento-bloco{
   background:#1c1c1c;
@@ -152,7 +153,7 @@ body{
   font-weight:600;
 }
 
-/* ================= FOOTER FIXO ================= */
+/* FOOTER FIXO */
 
 .footer-fixo{
   position:fixed;
@@ -189,7 +190,6 @@ body{
   font-weight:700;
   cursor:pointer;
 }
-  
 </style>
 </head>
 <body>
@@ -201,14 +201,12 @@ body{
 <div class="rota-box" id="rotaBox"></div>
 
 <div class="content">
-
   <div id="categorias"></div>
 
   <div class="pagamento-bloco">
     <div style="font-weight:700; margin-bottom:8px;">Forma de pagamento</div>
     <div id="pagamentos"></div>
   </div>
-
 </div>
 
 <div class="footer-fixo">
@@ -220,7 +218,7 @@ body{
 
 <script>
 
-/* === LÓGICA ORIGINAL (INTACTA) === */
+/* === LÓGICA ORIGINAL (INALTERADA) === */
 
 const corrida = JSON.parse(localStorage.getItem("rf_corrida_temp"));
 if(!corrida) window.location.href = "viagem.html";
@@ -293,12 +291,7 @@ function renderCategorias(){
 }
 
 function renderPagamentos(){
-  const pagamentos = [
-  "Dinheiro",
-  "Pix",
-  "Cartão Débito",
-  "Cartão Crédito"
-];
+  const pagamentos = ["Dinheiro","Pix","Cartão Débito","Cartão Crédito"];
   const box = document.getElementById("pagamentos");
 
   pagamentos.forEach(p=>{
@@ -318,7 +311,7 @@ function renderPagamentos(){
   });
 }
 
-    function arredondarParaCima(valor){
+function arredondarParaCima(valor){
   return Math.ceil(valor * 100) / 100;
 }
   
@@ -328,7 +321,6 @@ function atualizarTotal(){
   base = aplicarNoturno(base);
   let total = Dinamico.ativo ? base * Dinamico.multiplicador : base;
 
-  // === APLICAR TAXA DO CARTÃO ===
   if(pagamentoSelecionado === "Cartão Crédito"){
     total = total / 0.95;
   }
@@ -337,16 +329,14 @@ function atualizarTotal(){
     total = total / 0.98;
   }
 
-  // === ARREDONDAR CENTAVOS PARA CIMA ===
   total = arredondarParaCima(total);
 
-  const el = document.getElementById("valorTotal");
-  el.innerText = "R$ " + total.toFixed(2);
+  document.getElementById("valorTotal").innerText = "R$ " + total.toFixed(2);
 
-localStorage.setItem("rf_categoria", cat.nome);
-localStorage.setItem("rf_pagamento", pagamentoSelecionado);
-localStorage.setItem("rf_valor_final", total);
-localStorage.setItem("rf_mult", cat.mult);
+  localStorage.setItem("rf_categoria", cat.nome);
+  localStorage.setItem("rf_pagamento", pagamentoSelecionado);
+  localStorage.setItem("rf_valor_final", total);
+  localStorage.setItem("rf_mult", cat.mult);
 }
 
 function solicitar(){
@@ -360,8 +350,3 @@ renderPagamentos();
 
 </body>
 </html>
-
-
-
-
-
