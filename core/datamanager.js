@@ -2,29 +2,29 @@ const DataManager = {
   rotas: [],
 
   arquivos: [
-  "/data/condominio-porto-do-cabo.json",
-  "/data/gaibu.json",
-  "/data/enseadas.json",
-  "/data/setor-4.json",
-  "/data/xareu.json",
-  "/data/itapuama.json",
-  "/data/calhetas.json",
-  "/data/lote-garapu2-lote-dona-amara.json",
-  "/data/cohab.json",
-  "/data/centro-do-cabo.json",
-  "/data/shopping-costa-dourada.json",
-  "/data/aguia-american-club-br-101.json",
-  "/data/empresas.json",
-  "/data/engenhos.json",
-  "/data/hospitais-clinicas.json",
-  "/data/interurbanas.json",
-  "/data/interestaduais.json",
-  "/data/lazer-festa.json",
-  "/data/locais.json",
-  "/data/longas-locais.json",
-  "/data/praias.json",
-  "/data/bairro-sao-francisco-baixo.json"
-],
+    "/mobile-app-RF/data/condominio-porto-do-cabo.json",
+    "/mobile-app-RF/data/gaibu.json",
+    "/mobile-app-RF/data/enseadas.json",
+    "/mobile-app-RF/data/setor-4.json",
+    "/mobile-app-RF/data/xareu.json",
+    "/mobile-app-RF/data/itapuama.json",
+    "/mobile-app-RF/data/calhetas.json",
+    "/mobile-app-RF/data/lote-garapu2-lote-dona-amara.json",
+    "/mobile-app-RF/data/cohab.json",
+    "/mobile-app-RF/data/centro-do-cabo.json",
+    "/mobile-app-RF/data/shopping-costa-dourada.json",
+    "/mobile-app-RF/data/aguia-american-club-br-101.json",
+    "/mobile-app-RF/data/empresas.json",
+    "/mobile-app-RF/data/engenhos.json",
+    "/mobile-app-RF/data/hospitais-clinicas.json",
+    "/mobile-app-RF/data/interurbanas.json",
+    "/mobile-app-RF/data/interestaduais.json",
+    "/mobile-app-RF/data/lazer-festa.json",
+    "/mobile-app-RF/data/locais.json",
+    "/mobile-app-RF/data/longas-locais.json",
+    "/mobile-app-RF/data/praias.json",
+    "/mobile-app-RF/data/bairro-sao-francisco-baixo.json"
+  ],
 
   async carregar() {
     try {
@@ -73,12 +73,10 @@ const DataManager = {
 
     if (!origem || !destino) return null;
 
-    // sem parada
     if (!parada) {
       return this.buscarValor(origem, destino);
     }
 
-    // com parada
     const trecho1 = this.buscarValor(origem, parada);
     const trecho2 = this.buscarValor(parada, destino);
 
@@ -88,12 +86,4 @@ const DataManager = {
   }
 };
 
-
-
-
-
-
-
-
-
-
+window.DataManager = DataManager;
