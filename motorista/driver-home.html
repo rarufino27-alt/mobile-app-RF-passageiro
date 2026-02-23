@@ -249,10 +249,20 @@ async function aceitarCorrida(){
 
   clearInterval(timerInterval);
 
-  await supabaseClient
+  const motoristaId = localStorage.getItem("motorista_id") || "motorista_teste";
+
+  const { error } = await supabaseClient
     .from("rides")
-    .update({ status:"aceita" })
+    .update({
+      status:"aceita",
+      motorista_id: motoristaId
+    })
     .eq("id", currentRide.id);
+
+  if(error){
+    alert("Erro ao aceitar corrida");
+    return;
+  }
 
   window.location.href = "motorista-caminho.html";
 }
@@ -268,4 +278,5 @@ function ofertar(){
 
 </body>
 </html>
+
 
