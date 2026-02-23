@@ -5,8 +5,8 @@
 <title>RF – Procurando Motorista</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="/mobile-app-RF/core/datamanager.js"></script>
-<script src="/mobile-app-RF/core/global.js"></script>
+<!-- CORE CORRIGIDO -->
+<script src="../core/global.js"></script>
 
 <style>
 *{
@@ -17,16 +17,15 @@
 }
 
 body{
-  background:#fff;
-  height:100vh;
-  overflow:hidden;
+  background:#0f0f0f;
+  color:#fff;
+  min-height:100vh;
 }
 
-/* TOPO */
-
+/* HEADER PADRÃO RF */
 .top{
-  background:#facc15;
-  padding:25px 20px 110px;
+  background:#ffffff;
+  padding:25px 20px 55px;
   border-bottom-left-radius:40px;
   border-bottom-right-radius:40px;
 }
@@ -34,59 +33,34 @@ body{
 .logo{
   font-weight:900;
   font-size:1.4rem;
+  color:#000;
 }
 
 .status{
   margin-top:5px;
   font-weight:700;
+  color:#facc15;
 }
 
-/* MAPA */
-
-.map{
-  position:absolute;
-  top:140px;
-  left:0;
-  right:0;
-  bottom:0;
-  background:radial-gradient(circle at 30% 30%, #e5e5e5 0%, #f5f5f5 60%);
+/* CONTEÚDO */
+.content{
+  width:90%;
+  max-width:420px;
+  margin:-40px auto 120px auto;
 }
-
-.dot{
-  position:absolute;
-  width:10px;
-  height:10px;
-  background:#facc15;
-  border-radius:50%;
-  animation:pulse 2s infinite;
-}
-
-@keyframes pulse{
-  0%{transform:scale(1); opacity:1;}
-  50%{transform:scale(1.5); opacity:.4;}
-  100%{transform:scale(1); opacity:1;}
-}
-
-/* CARD */
 
 .card{
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#fff;
-  border-top-left-radius:25px;
-  border-top-right-radius:25px;
+  background:#1c1c1c;
+  border-radius:20px;
   padding:20px;
-  box-shadow:0 -10px 30px rgba(0,0,0,.1);
-  max-height:65%;
-  overflow-y:auto;
+  box-shadow:0 12px 30px rgba(0,0,0,.5);
 }
 
+/* SPINNER */
 .spinner{
   width:40px;
   height:40px;
-  border:4px solid #eee;
+  border:4px solid #333;
   border-top:4px solid #facc15;
   border-radius:50%;
   margin:0 auto 15px;
@@ -105,14 +79,15 @@ body{
 }
 
 .linha span:first-child{
-  color:#777;
+  color:#aaa;
 }
 
 .total{
   text-align:center;
-  font-size:1.5rem;
-  font-weight:800;
-  margin-top:10px;
+  font-size:1.4rem;
+  font-weight:700;
+  color:#facc15;
+  margin-top:12px;
 }
 
 .timer{
@@ -128,7 +103,7 @@ body{
   padding:14px;
   border:none;
   border-radius:14px;
-  background:#fff;
+  background:#111;
   border:1px solid #ef4444;
   color:#ef4444;
   font-weight:600;
@@ -139,29 +114,41 @@ body{
 <body>
 
 <div class="top">
-  <div class="logo">RF</div>
-  <div class="status" id="statusText">Buscando motoristas próximos...</div>
+  <div class="logo">PASSAGEIRO RF</div>
+  <div class="status" id="statusText">
+    Buscando motoristas próximos...
+  </div>
 </div>
 
-<div class="map">
-  <div class="dot" style="top:30%; left:20%;"></div>
-  <div class="dot" style="top:50%; left:60%; animation-delay:1s;"></div>
-  <div class="dot" style="top:70%; left:35%; animation-delay:1.5s;"></div>
+<div class="content">
+  <div class="card">
+
+    <div class="spinner"></div>
+
+    <div id="detalhamento"></div>
+
+    <div class="total" id="totalFinal"></div>
+
+    <div class="timer" id="timer">
+      Tempo de espera: 0s
+    </div>
+
+    <button class="btn-cancel" onclick="cancelar()">
+      Cancelar corrida
+    </button>
+
+  </div>
 </div>
 
-<div class="card">
-  <div class="spinner"></div>
-  <div id="detalhamento"></div>
-  <div class="total" id="totalFinal"></div>
-  <div class="timer" id="timer">Tempo de espera: 0s</div>
-  <button class="btn-cancel" onclick="cancelar()">Cancelar corrida</button>
-</div>
-
-<!-- SUPABASE CORRIGIDO -->
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="/mobile-app-RF/core/supabase.js"></script>
+<script src="../core/supabase.js"></script>
 
 <script>
+
+// ============================
+// DADOS DA CORRIDA
+// ============================
 
 const corrida = JSON.parse(localStorage.getItem("rf_corrida_temp")) || {};
 const totalFinal = Number(localStorage.getItem("rf_total_final")) || 0;
@@ -171,25 +158,51 @@ const origem = corrida.origem || "-";
 const parada = corrida.parada || null;
 const destino = corrida.destino || "-";
 
-let detalhesHTML = `<div class="linha"><span>Origem</span><span>${origem}</span></div>`;
+// ============================
+// RENDER DETALHAMENTO
+// ============================
+
+let detalhesHTML = `
+  <div class="linha">
+    <span>Origem</span>
+    <span>${origem}</span>
+  </div>
+`;
 
 if(parada){
-  detalhesHTML += `<div class="linha"><span>Parada</span><span>${parada}</span></div>`;
+  detalhesHTML += `
+    <div class="linha">
+      <span>Parada</span>
+      <span>${parada}</span>
+    </div>
+  `;
 }
 
 detalhesHTML += `
-<div class="linha"><span>Destino</span><span>${destino}</span></div>
-<div class="linha"><span>Categoria</span><span>${categoria}</span></div>
+  <div class="linha">
+    <span>Destino</span>
+    <span>${destino}</span>
+  </div>
+
+  <div class="linha">
+    <span>Categoria</span>
+    <span>${categoria}</span>
+  </div>
 `;
 
 document.getElementById("detalhamento").innerHTML = detalhesHTML;
 document.getElementById("totalFinal").innerText =
   "Total: R$ " + totalFinal.toFixed(2);
 
+// ============================
+// TIMER
+// ============================
+
 let segundos = 0;
 
 setInterval(()=>{
   segundos++;
+
   document.getElementById("timer").innerText =
     "Tempo de espera: " + segundos + "s";
 
@@ -205,21 +218,34 @@ setInterval(()=>{
 
 },1000);
 
+// ============================
+// CANCELAR
+// ============================
+
 function cancelar(){
+
   if(confirm("Deseja cancelar a corrida?")){
+
     localStorage.removeItem("rf_corrida_temp");
     localStorage.removeItem("rf_total_final");
     localStorage.removeItem("rf_categoria");
+
     App.go("viagem.html");
   }
 }
 
-async function criarCorrida() {
+// ============================
+// CRIAR CORRIDA
+// ============================
+
+async function criarCorrida(){
 
   if(typeof supabaseClient === "undefined"){
-    console.warn("Supabase ainda não configurado.");
+    console.error("❌ Supabase não carregado.");
     return;
   }
+
+  console.log("🚀 Criando corrida...");
 
   const { data, error } = await supabaseClient
     .from("rides")
@@ -234,14 +260,22 @@ async function criarCorrida() {
     .select()
     .single();
 
-  if (error) {
-    console.error(error);
+  if(error){
+    console.error("❌ ERRO SUPABASE:", error);
+    alert("Erro ao criar corrida.");
     return;
   }
 
+  console.log("✅ Corrida criada:", data);
+
   App.set("ride_id", data.id);
+
   escutarAceite(data.id);
 }
+
+// ============================
+// ESCUTAR ACEITE
+// ============================
 
 function escutarAceite(rideId){
 
@@ -257,6 +291,8 @@ function escutarAceite(rideId){
       },
       (payload) => {
 
+        console.log("📡 Atualização recebida:", payload);
+
         if(payload.new.status === "aceita"){
 
           document.getElementById("statusText").innerText =
@@ -269,7 +305,9 @@ function escutarAceite(rideId){
 
       }
     )
-    .subscribe();
+    .subscribe((status)=>{
+      console.log("Realtime status:", status);
+    });
 }
 
 criarCorrida();
