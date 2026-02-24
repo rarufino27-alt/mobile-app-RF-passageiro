@@ -5,9 +5,6 @@
 <title>RF – Painel Motorista</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../core/supabase.js"></script>
-
 <style>
 *{
   margin:0;
@@ -22,7 +19,7 @@ body{
   min-height:100vh;
 }
 
-/* HEADER PADRÃO RF */
+/* HEADER */
 .top{
   background:#ffffff;
   padding:25px 20px 65px;
@@ -42,7 +39,7 @@ body{
   color:#facc15;
 }
 
-/* CONTEÚDO */
+/* CONTENT */
 .content{
   width:90%;
   max-width:420px;
@@ -54,38 +51,23 @@ body{
   border-radius:20px;
   padding:22px;
   box-shadow:0 12px 30px rgba(0,0,0,.5);
+  margin-bottom:15px;
 }
 
-/* BOTÃO ONLINE */
-.btn-online{
+.btn{
   width:100%;
-  padding:16px;
-  border-radius:16px;
+  padding:14px;
+  border-radius:14px;
   border:none;
   font-weight:700;
-  font-size:1rem;
+  margin-top:10px;
   cursor:pointer;
-  background:#facc15;
-  color:#000;
-  transition:.2s;
 }
 
-.btn-online.online{
-  background:#22c55e;
-  color:#fff;
-}
-
-.btn-online:active{
-  transform:scale(.98);
-}
-
-/* CARD CORRIDA */
-.ride-card{
-  margin-top:15px;
-  display:none;
-  border-top:1px solid #2a2a2a;
-  padding-top:15px;
-}
+.btn-online{ background:#facc15; color:#000; }
+.btn-green{ background:#22c55e; color:#fff; }
+.btn-red{ background:#ef4444; color:#fff; }
+.btn-dark{ background:#111; color:#fff; border:1px solid #333; }
 
 .valor{
   text-align:center;
@@ -99,237 +81,219 @@ body{
   text-align:center;
   font-size:.85rem;
   opacity:.8;
+  margin-bottom:8px;
 }
 
 .timer{
   text-align:center;
   font-size:.75rem;
   color:#ef4444;
-  margin-top:8px;
+  margin-bottom:10px;
 }
 
-/* INPUT */
 input{
   width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:none;
-  margin-top:12px;
-  font-size:15px;
-}
-
-/* BOTÕES */
-.btn-proposta{
-  background:#22c55e;
-  border:none;
-  padding:14px;
-  border-radius:14px;
-  width:100%;
-  margin-top:10px;
-  font-weight:700;
-  cursor:pointer;
-}
-
-.btn-recusar{
-  background:#111;
-  border:1px solid #444;
   padding:12px;
-  border-radius:14px;
-  width:100%;
+  border-radius:12px;
+  border:none;
   margin-top:8px;
-  color:#ccc;
-  cursor:pointer;
 }
+.hidden{ display:none; }
 </style>
 </head>
 <body>
 
 <div class="top">
   <div class="logo">MOTORISTA RF</div>
-  <div class="status" id="statusBadge">
-    Offline
-  </div>
+  <div class="status" id="statusBadge">Offline</div>
 </div>
 
 <div class="content">
-  <div class="card">
 
-    <button class="btn-online" onclick="toggleOnline()" id="btnOnline">
+  <!-- CONTROLE ONLINE -->
+  <div class="card">
+    <button class="btn btn-online" id="btnOnline" onclick="toggleOnline()">
       Ficar Online
     </button>
-
-    <div class="ride-card" id="rideCard">
-      <div class="valor" id="rideValue"></div>
-      <div class="rota" id="rideRoute"></div>
-      <div class="timer" id="rideTimer"></div>
-
-      <input type="number" id="offerInput" placeholder="Enviar proposta (R$)">
-
-      <button class="btn-proposta" onclick="enviarProposta()">
-        Enviar Proposta
-      </button>
-
-      <button class="btn-recusar" onclick="fecharCard()">
-        Recusar
-      </button>
-    </div>
-
   </div>
+
+  <!-- BOTÃO CORRIDA MANUAL -->
+  <div class="card hidden" id="manualCard">
+    <button class="btn btn-dark" onclick="abrirManual()">
+      + Nova Corrida Manual
+    </button>
+  </div>
+
+  <!-- FORM MANUAL -->
+  <div class="card hidden" id="formManual">
+    <input type="text" id="manualOrigem" placeholder="Origem">
+    <input type="text" id="manualDestino" placeholder="Destino">
+    <input type="number" id="manualValor" placeholder="Valor (R$)">
+    <button class="btn btn-green" onclick="iniciarManual()">Iniciar Corrida</button>
+    <button class="btn btn-dark" onclick="fecharManual()">Cancelar</button>
+  </div>
+
+  <!-- CORRIDA RECEBIDA -->
+  <div class="card hidden" id="recebendoCard">
+    <div class="valor" id="rideValor"></div>
+    <div class="rota" id="rideRota"></div>
+    <div class="timer" id="rideTimer"></div>
+    <button class="btn btn-green" onclick="aceitarCorrida()">Aceitar</button>
+    <button class="btn btn-red" onclick="recusarCorrida()">Recusar</button>
+  </div>
+
+  <!-- EM ANDAMENTO -->
+  <div class="card hidden" id="andamentoCard">
+    <div class="valor" id="andamentoValor"></div>
+    <div class="rota" id="andamentoRota"></div>
+    <button class="btn btn-green" onclick="finalizarCorrida()">Finalizar Corrida</button>
+  </div>
+
+  <!-- FINALIZADA -->
+  <div class="card hidden" id="finalCard">
+    <div class="valor" id="finalValor"></div>
+    <button class="btn btn-dark" onclick="resetarPainel()">Voltar ao Painel</button>
+  </div>
+
+  <!-- SIMULAR CORRIDA -->
+  <div class="card hidden" id="simularCard">
+    <button class="btn btn-dark" onclick="simularCorrida()">
+      Simular Corrida Recebida
+    </button>
+  </div>
+
 </div>
 
 <script>
-
-document.addEventListener("DOMContentLoaded", function(){
-
 let online=false;
-let currentRide=null;
+let estado="OFFLINE";
 let timerInterval=null;
 let tempo=20;
-let rideChannel=null;
-let audio=null;
+let corridaAtual=null;
 
-function iniciarAudio(){
-  if(!audio){
-    audio = new Audio("../assets/sounds/notificacao.mp3");
-    audio.volume = 1;
+function setEstado(novo){
+  estado=novo;
+
+  document.querySelectorAll(".card").forEach(c=>c.classList.add("hidden"));
+
+  if(estado==="OFFLINE"){
+    document.getElementById("btnOnline").innerText="Ficar Online";
+    document.getElementById("statusBadge").innerText="Offline";
+    document.getElementById("statusBadge").style.color="#facc15";
   }
+
+  if(estado==="ONLINE"){
+    document.getElementById("manualCard").classList.remove("hidden");
+    document.getElementById("simularCard").classList.remove("hidden");
+  }
+
+  if(estado==="RECEBENDO"){
+    document.getElementById("recebendoCard").classList.remove("hidden");
+  }
+
+  if(estado==="ANDAMENTO"){
+    document.getElementById("andamentoCard").classList.remove("hidden");
+  }
+
+  if(estado==="FINALIZADA"){
+    document.getElementById("finalCard").classList.remove("hidden");
+  }
+
+  document.querySelector(".content > .card").classList.remove("hidden");
 }
 
-function desbloquearAudio(){
-  if(audio){
-    audio.play().then(()=>{
-      audio.pause();
-      audio.currentTime=0;
-    }).catch(()=>{});
-  }
-}
-
-window.toggleOnline = function(){
-
+function toggleOnline(){
   online=!online;
 
-  const badge=document.getElementById("statusBadge");
-  const btn=document.getElementById("btnOnline");
-
   if(online){
-
-    badge.innerText="Online";
-    badge.style.color="#22c55e";
-    btn.innerText="Online";
-    btn.classList.add("online");
-
-    iniciarAudio();
-    desbloquearAudio();
-    escutarCorridas();
-
+    document.getElementById("btnOnline").innerText="Online";
+    document.getElementById("btnOnline").classList.remove("btn-online");
+    document.getElementById("btnOnline").classList.add("btn-green");
+    document.getElementById("statusBadge").innerText="Online";
+    document.getElementById("statusBadge").style.color="#22c55e";
+    setEstado("ONLINE");
   }else{
-
-    badge.innerText="Offline";
-    badge.style.color="#facc15";
-    btn.innerText="Ficar Online";
-    btn.classList.remove("online");
-
-    if(rideChannel){
-      supabaseClient.removeChannel(rideChannel);
-      rideChannel=null;
-    }
-
+    document.getElementById("btnOnline").classList.remove("btn-green");
+    document.getElementById("btnOnline").classList.add("btn-online");
+    setEstado("OFFLINE");
   }
-};
-
-function escutarCorridas(){
-
-  if(rideChannel) return;
-
-  rideChannel = supabaseClient
-    .channel("public:rides")
-    .on("postgres_changes",
-      { event:"INSERT", schema:"public", table:"rides" },
-      (payload)=>{
-
-        if(!online) return;
-        if(currentRide) return;
-
-        if(payload.new.status==="procurando"){
-          mostrarCorrida(payload.new);
-        }
-
-      }
-    )
-    .subscribe();
 }
 
-function mostrarCorrida(ride){
-
-  currentRide=ride;
-
-  document.getElementById("rideValue").innerText =
-    "R$ " + Number(ride.valor_total || ride.valor).toFixed(2);
-
-  document.getElementById("rideRoute").innerText =
-    ride.origem + " → " + ride.destino;
-
-  document.getElementById("rideCard").style.display="block";
-
-  iniciarTimer();
+function abrirManual(){
+  document.getElementById("formManual").classList.remove("hidden");
 }
 
-function iniciarTimer(){
-
-  tempo=20;
-  clearInterval(timerInterval);
-
-  timerInterval=setInterval(()=>{
-
-    tempo--;
-
-    document.getElementById("rideTimer").innerText =
-      "Tempo restante: "+tempo+"s";
-
-    if(tempo<=0){
-      clearInterval(timerInterval);
-      fecharCard();
-    }
-
-  },1000);
+function fecharManual(){
+  document.getElementById("formManual").classList.add("hidden");
 }
 
-function fecharCard(){
-  document.getElementById("rideCard").style.display="none";
-  currentRide=null;
-  clearInterval(timerInterval);
-}
+function iniciarManual(){
+  const origem=document.getElementById("manualOrigem").value;
+  const destino=document.getElementById("manualDestino").value;
+  const valor=document.getElementById("manualValor").value;
 
-window.enviarProposta = async function(){
-
-  if(!currentRide) return;
-
-  const valor=document.getElementById("offerInput").value;
-  if(!valor) return alert("Digite um valor.");
-
-  const motoristaId =
-    localStorage.getItem("motorista_id") || "teste";
-
-  const { error } = await supabaseClient
-    .from("rides")
-    .update({
-      status: "aceita",
-      motorista_id: motoristaId,
-      valor_proposto: Number(valor)
-    })
-    .eq("id", currentRide.id);
-
-  if(error){
-    alert("Erro ao aceitar corrida.");
+  if(!origem||!destino||!valor){
+    alert("Preencha todos os campos.");
     return;
   }
 
-  alert("Corrida aceita!");
-  fecharCard();
-};
+  corridaAtual={ origem,destino,valor };
+  iniciarAndamento();
+}
 
-});
+function simularCorrida(){
+  corridaAtual={
+    origem:"Centro",
+    destino:"Aeroporto",
+    valor:65
+  };
 
+  document.getElementById("rideValor").innerText="R$ "+corridaAtual.valor;
+  document.getElementById("rideRota").innerText=corridaAtual.origem+" → "+corridaAtual.destino;
+
+  tempo=20;
+  document.getElementById("rideTimer").innerText="Tempo restante: 20s";
+
+  timerInterval=setInterval(()=>{
+    tempo--;
+    document.getElementById("rideTimer").innerText="Tempo restante: "+tempo+"s";
+    if(tempo<=0){
+      clearInterval(timerInterval);
+      recusarCorrida();
+    }
+  },1000);
+
+  setEstado("RECEBENDO");
+}
+
+function aceitarCorrida(){
+  clearInterval(timerInterval);
+  iniciarAndamento();
+}
+
+function recusarCorrida(){
+  clearInterval(timerInterval);
+  corridaAtual=null;
+  setEstado("ONLINE");
+}
+
+function iniciarAndamento(){
+  document.getElementById("andamentoValor").innerText="R$ "+corridaAtual.valor;
+  document.getElementById("andamentoRota").innerText=corridaAtual.origem+" → "+corridaAtual.destino;
+  setEstado("ANDAMENTO");
+}
+
+function finalizarCorrida(){
+  document.getElementById("finalValor").innerText="Corrida Finalizada - R$ "+corridaAtual.valor;
+  setEstado("FINALIZADA");
+}
+
+function resetarPainel(){
+  corridaAtual=null;
+  setEstado("ONLINE");
+}
+
+setEstado("OFFLINE");
 </script>
 
 </body>
