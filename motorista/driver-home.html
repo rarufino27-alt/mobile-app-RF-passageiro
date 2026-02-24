@@ -19,7 +19,6 @@ body{
   min-height:100vh;
 }
 
-/* HEADER */
 .top{
   background:#ffffff;
   padding:25px 20px 65px;
@@ -39,7 +38,6 @@ body{
   color:#facc15;
 }
 
-/* CONTENT */
 .content{
   width:90%;
   max-width:420px;
@@ -98,10 +96,13 @@ input{
   border:none;
   margin-top:8px;
 }
+
 .hidden{ display:none; }
 </style>
 </head>
 <body>
+
+<audio id="audioChamada" src="../assets/sounds/notificacao.mp3" preload="auto"></audio>
 
 <div class="top">
   <div class="logo">MOTORISTA RF</div>
@@ -110,18 +111,17 @@ input{
 
 <div class="content">
 
-  <!-- CONTROLE ONLINE -->
+  <!-- ONLINE -->
   <div class="card">
     <button class="btn btn-online" id="btnOnline" onclick="toggleOnline()">
       Ficar Online
     </button>
   </div>
 
-  <!-- BOTÃO CORRIDA MANUAL -->
-  <div class="card hidden" id="manualCard">
-    <button class="btn btn-dark" onclick="abrirManual()">
-      + Nova Corrida Manual
-    </button>
+  <!-- ONLINE OPTIONS -->
+  <div class="card hidden" id="onlineOptions">
+    <button class="btn btn-dark" onclick="abrirManual()">+ Nova Corrida Manual</button>
+    <button class="btn btn-dark" onclick="simularCorrida()">Simular Corrida Recebida</button>
   </div>
 
   <!-- FORM MANUAL -->
@@ -133,13 +133,21 @@ input{
     <button class="btn btn-dark" onclick="fecharManual()">Cancelar</button>
   </div>
 
-  <!-- CORRIDA RECEBIDA -->
+  <!-- RECEBENDO -->
   <div class="card hidden" id="recebendoCard">
     <div class="valor" id="rideValor"></div>
     <div class="rota" id="rideRota"></div>
     <div class="timer" id="rideTimer"></div>
     <button class="btn btn-green" onclick="aceitarCorrida()">Aceitar</button>
     <button class="btn btn-red" onclick="recusarCorrida()">Recusar</button>
+  </div>
+
+  <!-- INDO PASSAGEIRO -->
+  <div class="card hidden" id="indoCard">
+    <div class="valor">Indo até passageiro</div>
+    <div class="rota" id="indoRota"></div>
+    <button class="btn btn-green" onclick="cheguei()">Cheguei ao local</button>
+    <button class="btn btn-red" onclick="cancelarCorrida()">Cancelar Corrida</button>
   </div>
 
   <!-- EM ANDAMENTO -->
@@ -152,70 +160,51 @@ input{
   <!-- FINALIZADA -->
   <div class="card hidden" id="finalCard">
     <div class="valor" id="finalValor"></div>
-    <button class="btn btn-dark" onclick="resetarPainel()">Voltar ao Painel</button>
-  </div>
-
-  <!-- SIMULAR CORRIDA -->
-  <div class="card hidden" id="simularCard">
-    <button class="btn btn-dark" onclick="simularCorrida()">
-      Simular Corrida Recebida
-    </button>
+    <button class="btn btn-dark" onclick="voltarPainel()">Voltar ao Painel</button>
   </div>
 
 </div>
 
 <script>
+
 let online=false;
-let estado="OFFLINE";
+let corridaAtual=null;
 let timerInterval=null;
 let tempo=20;
-let corridaAtual=null;
 
-function setEstado(novo){
-  estado=novo;
+const audio = document.getElementById("audioChamada");
 
+function tocarAlerta(){
+  audio.currentTime=0;
+  audio.loop=true;
+  audio.play().catch(()=>{});
+}
+
+function pararAlerta(){
+  audio.pause();
+  audio.currentTime=0;
+  audio.loop=false;
+}
+
+function esconderTudo(){
   document.querySelectorAll(".card").forEach(c=>c.classList.add("hidden"));
-
-  if(estado==="OFFLINE"){
-    document.getElementById("btnOnline").innerText="Ficar Online";
-    document.getElementById("statusBadge").innerText="Offline";
-    document.getElementById("statusBadge").style.color="#facc15";
-  }
-
-  if(estado==="ONLINE"){
-    document.getElementById("manualCard").classList.remove("hidden");
-    document.getElementById("simularCard").classList.remove("hidden");
-  }
-
-  if(estado==="RECEBENDO"){
-    document.getElementById("recebendoCard").classList.remove("hidden");
-  }
-
-  if(estado==="ANDAMENTO"){
-    document.getElementById("andamentoCard").classList.remove("hidden");
-  }
-
-  if(estado==="FINALIZADA"){
-    document.getElementById("finalCard").classList.remove("hidden");
-  }
-
   document.querySelector(".content > .card").classList.remove("hidden");
 }
 
 function toggleOnline(){
   online=!online;
-
   if(online){
     document.getElementById("btnOnline").innerText="Online";
-    document.getElementById("btnOnline").classList.remove("btn-online");
-    document.getElementById("btnOnline").classList.add("btn-green");
+    document.getElementById("btnOnline").classList.replace("btn-online","btn-green");
     document.getElementById("statusBadge").innerText="Online";
     document.getElementById("statusBadge").style.color="#22c55e";
-    setEstado("ONLINE");
+    document.getElementById("onlineOptions").classList.remove("hidden");
   }else{
-    document.getElementById("btnOnline").classList.remove("btn-green");
-    document.getElementById("btnOnline").classList.add("btn-online");
-    setEstado("OFFLINE");
+    document.getElementById("btnOnline").innerText="Ficar Online";
+    document.getElementById("btnOnline").classList.replace("btn-green","btn-online");
+    document.getElementById("statusBadge").innerText="Offline";
+    document.getElementById("statusBadge").style.color="#facc15";
+    esconderTudo();
   }
 }
 
@@ -231,69 +220,75 @@ function iniciarManual(){
   const origem=document.getElementById("manualOrigem").value;
   const destino=document.getElementById("manualDestino").value;
   const valor=document.getElementById("manualValor").value;
-
-  if(!origem||!destino||!valor){
-    alert("Preencha todos os campos.");
-    return;
-  }
-
-  corridaAtual={ origem,destino,valor };
-  iniciarAndamento();
+  if(!origem||!destino||!valor) return alert("Preencha todos os campos.");
+  corridaAtual={origem,destino,valor};
+  iniciarIndo();
 }
 
 function simularCorrida(){
-  corridaAtual={
-    origem:"Centro",
-    destino:"Aeroporto",
-    valor:65
-  };
-
+  if(!online) return alert("Fique online primeiro.");
+  corridaAtual={origem:"Centro",destino:"Aeroporto",valor:65};
   document.getElementById("rideValor").innerText="R$ "+corridaAtual.valor;
   document.getElementById("rideRota").innerText=corridaAtual.origem+" → "+corridaAtual.destino;
-
   tempo=20;
   document.getElementById("rideTimer").innerText="Tempo restante: 20s";
-
+  tocarAlerta();
   timerInterval=setInterval(()=>{
     tempo--;
     document.getElementById("rideTimer").innerText="Tempo restante: "+tempo+"s";
     if(tempo<=0){
       clearInterval(timerInterval);
-      recusarCorrida();
+      pararAlerta();
+      esconderTudo();
     }
   },1000);
-
-  setEstado("RECEBENDO");
+  document.getElementById("recebendoCard").classList.remove("hidden");
 }
 
 function aceitarCorrida(){
   clearInterval(timerInterval);
-  iniciarAndamento();
+  pararAlerta();
+  iniciarIndo();
 }
 
 function recusarCorrida(){
   clearInterval(timerInterval);
-  corridaAtual=null;
-  setEstado("ONLINE");
+  pararAlerta();
+  esconderTudo();
+}
+
+function iniciarIndo(){
+  esconderTudo();
+  document.getElementById("indoCard").classList.remove("hidden");
+  document.getElementById("indoRota").innerText=corridaAtual.origem;
+}
+
+function cheguei(){
+  iniciarAndamento();
 }
 
 function iniciarAndamento(){
+  esconderTudo();
+  document.getElementById("andamentoCard").classList.remove("hidden");
   document.getElementById("andamentoValor").innerText="R$ "+corridaAtual.valor;
   document.getElementById("andamentoRota").innerText=corridaAtual.origem+" → "+corridaAtual.destino;
-  setEstado("ANDAMENTO");
 }
 
 function finalizarCorrida(){
+  esconderTudo();
+  document.getElementById("finalCard").classList.remove("hidden");
   document.getElementById("finalValor").innerText="Corrida Finalizada - R$ "+corridaAtual.valor;
-  setEstado("FINALIZADA");
 }
 
-function resetarPainel(){
-  corridaAtual=null;
-  setEstado("ONLINE");
+function cancelarCorrida(){
+  esconderTudo();
 }
 
-setEstado("OFFLINE");
+function voltarPainel(){
+  esconderTudo();
+  document.getElementById("onlineOptions").classList.remove("hidden");
+}
+
 </script>
 
 </body>
