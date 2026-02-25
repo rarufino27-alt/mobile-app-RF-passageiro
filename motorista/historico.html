@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Histórico RF</title>
+<style>
+body{background:#0f0f0f;color:#fff;font-family:sans-serif;padding:20px;}
+.card{background:#1c1c1c;padding:15px;border-radius:15px;margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<h2>Histórico de Viagens</h2>
+<h3>Total do dia: R$ <span id="totalDia"></span></h3>
+
+<div id="lista"></div>
+
+<script>
+let historico=JSON.parse(localStorage.getItem("historico_viagens"))||[];
+let totalDia=Number(localStorage.getItem("total_dia")||0);
+document.getElementById("totalDia").innerText=totalDia.toFixed(2);
+
+historico.reverse().forEach(c=>{
+  document.getElementById("lista").innerHTML+=`
+    <div class="card">
+      <div>${c.data}</div>
+      <div>Valor: R$ ${c.valor.toFixed(2)}</div>
+      <div>Taxa: R$ ${c.taxa.toFixed(2)}</div>
+      <div>Líquido: R$ ${c.liquido.toFixed(2)}</div>
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>
