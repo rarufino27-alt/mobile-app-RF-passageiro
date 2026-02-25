@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>RF – Finalização</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+
+body{
+  background:#0f0f0f;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  text-align:center;
+  padding:20px;
+}
+
+.valor{
+  font-size:52px;
+  font-weight:900;
+  margin-bottom:10px;
+}
+
+.sub{
+  opacity:.6;
+  margin-bottom:30px;
+}
+
+.btn{
+  width:100%;
+  max-width:400px;
+  padding:16px;
+  border-radius:16px;
+  border:none;
+  font-weight:700;
+  font-size:16px;
+  margin-bottom:15px;
+  cursor:pointer;
+}
+
+.btn-detalhes{
+  background:#1c1c1c;
+  color:#fff;
+  border:1px solid #333;
+}
+
+.btn-confirmar{
+  background:#22c55e;
+  color:#fff;
+}
+
+.detalhes{
+  background:#1c1c1c;
+  padding:20px;
+  border-radius:20px;
+  width:100%;
+  max-width:400px;
+  margin-top:20px;
+  display:none;
+  text-align:left;
+  font-size:14px;
+}
+
+</style>
+</head>
+<body>
+
+<div class="valor" id="valorFinal"></div>
+<div class="sub">Valor a cobrar do passageiro</div>
+
+<button class="btn btn-detalhes" onclick="toggleDetalhes()">
+Ver detalhes
+</button>
+
+<div class="detalhes" id="detalhesBox"></div>
+
+<button class="btn btn-confirmar" onclick="confirmar()">
+Confirmar Encerramento
+</button>
+
+<script>
+
+const corrida = JSON.parse(localStorage.getItem("corrida_ativa"));
+
+const agora = new Date();
+const data = agora.toLocaleDateString();
+const hora = agora.toLocaleTimeString();
+
+document.getElementById("valorFinal").innerText =
+"R$ " + Number(corrida.valor).toFixed(2);
+
+document.getElementById("detalhesBox").innerHTML = `
+<strong>Passageiro:</strong> ${corrida.passageiro || "Não informado"}<br><br>
+<strong>Origem:</strong> ${corrida.origem}<br>
+<strong>Destino:</strong> ${corrida.destino}<br>
+<strong>Forma de pagamento:</strong> ${corrida.forma_pagamento}<br><br>
+<strong>Data:</strong> ${data}<br>
+<strong>Hora:</strong> ${hora}
+`;
+
+function toggleDetalhes(){
+  const box = document.getElementById("detalhesBox");
+  box.style.display = box.style.display === "block" ? "none" : "block";
+}
+
+function confirmar(){
+
+  let historico = JSON.parse(localStorage.getItem("historico_viagens")) || [];
+
+  historico.push({
+    passageiro: corrida.passageiro || "Não informado",
+    valor: corrida.valor,
+    origem: corrida.origem,
+    destino: corrida.destino,
+    pagamento: corrida.forma_pagamento,
+    data: data,
+    hora: hora
+  });
+
+  localStorage.setItem("historico_viagens", JSON.stringify(historico));
+  localStorage.removeItem("corrida_ativa");
+
+  window.location.href = "driver-home.html";
+}
+
+</script>
+
+</body>
+</html>
