@@ -184,27 +184,99 @@ function avaliar(n){
   });
 }
 
+/* ========================= */
+/* CONFETE PROFISSIONAL */
+/* ========================= */
+
+const canvas = document.createElement("canvas");
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.width = "100%";
+canvas.style.height = "100%";
+canvas.style.pointerEvents = "none";
+canvas.style.zIndex = "999";
+document.body.appendChild(canvas);
+
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let confetes = [];
+
+function criarConfete(){
+  for(let i=0;i<120;i++){
+    confetes.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height - canvas.height,
+      r: Math.random()*6+4,
+      d: Math.random()*3+2,
+      color: ["#facc15","#22c55e","#ffffff"][Math.floor(Math.random()*3)]
+    });
+  }
+}
+
+function desenharConfete(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  confetes.forEach(c=>{
+    ctx.beginPath();
+    ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+    ctx.fillStyle=c.color;
+    ctx.fill();
+  });
+  atualizarConfete();
+}
+
+function atualizarConfete(){
+  confetes.forEach(c=>{
+    c.y += c.d;
+    if(c.y > canvas.height){
+      c.y = -10;
+    }
+  });
+}
+
+let animacao;
+
+function iniciarConfete(){
+  criarConfete();
+  animacao = setInterval(desenharConfete,20);
+
+  setTimeout(()=>{
+    clearInterval(animacao);
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  },2000);
+}
+
+/* ========================= */
+
 function confirmar(){
 
-  let historico =
-  JSON.parse(localStorage.getItem("historico_viagens")) || [];
+  iniciarConfete();
 
-  historico.push({
-    passageiro: corrida.passageiro || "Não informado",
-    valor: corrida.valor,
-    origem: corrida.origem,
-    destino: corrida.destino,
-    pagamento: corrida.forma_pagamento,
-    avaliacao: nota,
-    data: new Date().toLocaleString()
-  });
+  setTimeout(()=>{
 
-  localStorage.setItem("historico_viagens",
-  JSON.stringify(historico));
+    let historico =
+    JSON.parse(localStorage.getItem("historico_viagens")) || [];
 
-  localStorage.removeItem("corrida_ativa");
+    historico.push({
+      passageiro: corrida.passageiro || "Não informado",
+      valor: corrida.valor,
+      origem: corrida.origem,
+      destino: corrida.destino,
+      pagamento: corrida.forma_pagamento,
+      avaliacao: nota,
+      data: new Date().toLocaleString()
+    });
 
-  window.location.href="driver-home.html";
+    localStorage.setItem("historico_viagens",
+    JSON.stringify(historico));
+
+    localStorage.removeItem("corrida_ativa");
+
+    window.location.href="driver-home.html";
+
+  },2000);
 }
 
 </script>
