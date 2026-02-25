@@ -212,6 +212,8 @@ function toggleOnline(){
 /* SIMULAÇÃO */
 function simularCorrida(){
 
+  if(!online) return;
+
   corridaAtual={
     valor:12.00,
     forma_pagamento:"Dinheiro",
@@ -220,9 +222,17 @@ function simularCorrida(){
     passageiro:"Carlos"
   };
 
-  document.getElementById("pagamento").innerText=corridaAtual.forma_pagamento;
-  document.getElementById("valorCorrida").innerText="R$ "+corridaAtual.valor.toFixed(2);
-  document.getElementById("rotaCorrida").innerText=corridaAtual.origem+" → "+corridaAtual.destino;
+  document.getElementById("pagamento").innerText=
+    corridaAtual.forma_pagamento;
+
+  document.getElementById("valorCorrida").innerText=
+    "R$ "+corridaAtual.valor.toFixed(2);
+
+  document.getElementById("origemCorrida").innerText=
+    corridaAtual.origem;
+
+  document.getElementById("destinoCorrida").innerText=
+    corridaAtual.destino;
 
   audio.loop=true;
   audio.play().catch(()=>{});
