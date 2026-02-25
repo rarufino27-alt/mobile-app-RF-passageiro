@@ -115,64 +115,31 @@ input{
 <script>
 
 let estado="INDO";
-let corrida=JSON.parse(localStorage.getItem("corrida_ativa"));
-let taxaPercentual=0.15;
+let corrida = JSON.parse(localStorage.getItem("corrida_ativa"));
 
-document.getElementById("formaPagamento").innerText=corrida.forma_pagamento;
-document.getElementById("destinoInfo").innerText=corrida.destino;
+if(!corrida){
+  window.location.href = "driver-home.html";
+}
+
+document.getElementById("formaPagamento").innerText = corrida.forma_pagamento;
+document.getElementById("destinoInfo").innerText = corrida.destino;
+document.getElementById("nomePassageiro").innerText = corrida.passageiro || "Passageiro";
 
 function acaoPrincipal(){
+
   if(estado==="INDO"){
     estado="AGUARDANDO";
     document.getElementById("statusCorrida").innerText="Aguardando passageiro";
     document.getElementById("btnPrincipal").innerText="Iniciar Viagem";
   }
+
   else if(estado==="AGUARDANDO"){
-    estado="EM_ANDAMENTO";
-    document.getElementById("statusCorrida").innerText="Em andamento";
-    document.getElementById("btnPrincipal").innerText="Finalizar Corrida";
+    window.location.href = "viagem-andamento.html";
   }
-  else if(estado==="EM_ANDAMENTO"){
-    finalizarCorrida();
-  }
-}
 
-function finalizarCorrida(){
-  estado="FINALIZADA";
-  document.getElementById("botoesEstado").classList.add("hidden");
-  document.getElementById("resumoFinal").classList.remove("hidden");
-
-  let valor=corrida.valor;
-  let taxa=valor*taxaPercentual;
-  let liquido=valor-taxa;
-
-  document.getElementById("valorFinal").innerText=valor.toFixed(2);
-  document.getElementById("taxaFinal").innerText=taxa.toFixed(2);
-  document.getElementById("liquidoFinal").innerText=liquido.toFixed(2);
-
-  salvarHistorico(valor,taxa,liquido);
-}
-
-function salvarHistorico(valor,taxa,liquido){
-  let historico=JSON.parse(localStorage.getItem("historico_viagens"))||[];
-  historico.push({
-    data:new Date().toLocaleString(),
-    valor,
-    taxa,
-    liquido
-  });
-  localStorage.setItem("historico_viagens",JSON.stringify(historico));
-
-  let totalDia=Number(localStorage.getItem("total_dia")||0);
-  totalDia+=liquido;
-  localStorage.setItem("total_dia",totalDia);
 }
 
 function cancelarCorrida(){
-  window.location.href="driver-home.html";
-}
-
-function encerrar(){
   localStorage.removeItem("corrida_ativa");
   window.location.href="driver-home.html";
 }
@@ -180,7 +147,7 @@ function encerrar(){
 function enviarMsg(){
   let msg=document.getElementById("msgInput").value;
   if(!msg)return;
-  document.getElementById("chatBox").innerHTML+="<div>Você: "+msg+"</div>";
+  document.getElementById("chatBox").innerHTML += "<div>Você: "+msg+"</div>";
   document.getElementById("msgInput").value="";
 }
 
