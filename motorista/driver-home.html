@@ -192,79 +192,67 @@ body{
 
 <script>
 
-let online=false;
-let corridaAtual=null;
-const audio=document.getElementById("audioChamada");
+let online = false;
+let corridaAtual = null;
+const audio = document.getElementById("audioChamada");
 
 function tocarAlerta(){
-  audio.currentTime=0;
-  audio.loop=true;
+  audio.currentTime = 0;
+  audio.loop = true;
   audio.play().catch(()=>{});
 }
 
 function pararAlerta(){
   audio.pause();
-  audio.currentTime=0;
-  audio.loop=false;
-}
-
-function esconderCards(){
-  document.querySelectorAll("#recebendoCard,#indoCard,#andamentoCard,#finalCard")
-    .forEach(c=>c.classList.add("hidden"));
+  audio.currentTime = 0;
+  audio.loop = false;
 }
 
 function toggleOnline(){
-  online=!online;
+  online = !online;
 
   if(online){
-    document.getElementById("btnOnline").innerText="Online";
+    document.getElementById("btnOnline").innerText = "Online";
     document.getElementById("btnOnline").classList.replace("btn-online","btn-green");
-    document.getElementById("statusBadge").innerText="Online";
-    document.getElementById("statusBadge").style.color="#22c55e";
+    document.getElementById("statusBadge").innerText = "Online";
+    document.getElementById("statusBadge").style.color = "#22c55e";
     document.getElementById("onlineOptions").classList.remove("hidden");
   }else{
-    document.getElementById("btnOnline").innerText="Ficar Online";
+    document.getElementById("btnOnline").innerText = "Ficar Online";
     document.getElementById("btnOnline").classList.replace("btn-green","btn-online");
-    document.getElementById("statusBadge").innerText="Offline";
-    document.getElementById("statusBadge").style.color="#facc15";
+    document.getElementById("statusBadge").innerText = "Offline";
+    document.getElementById("statusBadge").style.color = "#facc15";
     document.getElementById("onlineOptions").classList.add("hidden");
-    esconderCards();
+    document.getElementById("recebendoCard").classList.add("hidden");
   }
 }
 
 function simularCorrida(){
+
   if(!online) return alert("Fique online primeiro.");
 
-  corridaAtual={
-    valor:8.95,
-    valor_km:4.30,
-    multiplicador:1.4,
-    forma_pagamento:"Dinheiro",
-    avaliacao:4.88,
-    total_corridas:655,
-    perfil:"Perfil Essencial",
-    origem:"Farmácia Santa Rosa, Avenida Eraldo Barros",
-    destino:"Rua Antônio Custódio de Lima",
-    tempo_origem:"5min",
-    distancia_origem:"688m",
-    tempo_destino:"4min",
-    distancia_destino:"1,4km"
+  corridaAtual = {
+    valor: 8.95,
+    forma_pagamento: "Dinheiro",
+    origem: "Farmácia Santa Rosa, Avenida Eraldo Barros",
+    destino: "Rua Antônio Custódio de Lima",
+    passageiro: "Carlos"
   };
 
-  document.getElementById("formaPagamento").innerText=corridaAtual.forma_pagamento;
-  document.getElementById("rideValorGrande").innerText="R$ "+corridaAtual.valor.toFixed(2);
-  document.getElementById("valorKm").innerText="R$ "+corridaAtual.valor_km.toFixed(2)+"/km";
-  document.getElementById("multiplicador").innerText="Preço x"+corridaAtual.multiplicador;
-  document.getElementById("avaliacao").innerText=corridaAtual.avaliacao;
-  document.getElementById("totalCorridas").innerText=corridaAtual.total_corridas;
-  document.getElementById("perfilPassageiro").innerText=corridaAtual.perfil;
-  document.getElementById("tempoOrigem").innerText=corridaAtual.tempo_origem;
-  document.getElementById("distanciaOrigem").innerText=corridaAtual.distancia_origem;
-  document.getElementById("enderecoOrigem").innerText=corridaAtual.origem;
-  document.getElementById("tempoDestino").innerText=corridaAtual.tempo_destino;
-  document.getElementById("distanciaDestino").innerText=corridaAtual.distancia_destino;
-  document.getElementById("enderecoDestino").innerText=corridaAtual.destino;
-  document.getElementById("botaoValor").innerText="R$ "+corridaAtual.valor.toFixed(2);
+  document.getElementById("formaPagamento").innerText = corridaAtual.forma_pagamento;
+  document.getElementById("rideValorGrande").innerText = "R$ " + corridaAtual.valor.toFixed(2);
+  document.getElementById("valorKm").innerText = "";
+  document.getElementById("multiplicador").innerText = "";
+  document.getElementById("avaliacao").innerText = "";
+  document.getElementById("totalCorridas").innerText = "";
+  document.getElementById("perfilPassageiro").innerText = "";
+  document.getElementById("tempoOrigem").innerText = "";
+  document.getElementById("distanciaOrigem").innerText = "";
+  document.getElementById("enderecoOrigem").innerText = corridaAtual.origem;
+  document.getElementById("tempoDestino").innerText = "";
+  document.getElementById("distanciaDestino").innerText = "";
+  document.getElementById("enderecoDestino").innerText = corridaAtual.destino;
+  document.getElementById("botaoValor").innerText = "R$ " + corridaAtual.valor.toFixed(2);
 
   tocarAlerta();
   document.getElementById("recebendoCard").classList.remove("hidden");
@@ -276,26 +264,9 @@ function aceitarCorrida(){
   window.location.href = "corrida-ativa.html";
 }
 
-function iniciarCorrida(){
-  esconderCards();
-  document.getElementById("andamentoCard").classList.remove("hidden");
-  document.getElementById("andamentoValor").innerText="R$ "+corridaAtual.valor.toFixed(2);
-  document.getElementById("andamentoRota").innerText=corridaAtual.origem+" → "+corridaAtual.destino;
-}
-
-function finalizarCorrida(){
-  esconderCards();
-  document.getElementById("finalCard").classList.remove("hidden");
-  document.getElementById("finalValor").innerText="Corrida Finalizada - R$ "+corridaAtual.valor.toFixed(2);
-}
-
-function cancelarCorrida(){
+function recusarCorrida(){
   pararAlerta();
-  esconderCards();
-}
-
-function voltarPainel(){
-  esconderCards();
+  document.getElementById("recebendoCard").classList.add("hidden");
 }
 
 </script>
