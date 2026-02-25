@@ -2,33 +2,89 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>RF – Finalização</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finalização - RF Motorista</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+:root{
+  --bg:#0f0f0f;
+  --card:#1c1c1c;
+  --text:#ffffff;
+  --text-muted:rgba(255,255,255,0.65);
+  --accent:#facc15;
+  --green:#22c55e;
+}
 
 body{
-  background:#0f0f0f;
-  color:#fff;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;
+  top:0;
+  left:-260px;
+  width:260px;
+  height:100%;
+  background:#111;
+  transition:.3s;
+  padding:20px;
+  z-index:50;
+}
+
+.sidebar.active{left:0;}
+
+.sidebar a{
+  display:block;
+  margin-bottom:15px;
+  color:var(--text-muted);
+  text-decoration:none;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px;
+  background:#111;
+}
+
+.menu-btn{
+  font-size:22px;
+  cursor:pointer;
+}
+
+.title{
+  font-weight:700;
+}
+
+/* CONTENT */
+.content{
+  flex:1;
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
-  height:100vh;
   text-align:center;
   padding:20px;
+  padding-bottom:120px;
 }
 
 .valor{
-  font-size:52px;
+  font-size:56px;
   font-weight:900;
-  margin-bottom:10px;
 }
 
 .sub{
-  opacity:.6;
-  margin-bottom:30px;
+  margin-top:10px;
+  color:var(--text-muted);
 }
 
 .btn{
@@ -39,7 +95,7 @@ body{
   border:none;
   font-weight:700;
   font-size:16px;
-  margin-bottom:15px;
+  margin-top:20px;
   cursor:pointer;
 }
 
@@ -50,42 +106,118 @@ body{
 }
 
 .btn-confirmar{
-  background:#22c55e;
+  background:var(--green);
   color:#fff;
 }
 
-.detalhes{
-  background:#1c1c1c;
-  padding:20px;
-  border-radius:20px;
+/* MODAL DETALHES */
+.modal{
+  position:fixed;
+  bottom:-100%;
+  left:0;
   width:100%;
-  max-width:400px;
-  margin-top:20px;
-  display:none;
-  text-align:left;
-  font-size:14px;
+  background:#111;
+  padding:25px;
+  border-top-left-radius:25px;
+  border-top-right-radius:25px;
+  transition:.3s;
+  z-index:60;
 }
 
+.modal.active{
+  bottom:0;
+}
+
+.modal h3{
+  margin-bottom:15px;
+}
+
+.modal p{
+  font-size:14px;
+  margin-bottom:8px;
+  color:var(--text-muted);
+}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  background:#111;
+  display:flex;
+  justify-content:space-around;
+  padding:12px 0;
+  border-top:1px solid #222;
+}
+
+.bottom-nav div{
+  font-size:12px;
+  color:var(--text-muted);
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
 
-<div class="valor" id="valorFinal"></div>
-<div class="sub">Valor a cobrar do passageiro</div>
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <a href="driver-home.html">Home</a>
+  <a href="perfil.html">Perfil</a>
+  <a href="veiculo.html">Veículo</a>
+  <a href="carteira.html">Carteira</a>
+  <a href="configuracoes.html">Configurações</a>
+</div>
 
-<button class="btn btn-detalhes" onclick="toggleDetalhes()">
-Ver detalhes
-</button>
+<!-- HEADER -->
+<div class="header">
+  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+  <div class="title">Finalização</div>
+  <div></div>
+</div>
 
-<div class="detalhes" id="detalhesBox"></div>
+<!-- CONTENT -->
+<div class="content">
 
-<button class="btn btn-confirmar" onclick="confirmar()">
-Confirmar Encerramento
-</button>
+  <div class="valor" id="valorFinal"></div>
+  <div class="sub">Valor a cobrar do passageiro</div>
+
+  <button class="btn btn-detalhes" onclick="abrirDetalhes()">
+    Ver detalhes
+  </button>
+
+  <button class="btn btn-confirmar" onclick="confirmar()">
+    Confirmar Encerramento
+  </button>
+
+</div>
+
+<!-- MODAL DETALHES -->
+<div class="modal" id="modalDetalhes">
+  <h3>Detalhes da Corrida</h3>
+  <div id="detalhesConteudo"></div>
+  <button class="btn btn-confirmar" onclick="fecharDetalhes()">Fechar</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div onclick="location.href='driver-home.html'">Home</div>
+  <div onclick="location.href='corridas.html'">Corridas</div>
+  <div onclick="location.href='carteira.html'">Carteira</div>
+  <div onclick="location.href='veiculo.html'">Veículo</div>
+  <div onclick="location.href='perfil.html'">Perfil</div>
+</div>
 
 <script>
 
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
 const corrida = JSON.parse(localStorage.getItem("corrida_ativa"));
+
+if(!corrida){
+  window.location.href = "driver-home.html";
+}
 
 const agora = new Date();
 const data = agora.toLocaleDateString();
@@ -94,18 +226,21 @@ const hora = agora.toLocaleTimeString();
 document.getElementById("valorFinal").innerText =
 "R$ " + Number(corrida.valor).toFixed(2);
 
-document.getElementById("detalhesBox").innerHTML = `
-<strong>Passageiro:</strong> ${corrida.passageiro || "Não informado"}<br><br>
-<strong>Origem:</strong> ${corrida.origem}<br>
-<strong>Destino:</strong> ${corrida.destino}<br>
-<strong>Forma de pagamento:</strong> ${corrida.forma_pagamento}<br><br>
-<strong>Data:</strong> ${data}<br>
-<strong>Hora:</strong> ${hora}
+document.getElementById("detalhesConteudo").innerHTML = `
+<p><strong>Passageiro:</strong> ${corrida.passageiro || "-"}</p>
+<p><strong>Origem:</strong> ${corrida.origem}</p>
+<p><strong>Destino:</strong> ${corrida.destino}</p>
+<p><strong>Forma de pagamento:</strong> ${corrida.forma_pagamento}</p>
+<p><strong>Data:</strong> ${data}</p>
+<p><strong>Hora:</strong> ${hora}</p>
 `;
 
-function toggleDetalhes(){
-  const box = document.getElementById("detalhesBox");
-  box.style.display = box.style.display === "block" ? "none" : "block";
+function abrirDetalhes(){
+  document.getElementById("modalDetalhes").classList.add("active");
+}
+
+function fecharDetalhes(){
+  document.getElementById("modalDetalhes").classList.remove("active");
 }
 
 function confirmar(){
@@ -113,7 +248,7 @@ function confirmar(){
   let historico = JSON.parse(localStorage.getItem("historico_viagens")) || [];
 
   historico.push({
-    passageiro: corrida.passageiro || "Não informado",
+    passageiro: corrida.passageiro || "-",
     valor: corrida.valor,
     origem: corrida.origem,
     destino: corrida.destino,
