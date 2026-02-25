@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RF – Offline</title>
+
+<style>
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:#ffffff;
+  color:#000;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  height:100vh;
+}
+
+.top{
+  padding:30px 20px;
+  font-size:22px;
+  font-weight:700;
+}
+
+.center{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  color:#777;
+}
+
+.bottom{
+  padding:20px;
+}
+
+.btn-online{
+  width:100%;
+  padding:18px;
+  border:none;
+  border-radius:40px;
+  background:#22c55e;
+  color:#fff;
+  font-size:18px;
+  font-weight:800;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  Você está offline
+</div>
+
+<div class="center">
+  Fique online para começar a receber viagens
+</div>
+
+<div class="bottom">
+  <button class="btn-online" onclick="ficarOnline()">
+    Ficar Online
+  </button>
+</div>
+
+<script>
+function ficarOnline(){
+  window.location.href="driver-home.html";
+}
+</script>
+
+</body>
+</html>
