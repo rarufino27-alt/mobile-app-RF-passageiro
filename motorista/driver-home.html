@@ -10,25 +10,23 @@
   --verde:#22c55e;
   --preto:#111;
   --cinza:#777;
-  --vermelho:#ef4444;
-  --card:#ffffff;
 }
 
 body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:#f2f4f7;
+  background:#eef1f5;
   overflow:hidden;
 }
 
-/* MAPA SIMULADO */
+/* MAPA */
 #map{
   position:absolute;
   inset:0;
   background:linear-gradient(180deg,#dfe6e9,#cfd8dc);
 }
 
-/* MENU */
+/* MENU LATERAL */
 .menu{
   position:fixed;
   top:0;
@@ -39,7 +37,7 @@ body{
   color:#fff;
   padding:25px;
   transition:.3s;
-  z-index:20;
+  z-index:50;
 }
 
 .menu.active{
@@ -56,14 +54,14 @@ body{
   inset:0;
   background:rgba(0,0,0,.4);
   display:none;
-  z-index:15;
+  z-index:40;
 }
 
 .overlay.active{
   display:block;
 }
 
-/* TOP BAR */
+/* TOPO */
 .top-bar{
   position:absolute;
   top:20px;
@@ -72,7 +70,7 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  z-index:10;
+  z-index:30;
 }
 
 .menu-btn{
@@ -88,20 +86,19 @@ body{
   cursor:pointer;
 }
 
-/* CREDITOS MINIMALISTA */
 .credit-box{
   background:#111;
   color:#fff;
-  padding:8px 18px;
+  padding:8px 16px;
   border-radius:20px;
   font-size:13px;
   font-weight:600;
 }
 
-/* CARD GANHOS DO DIA */
+/* GANHOS */
 .day-card{
   position:absolute;
-  top:90px;
+  top:100px;
   left:50%;
   transform:translateX(-50%);
   width:85%;
@@ -111,7 +108,7 @@ body{
   border-radius:20px;
   text-align:center;
   box-shadow:0 10px 30px rgba(0,0,0,.08);
-  z-index:5;
+  z-index:20;
 }
 
 .day-card h3{
@@ -121,31 +118,15 @@ body{
 }
 
 .day-card .valor{
-  font-size:32px;
+  font-size:34px;
   font-weight:800;
   margin-top:5px;
-}
-
-/* STATUS */
-.status-bar{
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#fff;
-  padding:20px;
-  border-top-left-radius:25px;
-  border-top-right-radius:25px;
-  text-align:center;
-  font-weight:700;
-  font-size:18px;
-  box-shadow:0 -10px 25px rgba(0,0,0,.08);
 }
 
 /* CARD CORRIDA */
 .request-card{
   position:absolute;
-  bottom:140px;
+  bottom:150px;
   left:15px;
   right:15px;
   background:#1c1c1c;
@@ -153,7 +134,7 @@ body{
   border-radius:25px;
   padding:20px;
   display:none;
-  z-index:10;
+  z-index:30;
 }
 
 .request-card.active{
@@ -192,6 +173,33 @@ body{
   color:#fff;
   margin-right:10px;
 }
+
+/* BOTÃO ONLINE/OFFLINE */
+.online-toggle{
+  position:absolute;
+  bottom:30px;
+  left:50%;
+  transform:translateX(-50%);
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background:var(--verde);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+  animation:pulse 2s infinite;
+  z-index:30;
+}
+
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(34,197,94,.6);}
+  70%{box-shadow:0 0 0 20px rgba(34,197,94,0);}
+  100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}
+}
 </style>
 </head>
 <body>
@@ -209,7 +217,7 @@ body{
 
 <div id="overlay" class="overlay" onclick="toggleMenu()"></div>
 
-<!-- TOP -->
+<!-- TOPO -->
 <div class="top-bar">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
   <div class="credit-box">
@@ -217,7 +225,7 @@ body{
   </div>
 </div>
 
-<!-- GANHOS DO DIA -->
+<!-- GANHOS -->
 <div class="day-card">
   <h3>Ganhos Hoje</h3>
   <div class="valor">R$ <span id="ganhosDia">0.00</span></div>
@@ -235,13 +243,14 @@ body{
   </div>
 </div>
 
-<!-- STATUS -->
-<div class="status-bar" id="statusBar"></div>
+<!-- BOTÃO OFFLINE -->
+<div class="online-toggle" onclick="ficarOffline()">
+  Online
+</div>
 
 <script>
 
-const TAXA = 0.15;
-let online = false;
+let online = true; // entra online automaticamente
 let corridaValor = 10.00;
 let audio = new Audio("https://rarufino27-alt.github.io/mobile-app-RF/assets/sounds/notificacao.mp3");
 audio.loop = true;
@@ -263,43 +272,10 @@ function atualizarCreditos(){
   return c;
 }
 
-/* GANHOS DO DIA */
+/* GANHOS */
 function atualizarGanhos(){
   let g = parseFloat(localStorage.getItem("ganhosDia")) || 0;
   document.getElementById("ganhosDia").innerText = g.toFixed(2);
-}
-
-/* STATUS */
-function atualizarStatus(){
-  let creditos = atualizarCreditos();
-  atualizarGanhos();
-
-  if(creditos <= 0){
-    online = false;
-    document.getElementById("statusBar").innerHTML =
-      'Sem créditos disponíveis<br><button onclick="ir(\'carteira.html\')">Recarregar</button>';
-    return;
-  }
-
-  if(!online){
-    document.getElementById("statusBar").innerHTML =
-      '<button onclick="ficarOnline()">Ficar Online</button>';
-  }else{
-    document.getElementById("statusBar").innerText = "Buscando corridas...";
-    simularCorrida();
-  }
-}
-
-/* ENTRAR ONLINE AUTOMATICAMENTE */
-if(localStorage.getItem("autoOnline") === "true"){
-  online = true;
-  localStorage.removeItem("autoOnline");
-}
-
-/* ONLINE */
-function ficarOnline(){
-  online = true;
-  atualizarStatus();
 }
 
 /* SIMULAÇÃO */
@@ -322,10 +298,19 @@ function aceitar(){
 function recusar(){
   audio.pause();
   document.getElementById("requestCard").classList.remove("active");
+  simularCorrida();
+}
+
+/* OFFLINE */
+function ficarOffline(){
+  online = false;
+  window.location.href="offline.html";
 }
 
 /* INIT */
-atualizarStatus();
+atualizarCreditos();
+atualizarGanhos();
+simularCorrida();
 
 </script>
 
