@@ -2,21 +2,47 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>RF – Viagem em Andamento</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viagem em Andamento - RF Motorista</title>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+:root{
+  --bg:#0f0f0f;
+  --card:#1c1c1c;
+  --text:#ffffff;
+  --text-muted:rgba(255,255,255,0.65);
+  --accent:#facc15;
+  --green:#22c55e;
+  --red:#ef4444;
 }
 
 body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   background:#000;
-  height:100vh;
   overflow:hidden;
+}
+
+/* SIDEBAR */
+.sidebar{
+  position:fixed;
+  top:0;
+  left:-260px;
+  width:260px;
+  height:100%;
+  background:#111;
+  transition:.3s;
+  padding:20px;
+  z-index:50;
+}
+
+.sidebar.active{left:0;}
+
+.sidebar a{
+  display:block;
+  margin-bottom:15px;
+  color:var(--text-muted);
+  text-decoration:none;
 }
 
 /* MAPA FULL */
@@ -29,19 +55,32 @@ body{
   background:#111;
 }
 
-/* HEADER FLUTUANTE */
-.top-status{
+/* TOP BAR FLUTUANTE */
+.top-bar{
   position:absolute;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
+  top:15px;
+  left:15px;
+  right:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  z-index:30;
+}
+
+.menu-btn{
   background:#111;
   color:#fff;
-  padding:10px 18px;
+  padding:8px 12px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.status{
+  background:#111;
+  padding:8px 14px;
   border-radius:20px;
-  font-size:14px;
-  z-index:10;
-  box-shadow:0 5px 15px rgba(0,0,0,.4);
+  font-size:13px;
+  color:#fff;
 }
 
 /* BOTTOM SHEET */
@@ -50,12 +89,12 @@ body{
   bottom:0;
   left:0;
   width:100%;
-  background:#0f0f0f;
+  background:var(--bg);
   border-top-left-radius:25px;
   border-top-right-radius:25px;
   padding:20px;
   box-shadow:0 -10px 30px rgba(0,0,0,.6);
-  z-index:10;
+  z-index:30;
 }
 
 .handle{
@@ -68,7 +107,7 @@ body{
 
 .tempo{
   font-size:14px;
-  opacity:.7;
+  color:var(--text-muted);
 }
 
 .nome{
@@ -79,7 +118,7 @@ body{
 
 .rota{
   font-size:13px;
-  opacity:.6;
+  color:var(--text-muted);
   margin-top:4px;
   margin-bottom:15px;
 }
@@ -95,40 +134,46 @@ body{
   cursor:pointer;
 }
 
-.btn-principal{
-  background:#22c55e;
-  color:#fff;
-}
-
-.btn-finalizar{
-  background:#ef4444;
-  color:#fff;
-}
-
-.btn-secundario{
+.btn-green{background:var(--green);color:#fff;}
+.btn-red{background:var(--red);color:#fff;}
+.btn-dark{
   background:#1c1c1c;
   color:#fff;
   border:1px solid #333;
 }
-
 </style>
 </head>
 <body>
 
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <a href="driver-home.html">Home</a>
+  <a href="perfil.html">Perfil</a>
+  <a href="veiculo.html">Veículo</a>
+  <a href="carteira.html">Carteira</a>
+  <a href="configuracoes.html">Configurações</a>
+</div>
+
+<!-- MAPA -->
 <div id="map">
   <!-- Google Maps será integrado aqui -->
 </div>
 
-<div class="top-status" id="statusTexto">
-  Indo até passageiro
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+  <div class="status" id="statusTexto">
+    Indo até passageiro
+  </div>
 </div>
 
+<!-- BOTTOM SHEET -->
 <div class="bottom-sheet">
 
   <div class="handle"></div>
 
   <div class="tempo" id="tempoInfo">
-    6 min • 1,8 km
+    Tempo estimado até chegada
   </div>
 
   <div class="nome" id="nomePassageiro">
@@ -139,17 +184,21 @@ body{
     Origem → Destino
   </div>
 
-  <button class="btn btn-principal" id="btnPrincipal" onclick="acaoPrincipal()">
+  <button class="btn btn-green" id="btnPrincipal" onclick="acaoPrincipal()">
     Cheguei
   </button>
 
-  <button class="btn btn-secundario" onclick="abrirWaze()">
-    Abrir no Waze
+  <button class="btn btn-dark" onclick="abrirNavegacao()">
+    Navegar
   </button>
 
 </div>
 
 <script>
+
+function toggleSidebar(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
 
 let estado = "INDO";
 let corrida = JSON.parse(localStorage.getItem("corrida_ativa"));
@@ -173,8 +222,8 @@ function acaoPrincipal(){
     estado = "EM_ANDAMENTO";
     document.getElementById("statusTexto").innerText = "Viagem em andamento";
     document.getElementById("btnPrincipal").innerText = "Finalizar Corrida";
-    document.getElementById("btnPrincipal").classList.remove("btn-principal");
-    document.getElementById("btnPrincipal").classList.add("btn-finalizar");
+    document.getElementById("btnPrincipal").classList.remove("btn-green");
+    document.getElementById("btnPrincipal").classList.add("btn-red");
   }
 
   else if(estado === "EM_ANDAMENTO"){
@@ -183,9 +232,17 @@ function acaoPrincipal(){
 
 }
 
-function abrirWaze(){
+function abrirNavegacao(){
   const destino = encodeURIComponent(corrida.destino);
-  window.open("https://waze.com/ul?q=" + destino + "&navigate=yes");
+
+  const waze = "waze://?q=" + destino + "&navigate=yes";
+  const google = "https://www.google.com/maps/dir/?api=1&destination=" + destino;
+
+  window.location.href = waze;
+
+  setTimeout(()=>{
+    window.location.href = google;
+  },1200);
 }
 
 </script>
