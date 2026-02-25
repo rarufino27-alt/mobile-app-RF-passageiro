@@ -210,6 +210,8 @@ body{
 <script>
 
 let online = false;
+let audio = new Audio("https://rarufino27-alt.github.io/mobile-app-RF/assets/sounds/notificacao.mp3");
+audio.loop = true;
 
 /* ATUALIZA SALDO */
 function atualizarSaldo(){
@@ -268,7 +270,24 @@ function simularCorrida(){
     }
 
     document.getElementById("requestCard").classList.add("active");
+
+    tocarSom();
   },5000);
+}
+
+/* SOM */
+function tocarSom(){
+  let somAtivo = localStorage.getItem("som");
+
+  if(somAtivo === "off") return;
+
+  audio.currentTime = 0;
+  audio.play().catch(e => console.log("Autoplay bloqueado:", e));
+}
+
+function pararSom(){
+  audio.pause();
+  audio.currentTime = 0;
 }
 
 /* ACEITAR */
@@ -284,6 +303,8 @@ function aceitar(){
   localStorage.setItem("creditos", saldo);
   atualizarSaldo();
 
+  pararSom();
+
   alert("Corrida aceita! 1 crédito descontado.");
   document.getElementById("requestCard").classList.remove("active");
 
@@ -296,6 +317,7 @@ function aceitar(){
 
 /* RECUSAR */
 function recusar(){
+  pararSom();
   document.getElementById("requestCard").classList.remove("active");
   simularCorrida();
 }
