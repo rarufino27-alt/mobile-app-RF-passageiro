@@ -7,19 +7,18 @@
 
 <style>
 :root{
-  --bg:#0f0f0f;
-  --card:#1c1c1c;
-  --text:#ffffff;
-  --text-muted:rgba(255,255,255,0.65);
-  --accent:#facc15;
-  --green:#22c55e;
+  --verde:#22c55e;
+  --cinza:#777;
+  --vermelho:#ef4444;
 }
+
+*{ box-sizing:border-box; }
 
 body{
   margin:0;
-  background:var(--bg);
-  color:var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:#ffffff;
+  color:#111;
 }
 
 /* HEADER */
@@ -28,32 +27,54 @@ body{
   align-items:center;
   justify-content:space-between;
   padding:20px;
-  background:#111;
+  border-bottom:1px solid #eee;
 }
 
-.menu-btn{font-size:22px;cursor:pointer;}
-.title{font-weight:700;}
+.menu-btn{
+  font-size:24px;
+  cursor:pointer;
+}
 
-/* SIDEBAR */
-.sidebar{
+.title{
+  font-weight:800;
+  font-size:18px;
+}
+
+.spacer{ width:24px; }
+
+/* MENU */
+.menu{
   position:fixed;
   top:0;
-  left:-260px;
-  width:260px;
+  left:-280px;
+  width:280px;
   height:100%;
   background:#111;
+  color:#fff;
+  padding:25px 20px;
   transition:.3s;
-  padding:20px;
+  z-index:20;
 }
 
-.sidebar.active{left:0;}
+.menu.active{ left:0; }
 
-.sidebar a{
-  display:block;
-  margin-bottom:15px;
-  color:var(--text-muted);
-  text-decoration:none;
+.menu-item{
+  margin:18px 0;
+  cursor:pointer;
+  font-weight:600;
 }
+
+.menu-item:hover{ color:var(--verde); }
+
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  z-index:15;
+}
+
+.overlay.active{ display:block; }
 
 /* CONTENT */
 .content{
@@ -62,21 +83,22 @@ body{
 }
 
 .card{
-  background:var(--card);
+  background:#fff;
   padding:20px;
-  border-radius:18px;
+  border-radius:20px;
+  box-shadow:0 5px 20px rgba(0,0,0,0.05);
   margin-bottom:15px;
 }
 
 .saldo{
-  font-size:34px;
+  font-size:32px;
   font-weight:800;
 }
 
 .sub{
-  color:var(--text-muted);
-  margin-top:4px;
+  color:var(--cinza);
   font-size:14px;
+  margin-top:4px;
 }
 
 .linha{
@@ -90,8 +112,17 @@ body{
 }
 
 .historico-item{
-  padding:12px 0;
-  border-bottom:1px solid #222;
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+  font-size:14px;
+}
+
+.input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  margin-top:10px;
   font-size:14px;
 }
 
@@ -101,9 +132,16 @@ body{
   border-radius:14px;
   border:none;
   font-weight:700;
-  background:var(--accent);
+  background:var(--verde);
+  color:#fff;
   cursor:pointer;
   margin-top:15px;
+}
+
+.alerta{
+  margin-top:10px;
+  font-size:13px;
+  color:var(--vermelho);
 }
 
 /* BOTTOM NAV */
@@ -111,94 +149,148 @@ body{
   position:fixed;
   bottom:0;
   width:100%;
-  background:#111;
+  background:#ffffff;
   display:flex;
   justify-content:space-around;
   padding:12px 0;
-  border-top:1px solid #222;
+  border-top:1px solid #eee;
 }
 
 .bottom-nav div{
   font-size:12px;
-  color:var(--text-muted);
+  color:#777;
+  cursor:pointer;
 }
 
 .bottom-nav .active{
-  color:var(--accent);
+  color:var(--verde);
+  font-weight:700;
 }
 </style>
 </head>
 <body>
 
-<div class="sidebar" id="sidebar">
-  <a href="driver-home.html">Home</a>
-  <a href="perfil.html">Perfil</a>
-  <a href="veiculo.html">Veículo</a>
-  <a href="configuracoes.html">Configurações</a>
+<!-- MENU -->
+<div id="menu" class="menu">
+  <div class="menu-item" onclick="ir('offline.html')">🏠 Início</div>
+  <div class="menu-item" onclick="ir('politica.html')">📄 Política de Privacidade</div>
+  <div class="menu-item" onclick="ir('termos.html')">📑 Termos de Uso</div>
+  <div class="menu-item" onclick="ir('configuracoes.html')">⚙ Configurações</div>
 </div>
 
+<div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+
 <div class="header">
-  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+  <div class="menu-btn" onclick="toggleMenu()">☰</div>
   <div class="title">Carteira</div>
-  <div></div>
+  <div class="spacer"></div>
 </div>
 
 <div class="content">
 
   <!-- SALDO -->
   <div class="card">
-    <div class="saldo">R$ 0,00</div>
-    <div class="sub">Saldo disponível</div>
+    <div class="saldo">R$ <span id="saldo">0.00</span></div>
+    <div class="sub">Créditos disponíveis</div>
   </div>
 
-  <!-- RESUMO -->
+  <!-- RECARGA -->
   <div class="card">
-    <div class="linha">
-      <div>Ganhos hoje</div>
-      <div class="valor">R$ 0,00</div>
-    </div>
-
-    <div class="linha">
-      <div>Ganhos semana</div>
-      <div class="valor">R$ 0,00</div>
-    </div>
-
-    <div class="linha">
-      <div>Total de corridas</div>
-      <div class="valor">0</div>
-    </div>
+    <strong>Adicionar Créditos</strong>
+    <input type="number" step="0.01" id="valorRecarga" class="input" placeholder="Valor em R$">
+    <button class="btn" onclick="recargar()">Adicionar</button>
+    <div id="alertaCredito" class="alerta"></div>
   </div>
 
   <!-- HISTÓRICO -->
   <div class="card">
-    <strong>Últimas corridas</strong>
-
-    <div class="historico-item">
-      25/02 • R$ 12,00
-    </div>
-
-    <div class="historico-item">
-      24/02 • R$ 9,50
-    </div>
-
+    <strong>Histórico de Recargas</strong>
+    <div id="historico"></div>
   </div>
-
-  <button class="btn">Solicitar Saque</button>
 
 </div>
 
 <div class="bottom-nav">
   <div onclick="location.href='driver-home.html'">Home</div>
-  <div>Corridas</div>
+  <div onclick="location.href='corridas.html'">Corridas</div>
   <div class="active">Carteira</div>
   <div onclick="location.href='veiculo.html'">Veículo</div>
   <div onclick="location.href='perfil.html'">Perfil</div>
 </div>
 
 <script>
-function toggleSidebar(){
-  document.getElementById("sidebar").classList.toggle("active");
+
+/* MENU */
+function toggleMenu(){
+  document.getElementById("menu").classList.toggle("active");
+  document.getElementById("overlay").classList.toggle("active");
 }
+
+function ir(pagina){
+  window.location.href = pagina;
+}
+
+/* DADOS */
+function atualizarSaldo(){
+  let saldo = parseFloat(localStorage.getItem("creditos")) || 0;
+  document.getElementById("saldo").innerText = saldo.toFixed(2);
+
+  if(saldo <= 0){
+    document.getElementById("alertaCredito").innerText =
+      "Você precisa de créditos para receber corridas.";
+  }else{
+    document.getElementById("alertaCredito").innerText = "";
+  }
+}
+
+function recargar(){
+  let valor = parseFloat(document.getElementById("valorRecarga").value);
+
+  if(!valor || valor <= 0){
+    alert("Informe um valor válido.");
+    return;
+  }
+
+  let saldoAtual = parseFloat(localStorage.getItem("creditos")) || 0;
+  let novoSaldo = saldoAtual + valor;
+
+  localStorage.setItem("creditos", novoSaldo.toFixed(2));
+
+  salvarHistorico(valor);
+
+  document.getElementById("valorRecarga").value = "";
+  atualizarSaldo();
+  carregarHistorico();
+}
+
+function salvarHistorico(valor){
+  let historico = JSON.parse(localStorage.getItem("historico_creditos")) || [];
+
+  historico.unshift({
+    data: new Date().toLocaleDateString(),
+    valor: valor.toFixed(2)
+  });
+
+  localStorage.setItem("historico_creditos", JSON.stringify(historico));
+}
+
+function carregarHistorico(){
+  let historico = JSON.parse(localStorage.getItem("historico_creditos")) || [];
+  let container = document.getElementById("historico");
+  container.innerHTML = "";
+
+  historico.forEach(item=>{
+    container.innerHTML += `
+      <div class="historico-item">
+        ${item.data} • + R$ ${item.valor}
+      </div>
+    `;
+  });
+}
+
+atualizarSaldo();
+carregarHistorico();
+
 </script>
 
 </body>
