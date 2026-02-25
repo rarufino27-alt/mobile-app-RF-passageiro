@@ -185,6 +185,8 @@ if(!corrida){
 
 document.getElementById("origemTopo").innerText = corrida.origem;
 
+document.getElementById("nomePassageiro").innerText=corrida.passageiro || "Passageiro";
+
 function toggleInfo(){
   const box=document.getElementById("infoPassageiro");
   box.style.display = box.style.display==="block" ? "none" : "block";
