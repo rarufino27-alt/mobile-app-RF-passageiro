@@ -3,264 +3,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Finalização - RF Motorista</title>
+<title>RF – Finalização</title>
 
 <style>
 :root{
-  --bg:#0f0f0f;
-  --card:#1c1c1c;
-  --text:#ffffff;
-  --text-muted:rgba(255,255,255,0.65);
-  --accent:#facc15;
-  --green:#22c55e;
+  --preto:#0f0f0f;
+  --branco:#ffffff;
+  --amarelo:#facc15;
+  --verde:#22c55e;
+  --vermelho:#ef4444;
 }
 
 body{
   margin:0;
-  background:var(--bg);
-  color:var(--text);
+  background:var(--preto);
+  color:var(--branco);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-}
-
-/* SIDEBAR */
-.sidebar{
-  position:fixed;
-  top:0;
-  left:-260px;
-  width:260px;
-  height:100%;
-  background:#111;
-  transition:.3s;
-  padding:20px;
-  z-index:50;
-}
-
-.sidebar.active{left:0;}
-
-.sidebar a{
-  display:block;
-  margin-bottom:15px;
-  color:var(--text-muted);
-  text-decoration:none;
-}
-
-/* HEADER */
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:20px;
-  background:#111;
-}
-
-.menu-btn{
-  font-size:22px;
-  cursor:pointer;
-}
-
-.title{
-  font-weight:700;
-}
-
-/* CONTENT */
-.content{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
   text-align:center;
-  padding:20px;
-  padding-bottom:120px;
+}
+
+/* TOPO */
+.top{
+  background:#fff;
+  padding:25px 20px 35px;
+  border-bottom-left-radius:35px;
+  border-bottom-right-radius:35px;
+  color:#000;
+}
+
+.top-header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  font-weight:700;
+  font-size:16px;
+}
+
+.status{
+  margin-top:10px;
+  font-size:20px;
+  font-weight:900;
+  color:var(--verde);
+}
+
+/* CENTRO */
+.container{
+  padding:40px 20px;
 }
 
 .valor{
-  font-size:56px;
+  font-size:48px;
   font-weight:900;
+  margin-bottom:10px;
 }
 
-.sub{
-  margin-top:10px;
-  color:var(--text-muted);
+.pagamento{
+  font-size:16px;
+  opacity:.7;
+  margin-bottom:30px;
 }
 
+.info{
+  background:#1c1c1c;
+  padding:20px;
+  border-radius:20px;
+  margin-bottom:30px;
+  text-align:left;
+  font-size:14px;
+}
+
+.label{
+  opacity:.6;
+  font-size:12px;
+}
+
+.valor-info{
+  margin-bottom:15px;
+  font-weight:600;
+}
+
+/* AVALIAÇÃO */
+.avaliacao{
+  margin-bottom:30px;
+}
+
+.estrela{
+  font-size:28px;
+  cursor:pointer;
+  color:#444;
+}
+
+.estrela.ativa{
+  color:var(--amarelo);
+}
+
+/* BOTÃO */
 .btn{
   width:100%;
-  max-width:400px;
-  padding:16px;
-  border-radius:16px;
+  padding:18px;
   border:none;
-  font-weight:700;
-  font-size:16px;
-  margin-top:20px;
+  border-radius:25px;
+  background:var(--verde);
+  color:#fff;
+  font-weight:800;
+  font-size:18px;
   cursor:pointer;
 }
 
-.btn-detalhes{
-  background:#1c1c1c;
-  color:#fff;
-  border:1px solid #333;
-}
-
-.btn-confirmar{
-  background:var(--green);
-  color:#fff;
-}
-
-/* MODAL DETALHES */
-.modal{
-  position:fixed;
-  bottom:-100%;
-  left:0;
-  width:100%;
-  background:#111;
-  padding:25px;
-  border-top-left-radius:25px;
-  border-top-right-radius:25px;
-  transition:.3s;
-  z-index:60;
-}
-
-.modal.active{
-  bottom:0;
-}
-
-.modal h3{
-  margin-bottom:15px;
-}
-
-.modal p{
-  font-size:14px;
-  margin-bottom:8px;
-  color:var(--text-muted);
-}
-
-/* BOTTOM NAV */
-.bottom-nav{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:#111;
-  display:flex;
-  justify-content:space-around;
-  padding:12px 0;
-  border-top:1px solid #222;
-}
-
-.bottom-nav div{
-  font-size:12px;
-  color:var(--text-muted);
-  cursor:pointer;
-}
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <a href="driver-home.html">Home</a>
-  <a href="perfil.html">Perfil</a>
-  <a href="veiculo.html">Veículo</a>
-  <a href="carteira.html">Carteira</a>
-  <a href="configuracoes.html">Configurações</a>
+<div class="top">
+  <div class="top-header">
+    <img src="../assets/icons/icon-192.png" style="height:26px;">
+    RF
+  </div>
+  <div class="status">
+    Viagem Concluída
+  </div>
 </div>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
-  <div class="title">Finalização</div>
-  <div></div>
-</div>
-
-<!-- CONTENT -->
-<div class="content">
+<div class="container">
 
   <div class="valor" id="valorFinal"></div>
-  <div class="sub">Valor a cobrar do passageiro</div>
 
-  <button class="btn btn-detalhes" onclick="abrirDetalhes()">
-    Ver detalhes
+  <div class="pagamento" id="formaPagamento"></div>
+
+  <div class="info">
+    <div class="label">ORIGEM</div>
+    <div class="valor-info" id="origemInfo"></div>
+
+    <div class="label">DESTINO</div>
+    <div class="valor-info" id="destinoInfo"></div>
+  </div>
+
+  <div class="avaliacao">
+    <div style="margin-bottom:10px;">Avalie o passageiro</div>
+    <span class="estrela" onclick="avaliar(1)">★</span>
+    <span class="estrela" onclick="avaliar(2)">★</span>
+    <span class="estrela" onclick="avaliar(3)">★</span>
+    <span class="estrela" onclick="avaliar(4)">★</span>
+    <span class="estrela" onclick="avaliar(5)">★</span>
+  </div>
+
+  <button class="btn" onclick="confirmar()">
+    Confirmar e Encerrar
   </button>
 
-  <button class="btn btn-confirmar" onclick="confirmar()">
-    Confirmar Encerramento
-  </button>
-
-</div>
-
-<!-- MODAL DETALHES -->
-<div class="modal" id="modalDetalhes">
-  <h3>Detalhes da Corrida</h3>
-  <div id="detalhesConteudo"></div>
-  <button class="btn btn-confirmar" onclick="fecharDetalhes()">Fechar</button>
-</div>
-
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <div onclick="location.href='driver-home.html'">Home</div>
-  <div onclick="location.href='corridas.html'">Corridas</div>
-  <div onclick="location.href='carteira.html'">Carteira</div>
-  <div onclick="location.href='veiculo.html'">Veículo</div>
-  <div onclick="location.href='perfil.html'">Perfil</div>
 </div>
 
 <script>
 
-function toggleSidebar(){
-  document.getElementById("sidebar").classList.toggle("active");
-}
-
-const corrida = JSON.parse(localStorage.getItem("corrida_ativa"));
+let corrida = JSON.parse(localStorage.getItem("corrida_ativa"));
 
 if(!corrida){
-  window.location.href = "driver-home.html";
+  window.location.href="driver-home.html";
 }
-
-const agora = new Date();
-const data = agora.toLocaleDateString();
-const hora = agora.toLocaleTimeString();
 
 document.getElementById("valorFinal").innerText =
 "R$ " + Number(corrida.valor).toFixed(2);
 
-document.getElementById("detalhesConteudo").innerHTML = `
-<p><strong>Passageiro:</strong> ${corrida.passageiro || "-"}</p>
-<p><strong>Origem:</strong> ${corrida.origem}</p>
-<p><strong>Destino:</strong> ${corrida.destino}</p>
-<p><strong>Forma de pagamento:</strong> ${corrida.forma_pagamento}</p>
-<p><strong>Data:</strong> ${data}</p>
-<p><strong>Hora:</strong> ${hora}</p>
-`;
+document.getElementById("formaPagamento").innerText =
+"Forma de pagamento: " + corrida.forma_pagamento;
 
-function abrirDetalhes(){
-  document.getElementById("modalDetalhes").classList.add("active");
-}
+document.getElementById("origemInfo").innerText =
+corrida.origem;
 
-function fecharDetalhes(){
-  document.getElementById("modalDetalhes").classList.remove("active");
+document.getElementById("destinoInfo").innerText =
+corrida.destino;
+
+let nota = 0;
+
+function avaliar(n){
+  nota = n;
+  const estrelas = document.querySelectorAll(".estrela");
+  estrelas.forEach((e,i)=>{
+    e.classList.toggle("ativa", i < n);
+  });
 }
 
 function confirmar(){
 
-  let historico = JSON.parse(localStorage.getItem("historico_viagens")) || [];
+  let historico =
+  JSON.parse(localStorage.getItem("historico_viagens")) || [];
 
   historico.push({
-    passageiro: corrida.passageiro || "-",
+    passageiro: corrida.passageiro || "Não informado",
     valor: corrida.valor,
     origem: corrida.origem,
     destino: corrida.destino,
     pagamento: corrida.forma_pagamento,
-    data: data,
-    hora: hora
+    avaliacao: nota,
+    data: new Date().toLocaleString()
   });
 
-  localStorage.setItem("historico_viagens", JSON.stringify(historico));
+  localStorage.setItem("historico_viagens",
+  JSON.stringify(historico));
+
   localStorage.removeItem("corrida_ativa");
 
-  window.location.href = "driver-home.html";
+  window.location.href="driver-home.html";
 }
 
 </script>
