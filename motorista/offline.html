@@ -16,10 +16,10 @@ body{
   margin:0;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   background:#ffffff;
-  overflow:hidden;
   display:flex;
   flex-direction:column;
   height:100vh;
+  overflow:hidden;
 }
 
 /* TOPO */
@@ -37,36 +37,43 @@ body{
   margin:0;
   font-size:22px;
   font-weight:800;
-  color:#000;
 }
 
-/* MAPA ANIMADO */
-.fake-map{
+/* SLIDER */
+.slider{
   flex:1;
   position:relative;
-  background:#f4f4f4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:0 30px;
   overflow:hidden;
 }
 
-.line{
+.slide{
   position:absolute;
-  width:200%;
-  height:2px;
-  background:rgba(0,0,0,.05);
-  animation:move 10s linear infinite;
+  opacity:0;
+  transform:translateX(30px);
+  transition:0.6s ease;
 }
 
-.line:nth-child(1){ top:20%; animation-duration:12s;}
-.line:nth-child(2){ top:40%; animation-duration:15s;}
-.line:nth-child(3){ top:60%; animation-duration:18s;}
-.line:nth-child(4){ top:80%; animation-duration:20s;}
-
-@keyframes move{
-  from{ transform:translateX(-50%); }
-  to{ transform:translateX(0%); }
+.slide.active{
+  opacity:1;
+  transform:translateX(0);
 }
 
-/* CARD INFERIOR */
+.slide h2{
+  margin:0 0 10px;
+  font-size:22px;
+}
+
+.slide p{
+  color:var(--cinza);
+  font-size:16px;
+}
+
+/* CARD */
 .card{
   background:#fff;
   padding:25px;
@@ -85,7 +92,6 @@ body{
   margin:0 0 20px;
 }
 
-/* BOTÃO ANIMADO */
 .btn-online{
   width:100%;
   padding:18px;
@@ -97,11 +103,6 @@ body{
   font-weight:800;
   cursor:pointer;
   animation:pulse 2s infinite;
-  transition:0.2s;
-}
-
-.btn-online:active{
-  transform:scale(0.96);
 }
 
 @keyframes pulse{
@@ -109,7 +110,6 @@ body{
   70%{box-shadow:0 0 0 18px rgba(34,197,94,0);}
   100%{box-shadow:0 0 0 0 rgba(34,197,94,0);}
 }
-
 </style>
 </head>
 <body>
@@ -119,11 +119,21 @@ body{
   <h1>RF Motorista</h1>
 </div>
 
-<div class="fake-map">
-  <div class="line"></div>
-  <div class="line"></div>
-  <div class="line"></div>
-  <div class="line"></div>
+<div class="slider">
+  <div class="slide active">
+    <h2>Ganhe até R$ 300 por dia</h2>
+    <p>Fique online e comece agora mesmo</p>
+  </div>
+
+  <div class="slide">
+    <h2>Indique e ganhe bônus</h2>
+    <p>Convide outros motoristas e aumente seus ganhos</p>
+  </div>
+
+  <div class="slide">
+    <h2>Mais liberdade</h2>
+    <p>Você escolhe quando e quanto quer trabalhar</p>
+  </div>
 </div>
 
 <div class="card">
@@ -136,11 +146,17 @@ body{
 
 <script>
 function ficarOnline(){
-  document.body.style.opacity="0.6";
-  setTimeout(()=>{
-    window.location.href="driver-home.html";
-  },400);
+  window.location.href="driver-home.html";
 }
+
+let slides = document.querySelectorAll(".slide");
+let index = 0;
+
+setInterval(()=>{
+  slides[index].classList.remove("active");
+  index = (index + 1) % slides.length;
+  slides[index].classList.add("active");
+},4000);
 </script>
 
 </body>
