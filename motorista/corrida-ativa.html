@@ -3,236 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Corrida Ativa - RF Motorista</title>
+<title>RF – Chegando ao Passageiro</title>
 
 <style>
 :root{
-  --bg:#0f0f0f;
-  --card:#1c1c1c;
-  --text:#ffffff;
-  --text-muted:rgba(255,255,255,0.65);
-  --accent:#facc15;
-  --green:#22c55e;
-  --red:#ef4444;
+  --preto:#0f0f0f;
+  --branco:#ffffff;
+  --amarelo:#facc15;
+  --verde:#22c55e;
+  --vermelho:#ef4444;
 }
 
 body{
   margin:0;
-  background:var(--bg);
-  color:var(--text);
+  background:var(--preto);
+  color:var(--branco);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
 
 /* HEADER */
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:20px;
-  background:#111;
+.top{
+  background:#fff;
+  padding:25px 20px 60px;
+  border-bottom-left-radius:40px;
+  border-bottom-right-radius:40px;
+  color:#000;
 }
 
-.menu-btn{font-size:22px;cursor:pointer;}
-.title{font-weight:700;}
-
-/* SIDEBAR */
-.sidebar{
-  position:fixed;
-  top:0;
-  left:-260px;
-  width:260px;
-  height:100%;
-  background:#111;
-  transition:.3s;
-  padding:20px;
-  z-index:20;
+.top h2{
+  margin:0;
+  font-size:18px;
 }
 
-.sidebar.active{left:0;}
-
-.sidebar a{
-  display:block;
-  margin-bottom:15px;
-  color:var(--text-muted);
-  text-decoration:none;
+.top span{
+  color:#facc15;
+  font-weight:700;
 }
 
-/* CONTENT */
-.content{
-  padding:20px;
-  padding-bottom:100px;
+/* CONTAINER */
+.container{
+  margin:20px;
 }
 
-.card{
-  background:var(--card);
-  padding:18px;
-  border-radius:18px;
-  margin-bottom:15px;
-}
-
+/* MAPA PLACEHOLDER */
 .mapa{
-  height:220px;
-  background:#111;
-  border-radius:18px;
+  height:200px;
+  background:#1c1c1c;
+  border-radius:20px;
   display:flex;
   align-items:center;
   justify-content:center;
-  color:var(--text-muted);
+  opacity:.6;
+  margin-bottom:20px;
+}
+
+/* CARD INFO */
+.card{
+  background:#1c1c1c;
+  padding:20px;
+  border-radius:20px;
+  margin-bottom:20px;
+}
+
+.card div{
+  margin-bottom:8px;
   font-size:14px;
 }
 
-.status{
-  color:var(--accent);
-  font-weight:700;
-  margin-bottom:10px;
+.card strong{
+  color:var(--amarelo);
 }
 
+/* BOTÕES */
 .btn{
   width:100%;
-  padding:14px;
+  padding:16px;
   border:none;
-  border-radius:14px;
+  border-radius:18px;
   font-weight:700;
+  font-size:16px;
   margin-top:10px;
   cursor:pointer;
 }
 
-.btn-green{background:var(--green);color:#fff;}
-.btn-red{background:var(--red);color:#fff;}
-.btn-dark{background:#111;color:#fff;border:1px solid #333;}
-
-.chat-box{
-  max-height:120px;
-  overflow-y:auto;
-  margin-bottom:10px;
-  font-size:13px;
+.btn-principal{
+  background:var(--verde);
+  color:#fff;
 }
 
-input{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:none;
-  margin-top:5px;
-}
-
-/* BOTTOM NAV */
-.bottom-nav{
-  position:fixed;
-  bottom:0;
-  width:100%;
+.btn-secundario{
   background:#111;
-  display:flex;
-  justify-content:space-around;
-  padding:12px 0;
-  border-top:1px solid #222;
-}
-
-.bottom-nav div{
-  font-size:12px;
-  color:var(--text-muted);
-  cursor:pointer;
-}
-
-.bottom-nav .active{
-  color:var(--accent);
+  color:#fff;
+  border:1px solid #333;
 }
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <a href="driver-home.html">Home</a>
-  <a href="perfil.html">Perfil</a>
-  <a href="veiculo.html">Veículo</a>
-  <a href="carteira.html">Carteira</a>
-  <a href="configuracoes.html">Configurações</a>
+<div class="top">
+  <h2>Status: <span id="statusTexto">Indo até passageiro</span></h2>
 </div>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
-  <div class="title">Corrida Ativa</div>
-  <div></div>
-</div>
+<div class="container">
 
-<!-- CONTENT -->
-<div class="content">
-
-  <div class="card">
-    <div class="status" id="statusCorrida">
-      Indo até passageiro
-    </div>
-  </div>
-
-  <div class="card mapa">
-    Google Maps será integrado aqui
+  <div class="mapa">
+    Mapa será integrado aqui
   </div>
 
   <div class="card">
     <div><strong>Passageiro:</strong> <span id="nomePassageiro"></span></div>
-    <div style="color:var(--text-muted);margin-top:5px;">
-      Pagamento: <span id="formaPagamento"></span>
-    </div>
-    <div style="color:var(--text-muted);margin-top:5px;">
-      Destino: <span id="destinoInfo"></span>
-    </div>
+    <div><strong>Pagamento:</strong> <span id="formaPagamento"></span></div>
+    <div><strong>Origem:</strong> <span id="origemInfo"></span></div>
+    <div><strong>Destino:</strong> <span id="destinoInfo"></span></div>
   </div>
 
-  <div class="card">
-    <strong>Conversa</strong>
-    <div class="chat-box" id="chatBox"></div>
-    <input type="text" id="msgInput" placeholder="Enviar mensagem...">
-    <button class="btn btn-dark" onclick="enviarMsg()">Enviar</button>
-  </div>
+  <button class="btn btn-principal" id="btnPrincipal" onclick="acaoPrincipal()">
+    Cheguei
+  </button>
 
-  <div class="card">
-    <button class="btn btn-green" id="btnPrincipal" onclick="acaoPrincipal()">
-      Cheguei
-    </button>
-    <button class="btn btn-red" onclick="cancelarCorrida()">
-      Cancelar Corrida
-    </button>
-  </div>
+  <button class="btn btn-secundario" onclick="cancelarCorrida()">
+    Cancelar Corrida
+  </button>
 
-</div>
-
-<!-- MENU INFERIOR -->
-<div class="bottom-nav">
-  <div onclick="location.href='driver-home.html'">Home</div>
-  <div class="active">Corrida</div>
-  <div onclick="location.href='carteira.html'">Carteira</div>
-  <div onclick="location.href='veiculo.html'">Veículo</div>
-  <div onclick="location.href='perfil.html'">Perfil</div>
 </div>
 
 <script>
 
-function toggleSidebar(){
-  document.getElementById("sidebar").classList.toggle("active");
-}
-
 let estado="INDO";
-let corrida = JSON.parse(localStorage.getItem("corrida_ativa"));
+let corrida=JSON.parse(localStorage.getItem("corrida_ativa"));
 
 if(!corrida){
-  window.location.href = "driver-home.html";
+  window.location.href="driver-home.html";
 }
 
-document.getElementById("formaPagamento").innerText = corrida.forma_pagamento;
-document.getElementById("destinoInfo").innerText = corrida.destino;
-document.getElementById("nomePassageiro").innerText = corrida.passageiro || "Passageiro";
+document.getElementById("nomePassageiro").innerText=corrida.passageiro||"Passageiro";
+document.getElementById("formaPagamento").innerText=corrida.forma_pagamento;
+document.getElementById("origemInfo").innerText=corrida.origem;
+document.getElementById("destinoInfo").innerText=corrida.destino;
 
 function acaoPrincipal(){
 
   if(estado==="INDO"){
     estado="AGUARDANDO";
-    document.getElementById("statusCorrida").innerText="Aguardando passageiro";
+    document.getElementById("statusTexto").innerText="Aguardando passageiro";
     document.getElementById("btnPrincipal").innerText="Iniciar Viagem";
   }
+
   else if(estado==="AGUARDANDO"){
-    window.location.href = "viagem-andamento.html";
+    window.location.href="viagem-andamento.html";
   }
 
 }
@@ -240,13 +158,6 @@ function acaoPrincipal(){
 function cancelarCorrida(){
   localStorage.removeItem("corrida_ativa");
   window.location.href="driver-home.html";
-}
-
-function enviarMsg(){
-  let msg=document.getElementById("msgInput").value;
-  if(!msg)return;
-  document.getElementById("chatBox").innerHTML += "<div>Você: "+msg+"</div>";
-  document.getElementById("msgInput").value="";
 }
 
 </script>
