@@ -29,35 +29,17 @@ body{
   border-bottom-left-radius:35px;
   border-bottom-right-radius:35px;
   color:#000;
-  min-height:120px;
+  min-height:140px;
 }
 
 .top strong{
   color:var(--amarelo);
 }
 
-/* ORIGEM CARD */
-.origem-card{
-  background:#1c1c1c;
-  margin:15px;
-  padding:18px;
-  border-radius:18px;
-}
-
-.label{
-  font-size:12px;
-  opacity:.6;
-}
-
-.valor{
-  font-weight:700;
-  margin-top:5px;
-}
-
 /* MAPA */
 #map{
   position:absolute;
-  top:150px;
+  top:180px;
   left:0;
   right:0;
   bottom:180px;
@@ -124,8 +106,7 @@ body{
 <div class="top">
 
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-    <img src="../assets/icons/icon-192.png" 
-         style="height:28px;">
+    <img src="../assets/icons/icon-192.png" style="height:28px;">
     <div style="font-weight:700;font-size:16px;">
       Viagem em Andamento
     </div>
@@ -142,11 +123,24 @@ body{
               word-wrap:break-word;">
   </div>
 
-</div>
+  <!-- BOTÃO NAVEGAÇÃO MINIMALISTA -->
+  <div style="margin-top:10px;">
+    <button onclick="abrirNavegacao()" 
+      style="
+        background:none;
+        border:none;
+        color:#000;
+        font-weight:600;
+        font-size:14px;
+        padding:0;
+        cursor:pointer;
+        display:flex;
+        align-items:center;
+        gap:6px;">
+      🧭 Navegar até passageiro
+    </button>
+  </div>
 
-<div class="origem-card">
-  <div class="label">ORIGEM</div>
-  <div class="valor" id="origemInfo"></div>
 </div>
 
 <div id="map">
@@ -155,11 +149,13 @@ body{
 
 <div class="bottom">
 
-  <button class="btn btn-nav" onclick="abrirNavegacao()">
-    Navegar até passageiro
+  <!-- BOTÃO PRINCIPAL -->
+  <button class="btn btn-principal" onclick="cheguei()">
+    Cheguei
   </button>
 
-  <button class="btn btn-principal" onclick="toggleInfo()">
+  <!-- PASSAGEIRO -->
+  <button class="btn btn-nav" onclick="toggleInfo()">
     Encontrar com <span id="nomePassageiro"></span>
   </button>
 
@@ -169,6 +165,7 @@ body{
     <button class="btn btn-nav" onclick="mensagem()">Enviar Mensagem</button>
   </div>
 
+  <!-- CANCELAR -->
   <button class="btn btn-cancelar" onclick="cancelar()">
     Cancelar Corrida
   </button>
@@ -184,8 +181,7 @@ if(!corrida){
 }
 
 document.getElementById("origemTopo").innerText = corrida.origem;
-
-document.getElementById("nomePassageiro").innerText=corrida.passageiro || "Passageiro";
+document.getElementById("nomePassageiro").innerText = corrida.passageiro || "Passageiro";
 
 function toggleInfo(){
   const box=document.getElementById("infoPassageiro");
@@ -199,9 +195,14 @@ function abrirNavegacao(){
   const google="https://www.google.com/maps/dir/?api=1&destination="+destino;
 
   window.location.href=waze;
+
   setTimeout(()=>{
     window.location.href=google;
   },1200);
+}
+
+function cheguei(){
+  window.location.href="viagem-andamento.html";
 }
 
 function ligar(){
