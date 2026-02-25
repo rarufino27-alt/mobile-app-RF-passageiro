@@ -25,10 +25,11 @@ body{
 /* TOPO */
 .top{
   background:#fff;
-  padding:20px;
+  padding:25px 20px 30px;
   border-bottom-left-radius:35px;
   border-bottom-right-radius:35px;
   color:#000;
+  min-height:120px;
 }
 
 .top strong{
@@ -121,7 +122,26 @@ body{
 <body>
 
 <div class="top">
-  Status: <strong>Indo até passageiro</strong>
+
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <img src="../assets/logo-rf.png" 
+         style="height:28px;">
+    <div style="font-weight:700;font-size:16px;">
+      Viagem em Andamento
+    </div>
+  </div>
+
+  <div style="font-size:12px;opacity:.6;">
+    ORIGEM
+  </div>
+
+  <div id="origemTopo" 
+       style="font-weight:800;
+              font-size:18px;
+              line-height:1.3;
+              word-wrap:break-word;">
+  </div>
+
 </div>
 
 <div class="origem-card">
@@ -163,7 +183,8 @@ if(!corrida){
   window.location.href="driver-home.html";
 }
 
-document.getElementById("origemInfo").innerText=corrida.origem;
+document.getElementById("origemTopo").innerText = corrida.origem;
+
 document.getElementById("nomePassageiro").innerText=corrida.passageiro || "Passageiro";
 
 function toggleInfo(){
