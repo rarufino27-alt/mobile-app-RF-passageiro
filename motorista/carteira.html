@@ -5,292 +5,76 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Carteira - RF Motorista</title>
 
-<style>
-:root{
-  --verde:#22c55e;
-  --cinza:#777;
-  --vermelho:#ef4444;
-}
+<link rel="stylesheet" href="../core/ui/layout.css">
 
-*{ box-sizing:border-box; }
+<script src="../core/config.js"></script>
+<script src="../core/datamanager.js"></script>
+<script src="../core/ui/theme.js" defer></script>
+<script src="../core/ui/sidebar.js" defer></script>
 
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background:#ffffff;
-  color:#111;
-}
-
-/* HEADER */
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:20px;
-  border-bottom:1px solid #eee;
-}
-
-.menu-btn{
-  font-size:24px;
-  cursor:pointer;
-}
-
-.title{
-  font-weight:800;
-  font-size:18px;
-}
-
-.spacer{ width:24px; }
-
-/* MENU */
-.menu{
-  position:fixed;
-  top:0;
-  left:-280px;
-  width:280px;
-  height:100%;
-  background:#111;
-  color:#fff;
-  padding:25px 20px;
-  transition:.3s;
-  z-index:20;
-}
-
-.menu.active{ left:0; }
-
-.menu-item{
-  margin:18px 0;
-  cursor:pointer;
-  font-weight:600;
-}
-
-.menu-item:hover{ color:var(--verde); }
-
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.4);
-  display:none;
-  z-index:15;
-}
-
-.overlay.active{ display:block; }
-
-/* CONTENT */
-.content{
-  padding:20px;
-  padding-bottom:100px;
-}
-
-.card{
-  background:#fff;
-  padding:20px;
-  border-radius:20px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.05);
-  margin-bottom:15px;
-}
-
-.saldo{
-  font-size:32px;
-  font-weight:800;
-}
-
-.sub{
-  color:var(--cinza);
-  font-size:14px;
-  margin-top:4px;
-}
-
-.linha{
-  display:flex;
-  justify-content:space-between;
-  margin-top:10px;
-}
-
-.valor{
-  font-weight:700;
-}
-
-.historico-item{
-  padding:10px 0;
-  border-bottom:1px solid #eee;
-  font-size:14px;
-}
-
-.input{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #ddd;
-  margin-top:10px;
-  font-size:14px;
-}
-
-.btn{
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:none;
-  font-weight:700;
-  background:var(--verde);
-  color:#fff;
-  cursor:pointer;
-  margin-top:15px;
-}
-
-.alerta{
-  margin-top:10px;
-  font-size:13px;
-  color:var(--vermelho);
-}
-
-/* BOTTOM NAV */
-.bottom-nav{
-  position:fixed;
-  bottom:0;
-  width:100%;
-  background:#ffffff;
-  display:flex;
-  justify-content:space-around;
-  padding:12px 0;
-  border-top:1px solid #eee;
-}
-
-.bottom-nav div{
-  font-size:12px;
-  color:#777;
-  cursor:pointer;
-}
-
-.bottom-nav .active{
-  color:var(--verde);
-  font-weight:700;
-}
-</style>
 </head>
 <body>
 
-<!-- MENU -->
-<div id="menu" class="menu">
-  <div class="menu-item" onclick="ir('offline.html')">🏠 Início</div>
-  <div class="menu-item" onclick="ir('politica.html')">📄 Política de Privacidade</div>
-  <div class="menu-item" onclick="ir('termos.html')">📑 Termos de Uso</div>
-  <div class="menu-item" onclick="ir('configuracoes.html')">⚙ Configurações</div>
-</div>
+<aside id="sidebar" class="sidebar"></aside>
+<div id="overlay" class="overlay"></div>
 
-<div id="overlay" class="overlay" onclick="toggleMenu()"></div>
+<header class="rf-top">
+  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+  <div>Carteira</div>
+  <div class="credit-box">
+    Créditos: <span id="creditosTopo">0.00</span>
+  </div>
+</header>
 
-<div class="header">
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
-  <div class="title">Carteira</div>
-  <div class="spacer"></div>
-</div>
+<main class="rf-body">
 
-<div class="content">
-
-  <!-- SALDO -->
-  <div class="card">
-    <div class="saldo">R$ <span id="saldo">0.00</span></div>
-    <div class="sub">Créditos disponíveis</div>
+  <div class="rf-card" style="text-align:center;">
+    <h3>Saldo de Créditos</h3>
+    <h1 id="saldoCredito">0.00</h1>
   </div>
 
-  <!-- RECARGA -->
-  <div class="card">
-    <strong>Adicionar Créditos</strong>
-    <input type="number" step="0.01" id="valorRecarga" class="input" placeholder="Valor em R$">
-    <button class="btn" onclick="recargar()">Adicionar</button>
-    <div id="alertaCredito" class="alerta"></div>
+  <div class="rf-card">
+    <h3>Recarregar Créditos</h3>
+    <input type="number" id="valorRecarga" placeholder="Valor em R$" style="width:100%;padding:10px;margin-top:10px;border-radius:10px;border:none;">
+    <button style="margin-top:15px;width:100%;padding:12px;border:none;border-radius:10px;background:#22c55e;color:#fff;font-weight:700;"
+      onclick="recarregar()">
+      Confirmar Recarga
+    </button>
   </div>
 
-  <!-- HISTÓRICO -->
-  <div class="card">
-    <strong>Histórico de Recargas</strong>
-    <div id="historico"></div>
+  <div class="rf-card">
+    <h3>Ganhos Hoje</h3>
+    <h2>R$ <span id="ganhosHoje">0.00</span></h2>
   </div>
 
-</div>
-
-<div class="bottom-nav">
-  <div onclick="location.href='driver-home.html'">Home</div>
-  <div onclick="location.href='corridas.html'">Corridas</div>
-  <div class="active">Carteira</div>
-  <div onclick="location.href='veiculo.html'">Veículo</div>
-  <div onclick="location.href='perfil.html'">Perfil</div>
-</div>
+</main>
 
 <script>
+document.addEventListener("DOMContentLoaded", atualizarTela);
 
-/* MENU */
-function toggleMenu(){
-  document.getElementById("menu").classList.toggle("active");
-  document.getElementById("overlay").classList.toggle("active");
+function atualizarTela(){
+  const creditos = DataManager.getCreditos();
+  const ganhos = DataManager.getGanhosHoje();
+
+  document.getElementById("creditosTopo").innerText = creditos.toFixed(2);
+  document.getElementById("saldoCredito").innerText = creditos.toFixed(2);
+  document.getElementById("ganhosHoje").innerText = ganhos.toFixed(2);
 }
 
-function ir(pagina){
-  window.location.href = pagina;
-}
-
-/* DADOS */
-function atualizarSaldo(){
-  let saldo = parseFloat(localStorage.getItem("creditos")) || 0;
-  document.getElementById("saldo").innerText = saldo.toFixed(2);
-
-  if(saldo <= 0){
-    document.getElementById("alertaCredito").innerText =
-      "Você precisa de créditos para receber corridas.";
-  }else{
-    document.getElementById("alertaCredito").innerText = "";
-  }
-}
-
-function recargar(){
-  let valor = parseFloat(document.getElementById("valorRecarga").value);
+function recarregar(){
+  const valor = parseFloat(document.getElementById("valorRecarga").value);
 
   if(!valor || valor <= 0){
     alert("Informe um valor válido.");
     return;
   }
 
-  let saldoAtual = parseFloat(localStorage.getItem("creditos")) || 0;
-  let novoSaldo = saldoAtual + valor;
+  const atual = DataManager.getCreditos();
+  DataManager.setCreditos(atual + valor);
 
-  localStorage.setItem("creditos", novoSaldo.toFixed(2));
-
-  salvarHistorico(valor);
-
-  document.getElementById("valorRecarga").value = "";
-  atualizarSaldo();
-  carregarHistorico();
+  alert("Créditos adicionados com sucesso!");
+  atualizarTela();
 }
-
-function salvarHistorico(valor){
-  let historico = JSON.parse(localStorage.getItem("historico_creditos")) || [];
-
-  historico.unshift({
-    data: new Date().toLocaleDateString(),
-    valor: valor.toFixed(2)
-  });
-
-  localStorage.setItem("historico_creditos", JSON.stringify(historico));
-}
-
-function carregarHistorico(){
-  let historico = JSON.parse(localStorage.getItem("historico_creditos")) || [];
-  let container = document.getElementById("historico");
-  container.innerHTML = "";
-
-  historico.forEach(item=>{
-    container.innerHTML += `
-      <div class="historico-item">
-        ${item.data} • + R$ ${item.valor}
-      </div>
-    `;
-  });
-}
-
-atualizarSaldo();
-carregarHistorico();
-
 </script>
 
 </body>
