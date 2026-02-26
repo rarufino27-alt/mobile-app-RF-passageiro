@@ -1,7 +1,6 @@
 const RideService = {
 
   aceitarCorrida(dados){
-
     DataManager.setCorridaAtual(dados);
     window.location.href = "corrida-ativa.html";
   },
@@ -17,12 +16,24 @@ const RideService = {
     DataManager.descontarCreditos(taxa);
     DataManager.atualizarGanhos(valor);
 
-    let historico = JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.HISTORICO)) || [];
-    historico.push(corrida);
-    localStorage.setItem(CONFIG.STORAGE_KEYS.HISTORICO, JSON.stringify(historico));
+    const historico = JSON.parse(
+      localStorage.getItem(CONFIG.STORAGE_KEYS.HISTORICO)
+    ) || [];
+
+    historico.push({
+      valor,
+      taxa,
+      origem: corrida.origem,
+      destino: corrida.destino,
+      data: new Date().toISOString()
+    });
+
+    localStorage.setItem(
+      CONFIG.STORAGE_KEYS.HISTORICO,
+      JSON.stringify(historico)
+    );
 
     DataManager.limparCorrida();
-
     window.location.href = "driver-home.html";
   }
 
