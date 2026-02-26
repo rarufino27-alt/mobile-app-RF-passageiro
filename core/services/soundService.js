@@ -1,32 +1,32 @@
 window.SoundService = {
 
   sounds: {
-    SEM_CREDITO: "../assets/sounds/sem-credito.mp3",
-    CHAMADA: "../assets/sounds/notificacao.mp3",
-    ACEITA: "../assets/sounds/viagem-aceita.mp3",
-    CANCELADA: "../assets/sounds/viagem-cancelada (1).mp3",
-    CREDITO: "../assets/sounds/credito-adicionado.mp3",
-    MSG_PASSAGEIRO: "../assets/sounds/mensagem.mp3",
-    MSG_APP: "../assets/sounds/mensagem1.mp3",
-    ONLINE: "../assets/sounds/online.mp3",
-    OFFLINE: "../assets/sounds/viagem-cancelada (1).mp3"
+    CHAMADA: "/mobile-app-RF/assets/sounds/notificacao.mp3",
+    ACEITA: "/mobile-app-RF/assets/sounds/viagem-aceita.mp3",
+    CANCELADA: "/mobile-app-RF/assets/sounds/viagem-cancelada.mp3",
+    SEM_CREDITO: "/mobile-app-RF/assets/sounds/sem-credito.mp3",
+    CREDITO_ADD: "/mobile-app-RF/assets/sounds/credito-adicionado.mp3",
+    MSG_PASSAGEIRO: "/mobile-app-RF/assets/sounds/mensagem.mp3",
+    MSG_APP: "/mobile-app-RF/assets/sounds/mensagem1.mp3",
+    ONLINE: "/mobile-app-RF/assets/sounds/online.mp3",
+    OFFLINE: "/mobile-app-RF/assets/sounds/viagem-cancelada.mp3"
   },
 
-  play(type){
+  play(tipo){
 
-    const src = this.sounds[type];
+    const caminho = this.sounds[tipo];
 
-    if(!src){
-      console.warn("Som não encontrado:", type);
+    if(!caminho){
+      console.warn("Som não encontrado:", tipo);
       return;
     }
 
-    const audio = new Audio(src);
-    audio.volume = 1;
-
-    audio.play().catch(err=>{
-      console.log("Autoplay bloqueado:", err);
+    const audio = new Audio(caminho);
+    audio.preload = "auto";
+    audio.play().catch(e=>{
+      console.warn("Autoplay bloqueado:", tipo);
     });
+
   }
 
 };
