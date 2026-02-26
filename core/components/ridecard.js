@@ -23,10 +23,14 @@ window.RideCard = {
     document.getElementById("rfDestino").innerText =
       corrida.destino || "Shopping";
 
-    SoundService.play("CHAMADA");
+    // Pequeno delay para evitar bloqueio de autoplay
+    setTimeout(()=>{
+      if(window.SoundService){
+        SoundService.play("CHAMADA");
+      }
+    },200);
 
     this.startTimer();
-
   },
 
   hide(){
@@ -61,7 +65,9 @@ window.RideCard = {
     const corrida = DataManager.getCorrida();
     if(!corrida) return;
 
-    SoundService.play("ACEITA");
+    if(window.SoundService){
+      SoundService.play("ACEITA");
+    }
 
     DataManager.atualizarStatusCorrida("aceita");
 
@@ -72,7 +78,9 @@ window.RideCard = {
 
     clearInterval(this.timer);
 
-    SoundService.play("CANCELADA");
+    if(window.SoundService){
+      SoundService.play("CANCELADA");
+    }
 
     DataManager.limparCorrida();
 
@@ -88,7 +96,9 @@ window.RideCard = {
       return;
     }
 
-    SoundService.play("MSG_PASSAGEIRO");
+    if(window.SoundService){
+      SoundService.play("MSG_PASSAGEIRO");
+    }
 
     alert("Contra-proposta enviada: R$ " + valor.toFixed(2));
   },
@@ -130,7 +140,9 @@ window.RideCard = {
       </div>
     `;
 
-    document.querySelector(".rf-body").appendChild(card);
+    // Fallback seguro
+    const container = document.querySelector(".rf-body") || document.body;
+    container.appendChild(card);
   }
 
 };
