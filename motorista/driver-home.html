@@ -45,6 +45,14 @@
 
 document.addEventListener("DOMContentLoaded", ()=>{
 
+if(!DataManager.getCorrida()){
+  setTimeout(()=>{
+    const corrida = DataManager.criarCorridaSimulada();
+    alert("Nova corrida disponível: R$ " + corrida.valor.toFixed(2));
+    window.location.href = "corrida-ativa.html";
+  }, 3000);
+}
+
   if(!DataManager.isOnline()){
     window.location.href = "offline.html";
     return;
