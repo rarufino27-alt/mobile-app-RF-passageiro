@@ -3,282 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RF – Finalização</title>
+<title>Finalização</title>
 
-<style>
-:root{
-  --preto:#0f0f0f;
-  --branco:#ffffff;
-  --amarelo:#facc15;
-  --verde:#22c55e;
-  --vermelho:#ef4444;
-}
+<link rel="stylesheet" href="../core/ui/layout.css">
 
-body{
-  margin:0;
-  background:var(--preto);
-  color:var(--branco);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  text-align:center;
-}
-
-/* TOPO */
-.top{
-  background:#fff;
-  padding:25px 20px 35px;
-  border-bottom-left-radius:35px;
-  border-bottom-right-radius:35px;
-  color:#000;
-}
-
-.top-header{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  font-weight:700;
-  font-size:16px;
-}
-
-.status{
-  margin-top:10px;
-  font-size:20px;
-  font-weight:900;
-  color:var(--verde);
-}
-
-/* CENTRO */
-.container{
-  padding:40px 20px;
-}
-
-.valor{
-  font-size:48px;
-  font-weight:900;
-  margin-bottom:10px;
-}
-
-.pagamento{
-  font-size:16px;
-  opacity:.7;
-  margin-bottom:30px;
-}
-
-.info{
-  background:#1c1c1c;
-  padding:20px;
-  border-radius:20px;
-  margin-bottom:30px;
-  text-align:left;
-  font-size:14px;
-}
-
-.label{
-  opacity:.6;
-  font-size:12px;
-}
-
-.valor-info{
-  margin-bottom:15px;
-  font-weight:600;
-}
-
-/* AVALIAÇÃO */
-.avaliacao{
-  margin-bottom:30px;
-}
-
-.estrela{
-  font-size:28px;
-  cursor:pointer;
-  color:#444;
-}
-
-.estrela.ativa{
-  color:var(--amarelo);
-}
-
-/* BOTÃO */
-.btn{
-  width:100%;
-  padding:18px;
-  border:none;
-  border-radius:25px;
-  background:var(--verde);
-  color:#fff;
-  font-weight:800;
-  font-size:18px;
-  cursor:pointer;
-}
-
-</style>
+<script src="../core/config.js"></script>
+<script src="../core/datamanager.js"></script>
+<script src="../core/services/rideService.js"></script>
+<script src="../core/ui/theme.js" defer></script>
+<script src="../core/ui/sidebar.js" defer></script>
 </head>
+
 <body>
 
-<div class="top">
-  <div class="top-header">
-    <img src="../assets/icons/icon-192.png" style="height:26px;">
-    RF
+<aside id="sidebar" class="sidebar"></aside>
+<div id="overlay" class="overlay"></div>
+
+<header class="rf-top">
+  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+  <div>Finalização</div>
+  <div class="credit-box">
+    Créditos: <span id="creditosTopo">0.00</span>
   </div>
-  <div class="status">
-    Viagem Concluída
-  </div>
-</div>
+</header>
 
-<div class="container">
+<main class="rf-body">
 
-  <div class="valor" id="valorFinal"></div>
-
-  <div class="pagamento" id="formaPagamento"></div>
-
-  <div class="info">
-    <div class="label">ORIGEM</div>
-    <div class="valor-info" id="origemInfo"></div>
-
-    <div class="label">DESTINO</div>
-    <div class="valor-info" id="destinoInfo"></div>
+  <div class="rf-card" style="text-align:center;">
+    <h2>Corrida Finalizada</h2>
+    <h1>R$ <span id="valorFinal"></span></h1>
+    <p>Taxa plataforma 15%</p>
+    <p>Desconto: R$ <span id="taxa"></span></p>
   </div>
 
-  <div class="avaliacao">
-    <div style="margin-bottom:10px;">Avalie o passageiro</div>
-    <span class="estrela" onclick="avaliar(1)">★</span>
-    <span class="estrela" onclick="avaliar(2)">★</span>
-    <span class="estrela" onclick="avaliar(3)">★</span>
-    <span class="estrela" onclick="avaliar(4)">★</span>
-    <span class="estrela" onclick="avaliar(5)">★</span>
-  </div>
-
-  <button class="btn" onclick="confirmar()">
-    Confirmar e Encerrar
+  <button class="fab fab-online" onclick="confirmar()">
+    OK
   </button>
 
-</div>
+</main>
 
 <script>
+document.addEventListener("DOMContentLoaded", ()=>{
 
-let corrida = JSON.parse(localStorage.getItem("corrida_ativa"));
+  const corrida = DataManager.getCorridaAtual();
 
-if(!corrida){
-  window.location.href="driver-home.html";
-}
-
-document.getElementById("valorFinal").innerText =
-"R$ " + Number(corrida.valor).toFixed(2);
-
-document.getElementById("formaPagamento").innerText =
-"Forma de pagamento: " + corrida.forma_pagamento;
-
-document.getElementById("origemInfo").innerText =
-corrida.origem;
-
-document.getElementById("destinoInfo").innerText =
-corrida.destino;
-
-let nota = 0;
-
-function avaliar(n){
-  nota = n;
-  const estrelas = document.querySelectorAll(".estrela");
-  estrelas.forEach((e,i)=>{
-    e.classList.toggle("ativa", i < n);
-  });
-}
-
-/* ========================= */
-/* CONFETE PROFISSIONAL */
-/* ========================= */
-
-const canvas = document.createElement("canvas");
-canvas.style.position = "fixed";
-canvas.style.top = "0";
-canvas.style.left = "0";
-canvas.style.width = "100%";
-canvas.style.height = "100%";
-canvas.style.pointerEvents = "none";
-canvas.style.zIndex = "999";
-document.body.appendChild(canvas);
-
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let confetes = [];
-
-function criarConfete(){
-  for(let i=0;i<120;i++){
-    confetes.push({
-      x: Math.random()*canvas.width,
-      y: Math.random()*canvas.height - canvas.height,
-      r: Math.random()*6+4,
-      d: Math.random()*3+2,
-      color: ["#facc15","#22c55e","#ffffff"][Math.floor(Math.random()*3)]
-    });
+  if(!corrida){
+    window.location.href = "driver-home.html";
+    return;
   }
-}
 
-function desenharConfete(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  confetes.forEach(c=>{
-    ctx.beginPath();
-    ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
-    ctx.fillStyle=c.color;
-    ctx.fill();
-  });
-  atualizarConfete();
-}
+  const valor = corrida.valor;
+  const taxa = valor * CONFIG.TAXA_PLATAFORMA;
 
-function atualizarConfete(){
-  confetes.forEach(c=>{
-    c.y += c.d;
-    if(c.y > canvas.height){
-      c.y = -10;
-    }
-  });
-}
+  document.getElementById("valorFinal").innerText = valor.toFixed(2);
+  document.getElementById("taxa").innerText = taxa.toFixed(2);
 
-let animacao;
-
-function iniciarConfete(){
-  criarConfete();
-  animacao = setInterval(desenharConfete,20);
-
-  setTimeout(()=>{
-    clearInterval(animacao);
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-  },2000);
-}
-
-/* ========================= */
+  document.getElementById("creditosTopo").innerText =
+    DataManager.getCreditos().toFixed(2);
+});
 
 function confirmar(){
-
-  iniciarConfete();
-
-  setTimeout(()=>{
-
-    let historico =
-    JSON.parse(localStorage.getItem("historico_viagens")) || [];
-
-    historico.push({
-      passageiro: corrida.passageiro || "Não informado",
-      valor: corrida.valor,
-      origem: corrida.origem,
-      destino: corrida.destino,
-      pagamento: corrida.forma_pagamento,
-      avaliacao: nota,
-      data: new Date().toLocaleString()
-    });
-
-    localStorage.setItem("historico_viagens",
-    JSON.stringify(historico));
-
-    localStorage.removeItem("corrida_ativa");
-
-    window.location.href="driver-home.html";
-
-  },2000);
+  RideService.finalizarCorrida();
 }
-
 </script>
 
 </body>
