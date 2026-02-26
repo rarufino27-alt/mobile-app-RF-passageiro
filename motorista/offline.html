@@ -44,14 +44,18 @@
 <script>
 document.addEventListener("DOMContentLoaded", ()=>{
 
-  document.getElementById("creditosTopo").innerText =
-    window.DataManager.getCreditos().toFixed(2);
+  if(window.DataManager && typeof window.DataManager.getCreditos === "function"){
+    document.getElementById("creditosTopo").innerText =
+      window.DataManager.getCreditos().toFixed(2);
+  }else{
+    document.getElementById("creditosTopo").innerText = "0.00";
+  }
 
 });
 
 function ficarOnline(){
 
-  if(!window.CreditService.podeFicarOnline()){
+  if(!window.CreditService || !window.CreditService.podeFicarOnline()){
     alert("Sem créditos suficientes.");
     return;
   }
