@@ -68,6 +68,11 @@ document.addEventListener("DOMContentLoaded", ()=>{
 function iniciarViagem(){
   window.location.href = "viagem-andamento.html";
 }
+
+function irPassageiro(){
+  DataManager.atualizarStatusCorrida("aceita");
+  window.location.href = "viagem-andamento.html";
+}
 </script>
 
 </body>
