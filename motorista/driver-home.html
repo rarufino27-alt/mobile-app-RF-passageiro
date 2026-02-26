@@ -45,6 +45,26 @@
 <script>
 
 let simulacaoTimer = null;
+let audioUnlocked = false;
+
+/* ========================= */
+/* DESBLOQUEIO DE ÁUDIO (ANDROID/CHROME) */
+
+function unlockAudio(){
+  if(audioUnlocked) return;
+
+  try{
+    const audio = new Audio();
+    audio.play().catch(()=>{});
+    audioUnlocked = true;
+    console.log("Áudio desbloqueado.");
+  }catch(e){}
+}
+
+document.addEventListener("click", unlockAudio, { once:true });
+document.addEventListener("touchstart", unlockAudio, { once:true });
+
+/* ========================= */
 
 document.addEventListener("DOMContentLoaded", ()=>{
 
@@ -84,7 +104,10 @@ function iniciarLoopAtualizacao(){
 /* OFFLINE */
 
 function ficarOffline(){
-  SoundService.play("OFFLINE");
+  if(window.SoundService){
+    SoundService.play("OFFLINE");
+  }
+
   DataManager.setOnline(false);
   window.location.href = "offline.html";
 }
