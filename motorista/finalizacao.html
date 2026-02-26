@@ -65,6 +65,28 @@ document.addEventListener("DOMContentLoaded", ()=>{
 function confirmar(){
   RideService.finalizarCorrida();
 }
+
+function finalizar(){
+
+  const corrida = DataManager.getCorrida();
+  if(!corrida) return;
+
+  const valor = corrida.valor;
+  const taxa = valor * 0.15;
+  const liquido = valor - taxa;
+
+  DataManager.descontarCreditos(taxa);
+  DataManager.atualizarGanhos(liquido);
+
+  DataManager.limparCorrida();
+
+  alert("Viagem finalizada.\nValor: R$ " + valor.toFixed(2) +
+        "\nTaxa: R$ " + taxa.toFixed(2) +
+        "\nLíquido: R$ " + liquido.toFixed(2));
+
+  window.location.href = "driver-home.html";
+}
+
 </script>
 
 </body>
