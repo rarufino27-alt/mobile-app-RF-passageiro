@@ -3,209 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RF – Indo até Passageiro</title>
+<title>Corrida Ativa</title>
 
-<style>
-:root{
-  --preto:#0f0f0f;
-  --branco:#ffffff;
-  --amarelo:#facc15;
-  --verde:#22c55e;
-  --vermelho:#ef4444;
-}
+<link rel="stylesheet" href="../core/ui/layout.css">
 
-body{
-  margin:0;
-  background:var(--preto);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  overflow:hidden;
-}
-
-/* TOPO */
-.top{
-  background:#fff;
-  padding:20px 20px 40px;
-  border-bottom-left-radius:35px;
-  border-bottom-right-radius:35px;
-  position:relative;
-}
-
-.top-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.top-left{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-weight:700;
-  font-size:16px;
-}
-
-.top-right{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-
-.cancel-btn{
-  background:none;
-  border:none;
-  font-size:14px;
-  color:var(--vermelho);
-  font-weight:600;
-  cursor:pointer;
-}
-
-.profile-btn{
-  width:35px;
-  height:35px;
-  border-radius:50%;
-  background:#000;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  font-size:14px;
-  cursor:pointer;
-}
-
-/* ORIGEM */
-.origem-label{
-  text-align:center;
-  font-size:12px;
-  opacity:.6;
-  margin-top:15px;
-}
-
-.origem-nome{
-  text-align:center;
-  font-size:24px;
-  font-weight:900;
-  margin-top:5px;
-  line-height:1.3;
-  word-break:break-word;
-}
-
-.btn-navegar{
-  display:block;
-  margin:18px auto 0 auto;
-  padding:10px 25px;
-  border-radius:20px;
-  border:none;
-  background:#000;
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-}
-
-/* MAPA */
-#map{
-  position:absolute;
-  top:220px;
-  left:0;
-  right:0;
-  bottom:130px;
-  background:#111;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#fff;
-  opacity:.5;
-}
-
-/* BOTTOM */
-.bottom{
-  position:absolute;
-  bottom:0;
-  width:100%;
-  padding:20px;
-}
-
-.btn-cheguei{
-  width:100%;
-  padding:18px;
-  border:none;
-  border-radius:20px;
-  background:var(--verde);
-  color:#fff;
-  font-weight:800;
-  font-size:18px;
-  cursor:pointer;
-}
-
-</style>
+<script src="../core/config.js"></script>
+<script src="../core/datamanager.js"></script>
+<script src="../core/ui/theme.js" defer></script>
+<script src="../core/ui/sidebar.js" defer></script>
 </head>
+
 <body>
 
-<div class="top">
+<aside id="sidebar" class="sidebar"></aside>
+<div id="overlay" class="overlay"></div>
 
-  <div class="top-header">
+<header class="rf-top">
+  <div class="menu-btn" onclick="toggleSidebar()">☰</div>
+  <div>Indo ao Passageiro</div>
+  <div class="credit-box">
+    Créditos: <span id="creditosTopo">0.00</span>
+  </div>
+</header>
 
-    <div class="top-left">
-      <img src="../assets/icons/icon-192.png" style="height:26px;">
-      Viagem em Andamento
-    </div>
+<main class="rf-body">
 
-    <div class="top-right">
-      <button class="cancel-btn" onclick="cancelar()">Cancelar</button>
-      <div class="profile-btn" onclick="abrirPerfil()">👤</div>
-    </div>
+  <div class="rf-card">
+    <h3>Origem</h3>
+    <p id="origem"></p>
 
+    <h3 style="margin-top:15px;">Destino</h3>
+    <p id="destino"></p>
+
+    <h2 style="margin-top:20px;">
+      Valor: R$ <span id="valor"></span>
+    </h2>
   </div>
 
-  <div class="origem-label">ORIGEM</div>
-  <div class="origem-nome" id="origemTopo"></div>
-
-  <button class="btn-navegar" onclick="abrirNavegacao()">
-    Navegar
+  <button class="fab fab-online" onclick="iniciarViagem()">
+    CHEGUEI
   </button>
 
-</div>
-
-<div id="map">
-  Mapa será integrado aqui
-</div>
-
-<div class="bottom">
-  <button class="btn-cheguei" onclick="cheguei()">
-    Cheguei
-  </button>
-</div>
+</main>
 
 <script>
+document.addEventListener("DOMContentLoaded", ()=>{
 
-let corrida = JSON.parse(localStorage.getItem("corrida_ativa"));
+  const corrida = DataManager.getCorridaAtual();
 
-if(!corrida){
-  window.location.href="driver-home.html";
+  if(!corrida){
+    window.location.href = "driver-home.html";
+    return;
+  }
+
+  document.getElementById("creditosTopo").innerText =
+    DataManager.getCreditos().toFixed(2);
+
+  document.getElementById("origem").innerText = corrida.origem;
+  document.getElementById("destino").innerText = corrida.destino;
+  document.getElementById("valor").innerText = corrida.valor.toFixed(2);
+
+});
+
+function iniciarViagem(){
+  window.location.href = "viagem-andamento.html";
 }
-
-document.getElementById("origemTopo").innerText = corrida.origem;
-
-function abrirNavegacao(){
-  const destino = encodeURIComponent(corrida.origem);
-  window.location.href="waze://?q="+destino+"&navigate=yes";
-  setTimeout(()=>{
-    window.location.href="https://www.google.com/maps/dir/?api=1&destination="+destino;
-  },1000);
-}
-
-function cheguei(){
-  window.location.href="viagem-andamento.html";
-}
-
-function cancelar(){
-  localStorage.removeItem("corrida_ativa");
-  window.location.href="driver-home.html";
-}
-
-function abrirPerfil(){
-  window.location.href="perfil-passageiro.html";
-}
-
 </script>
 
 </body>
