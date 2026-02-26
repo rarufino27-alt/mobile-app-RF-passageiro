@@ -1,45 +1,35 @@
 const DataManager = {
 
   /* CRÉDITOS */
+  window.DataManager = {
+
   getCreditos(){
-    return parseFloat(localStorage.getItem(CONFIG.STORAGE_KEYS.CREDITOS)) || 0;
+    return parseFloat(localStorage.getItem("rf_creditos")) || 0;
   },
 
   setCreditos(valor){
-    localStorage.setItem(CONFIG.STORAGE_KEYS.CREDITOS, valor.toFixed(2));
+    localStorage.setItem("rf_creditos", parseFloat(valor));
   },
 
   adicionarCreditos(valor){
     let atual = this.getCreditos();
-    this.setCreditos(atual + valor);
+    this.setCreditos(atual + parseFloat(valor));
   },
 
   descontarCreditos(valor){
     let atual = this.getCreditos();
-    this.setCreditos(atual - valor);
-  },
-
-  /* ONLINE */
-  isOnline(){
-    return localStorage.getItem(CONFIG.STORAGE_KEYS.ONLINE) === "true";
+    this.setCreditos(atual - parseFloat(valor));
   },
 
   setOnline(status){
-    localStorage.setItem(CONFIG.STORAGE_KEYS.ONLINE, status);
+    localStorage.setItem("rf_online", status ? "1" : "0");
   },
 
-  /* CORRIDA */
-  getCorridaAtual(){
-    return JSON.parse(localStorage.getItem(CONFIG.STORAGE_KEYS.CORRIDA_ATUAL));
-  },
+  isOnline(){
+    return localStorage.getItem("rf_online") === "1";
+  }
 
-  setCorridaAtual(corrida){
-    localStorage.setItem(CONFIG.STORAGE_KEYS.CORRIDA_ATUAL, JSON.stringify(corrida));
-  },
-
-  limparCorrida(){
-    localStorage.removeItem(CONFIG.STORAGE_KEYS.CORRIDA_ATUAL);
-  },
+};
 
   /* GANHOS DO DIA */
   atualizarGanhos(valor){
