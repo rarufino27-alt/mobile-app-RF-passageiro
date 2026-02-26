@@ -5,12 +5,17 @@ window.RideCard = {
 
   show(corrida){
 
+    if(!corrida) return;
+
     this.injectHTML();
 
-    document.getElementById("rfRideCard").style.display = "block";
+    const card = document.getElementById("rfRideCard");
+    if(!card) return;
+
+    card.style.display = "block";
 
     document.getElementById("rfValor").innerText =
-      corrida.valor.toFixed(2);
+      parseFloat(corrida.valor).toFixed(2);
 
     document.getElementById("rfOrigem").innerText =
       corrida.origem || "Centro";
@@ -26,13 +31,15 @@ window.RideCard = {
 
   hide(){
     clearInterval(this.timer);
-    document.getElementById("rfRideCard").style.display = "none";
+    const card = document.getElementById("rfRideCard");
+    if(card) card.style.display = "none";
   },
 
   startTimer(){
 
     this.tempo = 15;
     const contador = document.getElementById("rfContador");
+    if(!contador) return;
 
     this.timer = setInterval(()=>{
 
@@ -50,6 +57,9 @@ window.RideCard = {
   aceitar(){
 
     clearInterval(this.timer);
+
+    const corrida = DataManager.getCorrida();
+    if(!corrida) return;
 
     SoundService.play("ACEITA");
 
