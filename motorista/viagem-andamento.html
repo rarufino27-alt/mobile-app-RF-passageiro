@@ -41,19 +41,66 @@
 </main>
 
 <script>
+
+const TAXA_PLATAFORMA = 0.15;
+
 document.addEventListener("DOMContentLoaded", ()=>{
+
+  const corrida = DataManager.getCorrida();
+
+  if(!corrida){
+    window.location.href = "driver-home.html";
+    return;
+  }
+
+  DataManager.atualizarStatusCorrida("andamento");
+
   document.getElementById("creditosTopo").innerText =
     DataManager.getCreditos().toFixed(2);
+
 });
 
-function iniciarViagem(){
-  DataManager.atualizarStatusCorrida("andamento");
+/* =========================
+   FINALIZAR VIAGEM
+========================= */
+
+function finalizar(){
+
+  const corrida = DataManager.getCorrida();
+
+  if(!corrida){
+    window.location.href = "driver-home.html";
+    return;
+  }
+
+  const valor = parseFloat(corrida.valor);
+  const taxa = valor * TAXA_PLATAFORMA;
+
+  let creditos = DataManager.getCreditos();
+
+  if(creditos < taxa){
+    SoundService.play("SEM_CREDITO");
+    alert("Créditos insuficientes para pagar a taxa da plataforma.");
+    DataManager.setOnline(false);
+    window.location.href = "offline.html";
+    return;
+  }
+
+  /* Desconta taxa */
+  DataManager.descontarCreditos(taxa);
+
+  /* Atualiza ganhos do motorista */
+  DataManager.atualizarGanhos(valor);
+
+  /* Limpa corrida */
+  DataManager.limparCorrida();
+
+  /* Som de corrida aceita/finalizada */
+  SoundService.play("ACEITA");
+
   window.location.href = "finalizacao.html";
 }
 
-function finalizar(){
-  window.location.href = "finalizacao.html";
-}
 </script>
 
 </body>
