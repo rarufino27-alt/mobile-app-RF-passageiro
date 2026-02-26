@@ -100,20 +100,23 @@ function iniciarSimulacao(){
 
     if(!DataManager.isOnline()) return;
 
-    if(DataManager.getCorrida()) return;
+    const corridaExistente = DataManager.getCorrida();
 
+    // Se existir corrida pendente, apenas mostra o card
+    if(corridaExistente && corridaExistente.status === "pendente"){
+      RideCard.show(corridaExistente);
+      return;
+    }
+
+    // Caso contrário cria nova
     const corrida = DataManager.criarCorridaSimulada();
 
-    console.log("Corrida simulada:", corrida);
-
-    if(window.RideCard){
+    if(corrida){
+      console.log("Corrida simulada:", corrida);
       RideCard.show(corrida);
-    }else{
-      console.error("RideCard não carregado.");
     }
 
   },3000);
-
 }
 
 </script>
