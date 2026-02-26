@@ -54,9 +54,9 @@ window.DataManager = {
 
   getGanhosHoje(){
     return parseFloat(localStorage.getItem("rf_ganhos_dia")) || 0;
-  }
+  },
 
-/* =========================
+  /* =========================
      CORRIDA SIMULADA
   ========================== */
 
@@ -64,7 +64,7 @@ window.DataManager = {
 
     const corrida = {
       id: Date.now(),
-      valor: 20 + Math.floor(Math.random() * 30), // entre 20 e 50
+      valor: 20 + Math.floor(Math.random() * 30),
       status: "pendente"
     };
 
