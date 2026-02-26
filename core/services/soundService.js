@@ -15,17 +15,11 @@ window.SoundService = {
   play(tipo){
 
     const caminho = this.sounds[tipo];
-
-    if(!caminho){
-      console.warn("Som não encontrado:", tipo);
-      return;
-    }
+    if(!caminho) return;
 
     const audio = new Audio(caminho);
-    audio.preload = "auto";
-    audio.play().catch(e=>{
-      console.warn("Autoplay bloqueado:", tipo);
-    });
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
 
   }
 
