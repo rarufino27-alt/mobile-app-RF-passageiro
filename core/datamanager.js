@@ -56,4 +56,36 @@ window.DataManager = {
     return parseFloat(localStorage.getItem("rf_ganhos_dia")) || 0;
   }
 
+/* =========================
+     CORRIDA SIMULADA
+  ========================== */
+
+  criarCorridaSimulada(){
+
+    const corrida = {
+      id: Date.now(),
+      valor: 20 + Math.floor(Math.random() * 30), // entre 20 e 50
+      status: "pendente"
+    };
+
+    localStorage.setItem("rf_corrida", JSON.stringify(corrida));
+    return corrida;
+  },
+
+  getCorrida(){
+    return JSON.parse(localStorage.getItem("rf_corrida"));
+  },
+
+  atualizarStatusCorrida(status){
+    let corrida = this.getCorrida();
+    if(!corrida) return;
+
+    corrida.status = status;
+    localStorage.setItem("rf_corrida", JSON.stringify(corrida));
+  },
+
+  limparCorrida(){
+    localStorage.removeItem("rf_corrida");
+  }
+
 };
