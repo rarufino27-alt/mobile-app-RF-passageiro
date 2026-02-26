@@ -43,36 +43,28 @@
 </main>
 
 <script>
+
 document.addEventListener("DOMContentLoaded", ()=>{
 
-  if(window.DataManager && typeof window.DataManager.getCreditos === "function"){
-    document.getElementById("creditosTopo").innerText =
-      window.DataManager.getCreditos().toFixed(2);
-  }else{
-    document.getElementById("creditosTopo").innerText = "0.00";
-  }
+  document.getElementById("creditosTopo").innerText =
+    DataManager.getCreditos().toFixed(2);
 
 });
-
-if(creditos <= 0){
-  SoundService.play("SEM_CREDITO");
-  alert("Sem créditos suficientes.");
-  return;
-}
-
-SoundService.play("ONLINE");
-DataManager.setOnline(true);
 
 function ficarOnline(){
 
   const creditos = DataManager.getCreditos();
 
   if(creditos <= 0){
+    SoundService.play("SEM_CREDITO");
     alert("Sem créditos suficientes.");
     return;
   }
 
+  SoundService.play("ONLINE");
+
   DataManager.setOnline(true);
+
   window.location.href = "driver-home.html";
 }
 
