@@ -9,9 +9,9 @@
 
 <style>
 :root{
-  --rf-yellow:#ffd600;
-  --rf-yellow-strong:#ffb800;
-  --rf-radius:26px;
+  --rf-gold:#C6A85E;
+  --rf-gold-soft:#B8964A;
+  --rf-radius:20px;
 }
 
 *{
@@ -21,83 +21,63 @@
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
 
-/* ===== FUNDO PREMIUM ===== */
 body{
-  background: radial-gradient(circle at top,#1a1a1a 0%,#000 70%);
+  background: radial-gradient(circle at top,#141417 0%,#0e0e11 70%);
   color:#fff;
+  animation:fadeIn .5s ease;
 }
 
-/* ===== HEADER ===== */
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(6px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* HEADER */
 .header{
-  padding:25px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.logo{
+  padding:18px 20px;
   display:flex;
   align-items:center;
   gap:10px;
-  font-weight:900;
-  font-size:18px;
+  font-weight:700;
+  font-size:16px;
 }
 
 .logo-img{
-  width:30px;
-  height:30px;
-  border-radius:10px;
+  width:26px;
+  height:26px;
+  border-radius:8px;
 }
 
-/* ===== HERO ===== */
+/* HERO MINIMAL */
 .hero{
-  padding:35px 25px 10px;
-  text-align:center;
-}
-
-.hero h1{
-  font-size:22px;
+  padding:10px 20px 5px;
+  font-size:20px;
   font-weight:800;
 }
 
-.hero p{
-  opacity:.6;
-  margin-top:6px;
-}
-
-.status-card{
-  margin:20px 25px;
-  padding:16px;
-  border-radius:20px;
-  background:rgba(255,255,255,.06);
-  backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,.08);
-  font-size:14px;
-}
-
-/* ===== CARD GLASS ===== */
+/* CARD */
 .card{
-  margin:0 25px 50px;
-  padding:25px;
-  border-radius:30px;
-  background:rgba(255,255,255,.07);
+  margin:10px 20px 30px;
+  padding:18px;
+  border-radius:var(--rf-radius);
+  background:rgba(255,255,255,.04);
   backdrop-filter:blur(25px);
-  border:1px solid rgba(255,255,255,.08);
-  box-shadow:0 20px 60px rgba(0,0,0,.8);
+  border:1px solid rgba(198,168,94,.15);
   display:flex;
   flex-direction:column;
-  gap:18px;
+  gap:12px;
 }
 
-/* ===== INPUTS ===== */
+/* INPUT */
 .input-box{
-  background:rgba(255,255,255,.08);
-  padding:16px;
-  border-radius:18px;
+  background:rgba(255,255,255,.07);
+  padding:12px 14px;
+  border-radius:14px;
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
   cursor:pointer;
+  font-size:14px;
   transition:.2s;
 }
 
@@ -106,8 +86,8 @@ body{
 }
 
 .dot{
-  width:12px;
-  height:12px;
+  width:10px;
+  height:10px;
   border-radius:50%;
 }
 
@@ -115,49 +95,41 @@ body{
 .parada{background:#3b82f6;}
 .destino{background:#ef4444;}
 
-/* ===== BOTÃO + ===== */
+/* PLUS */
 .plus-btn{
   align-self:center;
-  width:44px;
-  height:44px;
+  width:38px;
+  height:38px;
   border-radius:50%;
-  background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-strong));
+  background:linear-gradient(135deg,var(--rf-gold),var(--rf-gold-soft));
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:900;
+  font-weight:800;
   cursor:pointer;
-  font-size:22px;
   transition:.3s;
-  box-shadow:0 10px 30px rgba(255,214,0,.5);
+  box-shadow:0 0 15px rgba(198,168,94,.35);
 }
 
 .plus-btn.active{
   transform:rotate(45deg);
-  background:#ef4444;
-  box-shadow:0 10px 30px rgba(239,68,68,.5);
-  color:#fff;
 }
 
-/* ===== BOTÕES EXTRAS ===== */
+/* OPTIONS */
 .option-btn{
-  padding:14px;
-  border-radius:16px;
+  padding:10px;
+  border-radius:14px;
   border:1px solid rgba(255,255,255,.15);
   text-align:center;
   cursor:pointer;
-  font-weight:600;
-  background:rgba(255,255,255,.06);
+  font-size:13px;
+  background:rgba(255,255,255,.05);
   transition:.2s;
 }
 
-.option-btn:hover{
-  background:rgba(255,255,255,.12);
-}
-
 .option-btn.active{
-  border-color:var(--rf-yellow);
-  background:rgba(255,214,0,.15);
+  border-color:var(--rf-gold);
+  background:rgba(198,168,94,.12);
 }
 
 .option-mercado.active{
@@ -165,53 +137,47 @@ body{
   background:rgba(34,197,94,.15);
 }
 
-/* ===== PREÇO ===== */
+/* PREÇO */
 .preco{
   display:none;
-  background:rgba(255,214,0,.15);
-  padding:18px;
-  border-radius:18px;
-  text-align:center;
+  padding:14px;
+  border-radius:14px;
+  background:rgba(198,168,94,.12);
+  font-size:14px;
 }
 
 .preco strong{
-  font-size:20px;
-  color:var(--rf-yellow);
+  color:var(--rf-gold);
+  font-size:16px;
 }
 
 .preco.animar{
-  animation:pulse .3s ease;
+  animation:pulse .25s ease;
 }
 
 @keyframes pulse{
-  0%{ transform:scale(1); }
-  50%{ transform:scale(1.05); }
-  100%{ transform:scale(1); }
+  0%{transform:scale(1);}
+  50%{transform:scale(1.04);}
+  100%{transform:scale(1);}
 }
 
-/* ===== BOTÃO PRINCIPAL ===== */
+/* BUTTON */
 button{
-  padding:18px;
+  padding:14px;
   border:none;
-  border-radius:40px;
-  background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-strong));
-  font-weight:900;
+  border-radius:30px;
+  background:linear-gradient(135deg,var(--rf-gold),var(--rf-gold-soft));
+  font-weight:700;
+  font-size:14px;
   cursor:pointer;
-  font-size:16px;
-  box-shadow:0 15px 40px rgba(255,214,0,.5);
   transition:.2s;
-}
-
-button:hover{
-  transform:translateY(-2px);
 }
 
 button:disabled{
   opacity:.4;
-  box-shadow:none;
 }
 
-/* ===== MODAL ===== */
+/* MODAL */
 .modal{
   position:fixed;
   inset:0;
@@ -219,29 +185,27 @@ button:disabled{
   display:none;
   align-items:center;
   justify-content:center;
-  z-index:100;
 }
 
 .modal-content{
-  background:#111;
-  color:#fff;
+  background:#141417;
   width:90%;
-  max-width:420px;
-  border-radius:22px;
-  padding:20px;
+  max-width:400px;
+  border-radius:18px;
+  padding:18px;
   max-height:80vh;
   overflow:auto;
 }
 
 .modal-content div{
-  padding:12px;
-  border-radius:12px;
+  padding:10px;
+  border-radius:10px;
   cursor:pointer;
-  transition:.2s;
+  font-size:14px;
 }
 
 .modal-content div:hover{
-  background:rgba(255,255,255,.1);
+  background:rgba(255,255,255,.08);
 }
 </style>
 </head>
@@ -249,24 +213,15 @@ button:disabled{
 <body>
 
 <header class="header">
-  <div class="logo">
-    <img src="assets/icons/icon-192.png" class="logo-img">
-    <span>PASSAGEIRO RF</span>
-  </div>
+  <img src="assets/icons/icon-192.png" class="logo-img">
+  PASSAGEIRO RF
 </header>
 
 <div class="hero">
-  <h1>Seu motorista está mais perto do que você imagina.</h1>
-  <p>Solicite sua viagem com confiança.</p>
-</div>
-
-<div class="status-card">
-  ✔ 12 motoristas online • ⏱ 4 min médio
+  Para onde vamos?
 </div>
 
 <div class="card">
-
-  <h2>Para onde vamos?</h2>
 
   <div class="input-box" id="origemBtn">
     <div class="dot origem"></div>
