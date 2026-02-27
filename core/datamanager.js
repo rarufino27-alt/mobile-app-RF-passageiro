@@ -1,7 +1,10 @@
 const DataManager = {
   rotas: [],
+  carregado: false,
 
-  async carregar(){
+  async carregar() {
+    if (this.carregado) return;
+
     try {
 
       const arquivos = [
@@ -31,10 +34,11 @@ const DataManager = {
 
       const respostas = await Promise.all(
         arquivos.map(nome =>
-          fetch("/mobile-app-RF/data/" + nome)
+          fetch("data/" + nome)
             .then(r => {
-              if(!r.ok){
-                throw new Error("Erro ao carregar: " + nome);
+              if (!r.ok) {
+                console.warn("Arquivo não encontrado:", nome);
+                return [];
               }
               return r.json();
             })
@@ -42,25 +46,26 @@ const DataManager = {
       );
 
       this.rotas = respostas.flat();
+      this.carregado = true;
 
       console.log("ROTAS CARREGADAS:", this.rotas.length);
 
-    } catch(e){
+    } catch (e) {
       console.error("ERRO NO CARREGAMENTO:", e);
     }
   },
 
-  listarOrigens(){
+  listarOrigens() {
     return [...new Set(this.rotas.map(r => r.origem))].sort();
   },
 
-  listarDestinos(origem){
+  listarDestinos(origem) {
     return this.rotas
       .filter(r => r.origem === origem)
       .map(r => r.destino);
   },
 
-  buscarValor(origem, destino){
+  buscarValor(origem, destino) {
     const rota = this.rotas.find(r =>
       (r.origem === origem && r.destino === destino) ||
       (r.origem === destino && r.destino === origem)
@@ -69,3 +74,5 @@ const DataManager = {
     return rota ? Number(rota.valor) : null;
   }
 };
+
+window.DataManager = DataManager;
