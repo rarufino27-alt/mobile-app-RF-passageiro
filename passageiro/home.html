@@ -8,15 +8,22 @@
 <script src="/mobile-app-RF/passageiro/core/datamanager.js"></script>
 
 <style>
+
+/* ============================= */
+/* DESIGN SYSTEM RF BASE */
+/* ============================= */
+
 :root{
-  --rf-yellow1:#ffd600;
-  --rf-yellow2:#ffb800;
-  --rf-red1:#ff4d4d;
-  --rf-red2:#b30000;
-  --rf-light-bg:#f4f4f4;
-  --rf-dark-bg:#0b0b0b;
-  --rf-card-light:#ffffff;
-  --rf-card-dark:#1c1c1c;
+  --rf-black:#0b0b0b;
+  --rf-dark:#121212;
+  --rf-yellow:#ffd600;
+  --rf-yellow-strong:#ffb800;
+  --rf-white:#ffffff;
+  --rf-gray:#eaeaea;
+  --rf-text-dark:#000;
+  --rf-text-light:#fff;
+  --rf-radius:22px;
+  --rf-shadow:0 20px 60px rgba(0,0,0,.35);
 }
 
 /* RESET */
@@ -28,43 +35,29 @@
 }
 
 /* BODY */
+
 body{
-  height:100vh;
-  overflow:hidden;
-  transition:.4s ease;
+  background: radial-gradient(circle at top, #1a1a1a 0%, #000 60%);
+  color:var(--rf-text-light);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
 }
 
-/* TEMA CLARO */
-body.light{
-  background: radial-gradient(circle at 50% 0%, #ffffff 0%, #eaeaea 60%, #dcdcdc 100%);
-  color:#000;
-}
+/* HEADER */
 
-/* TEMA ESCURO */
-body:not(.light){
-  background: radial-gradient(circle at 50% 0%, #2a2a2a 0%, #111 50%, #000 100%);
-  color:#fff;
-}
-
-/* HEADER SEMPRE PRETO PREMIUM */
-.top{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
+.header{
+  background:linear-gradient(180deg,#000,#111);
   padding:20px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  z-index:10;
-  background:linear-gradient(180deg,#000 0%, #111 100%);
-  color:#fff;
 }
 
 .logo{
   font-weight:900;
+  letter-spacing:.8px;
   font-size:1.1rem;
-  letter-spacing:.6px;
 }
 
 .menu{
@@ -72,144 +65,78 @@ body:not(.light){
   cursor:pointer;
 }
 
-/* SLIDER */
-#slider-wrapper{
-  position:absolute;
-  top:90px;
-  left:20px;
-  right:20px;
-  height:170px;
-  z-index:2;
-}
+/* MAIN CONTAINER */
 
-#slider{
-  position:relative;
-  width:100%;
-  height:100%;
-  border-radius:22px;
-  overflow:hidden;
-  box-shadow:0 20px 60px rgba(0,0,0,.35);
-}
-
-/* SLIDES BASE */
-.slide{
-  position:absolute;
-  inset:0;
+.main{
+  flex:1;
   display:flex;
-  align-items:center;
+  flex-direction:column;
   justify-content:center;
-  text-align:center;
   padding:20px;
-  opacity:0;
-  transition:all .6s ease;
+  gap:30px;
 }
 
-.slide.active{
-  opacity:1;
+/* HERO */
+
+.hero{
+  text-align:center;
 }
 
-/* SLIDE FUNDO TEMA CLARO */
-body.light .slide.dark-base{
-  background:linear-gradient(135deg,#2a2a2a,#1a1a1a);
-  color:#fff;
-}
-
-/* SLIDE FUNDO TEMA ESCURO */
-body:not(.light) .slide.dark-base{
-  background:linear-gradient(135deg,#000,#111);
-  color:#fff;
-}
-
-/* AMARELO */
-.slide.yellow{
-  background:linear-gradient(135deg,var(--rf-yellow1),var(--rf-yellow2));
-  color:#000;
-}
-
-/* VERMELHO */
-.slide.red{
-  background:linear-gradient(135deg,var(--rf-red1),var(--rf-red2));
-  color:#fff;
-}
-
-/* BRANCO PREMIUM CLARO */
-body.light .slide.white{
-  background:linear-gradient(135deg,#ffffff,#e6e6e6);
-  color:#000;
-}
-
-/* BRANCO PUXANDO PRO PRETO NO ESCURO */
-body:not(.light) .slide.white{
-  background:linear-gradient(135deg,#1a1a1a,#000);
-  color:#fff;
-}
-
-.emoji{
-  font-size:2rem;
-  margin-bottom:10px;
-}
-
-.slide h2{
-  font-size:1.25rem;
+.hero h1{
+  font-size:1.4rem;
   font-weight:800;
-  letter-spacing:.3px;
+  margin-bottom:8px;
 }
 
-/* CARD INFERIOR */
+.hero p{
+  opacity:.75;
+  font-size:.95rem;
+}
+
+/* STATUS BLOCO */
+
+.status{
+  background:rgba(255,255,255,.05);
+  border-radius:var(--rf-radius);
+  padding:18px;
+  display:flex;
+  justify-content:space-between;
+  font-size:.9rem;
+}
+
+.status span{
+  opacity:.85;
+}
+
+/* CARD PRINCIPAL */
+
 .card{
-  position:absolute;
-  bottom:0;
-  left:0;
-  right:0;
-  padding:25px 20px 35px;
-  border-top-left-radius:28px;
-  border-top-right-radius:28px;
-  backdrop-filter:blur(25px);
-  z-index:5;
-  animation:slideUp .5s ease;
+  background:var(--rf-white);
+  color:var(--rf-text-dark);
+  border-radius:var(--rf-radius);
+  padding:25px;
+  box-shadow:var(--rf-shadow);
+  display:flex;
+  flex-direction:column;
+  gap:15px;
 }
 
-/* CARD CLARO */
-body.light .card{
-  background:rgba(255,255,255,.95);
-  box-shadow:0 -20px 60px rgba(0,0,0,.25);
-}
-
-/* CARD ESCURO */
-body:not(.light) .card{
-  background:rgba(25,25,25,.95);
-  box-shadow:0 -20px 60px rgba(0,0,0,.5);
-}
-
-@keyframes slideUp{
-  from{transform:translateY(100%);}
-  to{transform:translateY(0);}
-}
-
-.titulo{
+.card h2{
   font-size:1.2rem;
-  font-weight:700;
-  margin-bottom:20px;
+  font-weight:800;
 }
 
-/* INPUTS */
+/* INPUT BOX */
+
 .input-box{
-  border-radius:14px;
+  background:#f2f2f2;
   padding:14px;
-  margin-bottom:12px;
+  border-radius:14px;
   display:flex;
   align-items:center;
   gap:10px;
   cursor:pointer;
   transition:.2s ease;
-}
-
-body.light .input-box{
-  background:#f0f0f0;
-}
-
-body:not(.light) .input-box{
-  background:#2a2a2a;
 }
 
 .input-box:active{
@@ -225,55 +152,40 @@ body:not(.light) .input-box{
 .origem{background:#22c55e;}
 .destino{background:#ef4444;}
 
-.preco-box{
-  margin-top:15px;
-  padding:15px;
-  border-radius:14px;
+.preco{
   background:rgba(255,214,0,.15);
+  padding:14px;
+  border-radius:14px;
   display:none;
 }
 
-.preco-valor{
-  font-size:1.6rem;
-  font-weight:900;
-  color:var(--rf-yellow1);
+.preco strong{
+  font-size:1.4rem;
+  color:var(--rf-yellow-strong);
 }
 
 /* BOTÃO */
+
 button{
-  width:100%;
-  margin-top:15px;
   padding:16px;
   border:none;
   border-radius:30px;
-  background:linear-gradient(135deg,var(--rf-yellow1),var(--rf-yellow2));
-  box-shadow:0 12px 30px rgba(255,190,0,.4);
+  background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-strong));
   font-weight:800;
-  font-size:1rem;
   cursor:pointer;
   transition:.2s ease;
 }
 
 button:disabled{
   opacity:.5;
-  box-shadow:none;
 }
 
 button:active{
   transform:scale(.96);
 }
 
-@keyframes spin{
-  from{transform:rotate(0deg);}
-  to{transform:rotate(360deg);}
-}
-
-#btnLoader{
-  display:inline-block;
-  animation:spin 1s linear infinite;
-}
-
 /* MODAL */
+
 .modal{
   position:fixed;
   inset:0;
@@ -281,160 +193,61 @@ button:active{
   display:none;
   align-items:center;
   justify-content:center;
-  z-index:20;
 }
 
 .modal-content{
   background:#fff;
   width:90%;
   max-width:400px;
-  padding:20px;
   border-radius:20px;
-  max-height:80vh;
-  overflow:auto;
-}
-
-.mensagem-central{
-  position:absolute;
-  top:280px;
-  left:20px;
-  right:20px;
-  text-align:center;
-  z-index:3;
-  transition:.3s ease;
-}
-
-.mensagem-central h3{
-  font-size:1.1rem;
-  font-weight:800;
-  margin-bottom:6px;
-}
-
-.mensagem-central p{
-  font-size:.95rem;
-  opacity:.75;
-}
-
-body:not(.light) .mensagem-central{
-  color:#fff;
-}
-
-body.light .mensagem-central{
-  color:#000;
-}
-
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.5);
-  display:none;
-  z-index:15;
-}
-
-.menu-drawer{
-  position:fixed;
-  top:0;
-  left:-260px;
-  width:260px;
-  height:100%;
-  background:#111;
-  color:#fff;
   padding:20px;
-  transition:.3s ease;
-  z-index:20;
-  box-shadow:5px 0 30px rgba(0,0,0,.4);
 }
 
-.menu-drawer.open{
-  left:0;
-}
-
-.menu-header{
-  font-weight:900;
-  margin-bottom:20px;
-}
-
-.menu-item{
-  padding:12px 0;
-  border-bottom:1px solid rgba(255,255,255,.1);
-  cursor:pointer;
-  transition:.2s ease;
-}
-
-.menu-item:hover{
-  opacity:.7;
-}
 </style>
 </head>
 <body>
 
-<div class="top">
+<header class="header">
   <div class="logo">PASSAGEIRO RF</div>
   <div class="menu">☰</div>
-</div>
+</header>
 
-<div id="slider-wrapper">
-  <div id="slider">
+<main class="main">
 
-    <div class="slide dark-base active">
-      <div>
-        <div class="emoji">🚗</div>
-        <h2>Viaje com rapidez e segurança</h2>
-      </div>
-    </div>
-
-    <div class="slide yellow">
-      <div>
-        <div class="emoji">💛</div>
-        <h2>Apoie motoristas locais</h2>
-      </div>
-    </div>
-
-    <div class="slide red">
-      <div>
-        <div class="emoji">🔥</div>
-        <h2>Promoções especiais hoje</h2>
-      </div>
-    </div>
-
-    <div class="slide white">
-      <div>
-        <div class="emoji">💰</div>
-        <h2>Preço justo e transparente</h2>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<div class="mensagem-central">
-  <h3>Seu destino começa aqui.</h3>
-  <p>Escolha origem e destino e viaje com conforto, segurança e preço justo.</p>
-</div>
-
-<div class="card">
-  <div class="titulo">Para onde vamos?</div>
-
-  <div class="input-box" id="origemBtn">
-    <div class="dot origem"></div>
-    <div id="origemTexto">Selecionar origem</div>
+  <div class="hero">
+    <h1>Seu motorista está mais perto do que você imagina.</h1>
+    <p>Disponibilidade garantida todos os dias.</p>
   </div>
 
-  <div class="input-box" id="destinoBtn">
-    <div class="dot destino"></div>
-    <div id="destinoTexto">Selecionar destino</div>
+  <div class="status">
+    <span>✔ 12 motoristas online</span>
+    <span>⏱ Tempo médio: 4 min</span>
   </div>
 
-  <div class="preco-box" id="precoBox">
-    <div>Valor estimado</div>
-    <div class="preco-valor" id="precoValor">R$ 0,00</div>
+  <div class="card">
+
+    <h2>Para onde vamos?</h2>
+
+    <div class="input-box" id="origemBtn">
+      <div class="dot origem"></div>
+      <div id="origemTexto">Selecionar origem</div>
+    </div>
+
+    <div class="input-box" id="destinoBtn">
+      <div class="dot destino"></div>
+      <div id="destinoTexto">Selecionar destino</div>
+    </div>
+
+    <div class="preco" id="precoBox">
+      Valor estimado<br>
+      <strong id="precoValor">R$ 0,00</strong>
+    </div>
+
+    <button id="confirmar" disabled>Buscar Motorista</button>
+
   </div>
 
-  <button id="confirmar" disabled>
-    <span id="btnText">Buscar Motorista</span>
-    <span id="btnLoader" style="display:none;">⏳</span>
-  </button>
-</div>
+</main>
 
 <div class="modal" id="modal">
   <div class="modal-content">
@@ -443,53 +256,19 @@ body.light .mensagem-central{
   </div>
 </div>
 
-<div class="overlay" id="overlay"></div>
-
-<div class="menu-drawer" id="menuDrawer">
-  <div class="menu-header">Menu</div>
-  <div class="menu-item">Minhas viagens</div>
-  <div class="menu-item">Carteira</div>
-  <div class="menu-item">Suporte</div>
-  <div class="menu-item">Configurações</div>
-</div>
-
 <script>
+
 let origem=null,destino=null;
+
 const modal=document.getElementById("modal");
 const lista=document.getElementById("lista");
 const confirmarBtn=document.getElementById("confirmar");
 const precoBox=document.getElementById("precoBox");
 const precoValor=document.getElementById("precoValor");
 
-/* TEMA AUTOMÁTICO */
-function aplicarTema(){
-  const agora=new Date();
-  const minutos=agora.getHours()*60+agora.getMinutes();
-  const claro=330; // 5:30
-  const escuro=1050; // 17:30
-
-  if(minutos>=claro && minutos<escuro){
-    document.body.classList.add("light");
-  }else{
-    document.body.classList.remove("light");
-  }
-}
-aplicarTema();
-setInterval(aplicarTema,60000);
-
 /* CARREGAR DADOS */
 (async()=>{ await DataManager.carregar(); })();
 
-/* SLIDER */
-const slides=document.querySelectorAll(".slide");
-let index=0;
-setInterval(()=>{
-  slides[index].classList.remove("active");
-  index=(index+1)%slides.length;
-  slides[index].classList.add("active");
-},4000);
-
-/* FUNÇÕES */
 function atualizarPreco(){
   if(origem && destino){
     const valor=DataManager.buscarValor(origem,destino)||0;
@@ -514,6 +293,8 @@ function abrirModal(tipo){
   dados.forEach(item=>{
     const div=document.createElement("div");
     div.innerText=item;
+    div.style.padding="10px";
+    div.style.cursor="pointer";
     div.onclick=()=>{
       if(tipo==="origem"){
         origem=item;
@@ -537,32 +318,13 @@ origemBtn.onclick=()=>abrirModal("origem");
 destinoBtn.onclick=()=>abrirModal("destino");
 
 confirmarBtn.onclick=()=>{
-  document.getElementById("btnText").style.display="none";
-  document.getElementById("btnLoader").style.display="inline-block";
-  confirmarBtn.disabled=true;
-
-  setTimeout(()=>{
-    const valor=DataManager.buscarValor(origem,destino)||0;
-    localStorage.setItem("rf_corrida_temp",
-      JSON.stringify({origem,destino,valor})
-    );
-    window.location.href="selecionar.html";
-  },1200);
+  const valor=DataManager.buscarValor(origem,destino)||0;
+  localStorage.setItem("rf_corrida_temp",
+    JSON.stringify({origem,destino,valor})
+  );
+  window.location.href="selecionar.html";
 };
 
-const menuBtn=document.querySelector(".menu");
-const menuDrawer=document.getElementById("menuDrawer");
-const overlay=document.getElementById("overlay");
-
-menuBtn.onclick=()=>{
-  menuDrawer.classList.add("open");
-  overlay.style.display="block";
-};
-
-overlay.onclick=()=>{
-  menuDrawer.classList.remove("open");
-  overlay.style.display="none";
-};
 </script>
 
 </body>
