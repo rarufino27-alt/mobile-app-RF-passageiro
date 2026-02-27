@@ -9,14 +9,14 @@
 
 <style>
 :root{
-  --rf-yellow:#ffd600;
-  --rf-yellow-dark:#ffb800;
+  --rf-yellow1:#ffd600;
+  --rf-yellow2:#ffb800;
+  --rf-red1:#ff4d4d;
+  --rf-red2:#b30000;
   --rf-light-bg:#f4f4f4;
   --rf-dark-bg:#0b0b0b;
-  --rf-light-card:#ffffff;
-  --rf-dark-card:#1c1c1c;
-  --rf-light-text:#000;
-  --rf-dark-text:#fff;
+  --rf-card-light:#ffffff;
+  --rf-card-dark:#1c1c1c;
 }
 
 /* RESET */
@@ -31,18 +31,22 @@
 body{
   height:100vh;
   overflow:hidden;
-  background: radial-gradient(circle at 50% 0%, #2a2a2a 0%, #111 50%, #0a0a0a 100%);
-  color:var(--rf-dark-text);
   transition:.4s ease;
 }
 
 /* TEMA CLARO */
 body.light{
   background: radial-gradient(circle at 50% 0%, #ffffff 0%, #eaeaea 60%, #dcdcdc 100%);
-  color:var(--rf-light-text);
+  color:#000;
 }
 
-/* HEADER */
+/* TEMA ESCURO */
+body:not(.light){
+  background: radial-gradient(circle at 50% 0%, #2a2a2a 0%, #111 50%, #000 100%);
+  color:#fff;
+}
+
+/* HEADER SEMPRE PRETO PREMIUM */
 .top{
   position:absolute;
   top:0;
@@ -53,20 +57,14 @@ body.light{
   justify-content:space-between;
   align-items:center;
   z-index:10;
-  background:#000;
+  background:linear-gradient(180deg,#000 0%, #111 100%);
   color:#fff;
-  transition:.4s ease;
-}
-
-body.light .top{
-  background:#fff;
-  color:#000;
 }
 
 .logo{
   font-weight:900;
   font-size:1.1rem;
-  letter-spacing:.5px;
+  letter-spacing:.6px;
 }
 
 .menu{
@@ -90,9 +88,10 @@ body.light .top{
   height:100%;
   border-radius:22px;
   overflow:hidden;
-  box-shadow:0 15px 45px rgba(0,0,0,.35);
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
 }
 
+/* SLIDES BASE */
 .slide{
   position:absolute;
   inset:0;
@@ -107,15 +106,42 @@ body.light .top{
 
 .slide.active{
   opacity:1;
-  transform:translateX(0);
 }
 
-.slide-content{
+/* SLIDE FUNDO TEMA CLARO */
+body.light .slide.dark-base{
+  background:linear-gradient(135deg,#2a2a2a,#1a1a1a);
   color:#fff;
 }
 
-.slide-content.dark-text{
+/* SLIDE FUNDO TEMA ESCURO */
+body:not(.light) .slide.dark-base{
+  background:linear-gradient(135deg,#000,#111);
+  color:#fff;
+}
+
+/* AMARELO */
+.slide.yellow{
+  background:linear-gradient(135deg,var(--rf-yellow1),var(--rf-yellow2));
   color:#000;
+}
+
+/* VERMELHO */
+.slide.red{
+  background:linear-gradient(135deg,var(--rf-red1),var(--rf-red2));
+  color:#fff;
+}
+
+/* BRANCO PREMIUM CLARO */
+body.light .slide.white{
+  background:linear-gradient(135deg,#ffffff,#e6e6e6);
+  color:#000;
+}
+
+/* BRANCO PUXANDO PRO PRETO NO ESCURO */
+body:not(.light) .slide.white{
+  background:linear-gradient(135deg,#1a1a1a,#000);
+  color:#fff;
 }
 
 .emoji{
@@ -126,9 +152,10 @@ body.light .top{
 .slide h2{
   font-size:1.25rem;
   font-weight:800;
+  letter-spacing:.3px;
 }
 
-/* CARD */
+/* CARD INFERIOR */
 .card{
   position:absolute;
   bottom:0;
@@ -138,19 +165,20 @@ body.light .top{
   border-top-left-radius:28px;
   border-top-right-radius:28px;
   backdrop-filter:blur(25px);
-  background:rgba(255,255,255,.95);
-  box-shadow:0 -20px 60px rgba(0,0,0,.25);
   z-index:5;
   animation:slideUp .5s ease;
 }
 
+/* CARD CLARO */
 body.light .card{
   background:rgba(255,255,255,.95);
+  box-shadow:0 -20px 60px rgba(0,0,0,.25);
 }
 
+/* CARD ESCURO */
 body:not(.light) .card{
   background:rgba(25,25,25,.95);
-  color:#fff;
+  box-shadow:0 -20px 60px rgba(0,0,0,.5);
 }
 
 @keyframes slideUp{
@@ -164,8 +192,8 @@ body:not(.light) .card{
   margin-bottom:20px;
 }
 
+/* INPUTS */
 .input-box{
-  background:#f0f0f0;
   border-radius:14px;
   padding:14px;
   margin-bottom:12px;
@@ -174,6 +202,10 @@ body:not(.light) .card{
   gap:10px;
   cursor:pointer;
   transition:.2s ease;
+}
+
+body.light .input-box{
+  background:#f0f0f0;
 }
 
 body:not(.light) .input-box{
@@ -193,11 +225,6 @@ body:not(.light) .input-box{
 .origem{background:#22c55e;}
 .destino{background:#ef4444;}
 
-.texto{
-  font-weight:500;
-}
-
-/* PREÇO */
 .preco-box{
   margin-top:15px;
   padding:15px;
@@ -209,7 +236,7 @@ body:not(.light) .input-box{
 .preco-valor{
   font-size:1.6rem;
   font-weight:900;
-  color:var(--rf-yellow);
+  color:var(--rf-yellow1);
 }
 
 /* BOTÃO */
@@ -219,7 +246,7 @@ button{
   padding:16px;
   border:none;
   border-radius:30px;
-  background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-dark));
+  background:linear-gradient(135deg,var(--rf-yellow1),var(--rf-yellow2));
   box-shadow:0 12px 30px rgba(255,190,0,.4);
   font-weight:800;
   font-size:1rem;
@@ -266,24 +293,6 @@ button:active{
   max-height:80vh;
   overflow:auto;
 }
-
-.modal-content input{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:2px solid var(--rf-yellow);
-  margin-bottom:10px;
-}
-
-.lista div{
-  padding:10px;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.lista div:hover{
-  background:#f0f0f0;
-}
 </style>
 </head>
 <body>
@@ -296,22 +305,29 @@ button:active{
 <div id="slider-wrapper">
   <div id="slider">
 
-    <div class="slide active premium-dark">
-      <div class="slide-content">
+    <div class="slide dark-base active">
+      <div>
         <div class="emoji">🚗</div>
         <h2>Viaje com rapidez e segurança</h2>
       </div>
     </div>
 
-    <div class="slide premium-yellow">
-      <div class="slide-content dark-text">
+    <div class="slide yellow">
+      <div>
         <div class="emoji">💛</div>
         <h2>Apoie motoristas locais</h2>
       </div>
     </div>
 
-    <div class="slide premium-blue">
-      <div class="slide-content">
+    <div class="slide red">
+      <div>
+        <div class="emoji">🔥</div>
+        <h2>Promoções especiais hoje</h2>
+      </div>
+    </div>
+
+    <div class="slide white">
+      <div>
         <div class="emoji">💰</div>
         <h2>Preço justo e transparente</h2>
       </div>
@@ -325,12 +341,12 @@ button:active{
 
   <div class="input-box" id="origemBtn">
     <div class="dot origem"></div>
-    <div class="texto" id="origemTexto">Selecionar origem</div>
+    <div id="origemTexto">Selecionar origem</div>
   </div>
 
   <div class="input-box" id="destinoBtn">
     <div class="dot destino"></div>
-    <div class="texto" id="destinoTexto">Selecionar destino</div>
+    <div id="destinoTexto">Selecionar destino</div>
   </div>
 
   <div class="preco-box" id="precoBox">
@@ -347,13 +363,12 @@ button:active{
 <div class="modal" id="modal">
   <div class="modal-content">
     <input type="text" id="busca" placeholder="Buscar local...">
-    <div class="lista" id="lista"></div>
+    <div id="lista"></div>
   </div>
 </div>
 
 <script>
 let origem=null,destino=null;
-
 const modal=document.getElementById("modal");
 const lista=document.getElementById("lista");
 const confirmarBtn=document.getElementById("confirmar");
@@ -364,8 +379,8 @@ const precoValor=document.getElementById("precoValor");
 function aplicarTema(){
   const agora=new Date();
   const minutos=agora.getHours()*60+agora.getMinutes();
-  const claro=5*60+30;
-  const escuro=17*60+30;
+  const claro=330; // 5:30
+  const escuro=1050; // 17:30
 
   if(minutos>=claro && minutos<escuro){
     document.body.classList.add("light");
@@ -377,18 +392,7 @@ aplicarTema();
 setInterval(aplicarTema,60000);
 
 /* CARREGAR DADOS */
-(async()=>{
-  await DataManager.carregar();
-})();
-
-function atualizarPreco(){
-  if(origem && destino){
-    const valor=DataManager.buscarValor(origem,destino)||0;
-    precoValor.innerText="R$ "+valor.toFixed(2);
-    precoBox.style.display="block";
-    confirmarBtn.disabled=false;
-  }
-}
+(async()=>{ await DataManager.carregar(); })();
 
 /* SLIDER */
 const slides=document.querySelectorAll(".slide");
@@ -399,12 +403,22 @@ setInterval(()=>{
   slides[index].classList.add("active");
 },4000);
 
-/* MODAL */
+/* FUNÇÕES */
+function atualizarPreco(){
+  if(origem && destino){
+    const valor=DataManager.buscarValor(origem,destino)||0;
+    precoValor.innerText="R$ "+valor.toFixed(2);
+    precoBox.style.display="block";
+    confirmarBtn.disabled=false;
+  }
+}
+
 function abrirModal(tipo){
   if(tipo==="destino" && !origem){
     alert("Selecione a origem primeiro.");
     return;
   }
+
   modal.style.display="flex";
   const dados=tipo==="origem"
     ?DataManager.listarOrigens()
