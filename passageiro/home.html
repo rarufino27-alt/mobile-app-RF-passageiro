@@ -293,6 +293,77 @@ button:active{
   max-height:80vh;
   overflow:auto;
 }
+
+.mensagem-central{
+  position:absolute;
+  top:280px;
+  left:20px;
+  right:20px;
+  text-align:center;
+  z-index:3;
+  transition:.3s ease;
+}
+
+.mensagem-central h3{
+  font-size:1.1rem;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.mensagem-central p{
+  font-size:.95rem;
+  opacity:.75;
+}
+
+body:not(.light) .mensagem-central{
+  color:#fff;
+}
+
+body.light .mensagem-central{
+  color:#000;
+}
+
+.overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  z-index:15;
+}
+
+.menu-drawer{
+  position:fixed;
+  top:0;
+  left:-260px;
+  width:260px;
+  height:100%;
+  background:#111;
+  color:#fff;
+  padding:20px;
+  transition:.3s ease;
+  z-index:20;
+  box-shadow:5px 0 30px rgba(0,0,0,.4);
+}
+
+.menu-drawer.open{
+  left:0;
+}
+
+.menu-header{
+  font-weight:900;
+  margin-bottom:20px;
+}
+
+.menu-item{
+  padding:12px 0;
+  border-bottom:1px solid rgba(255,255,255,.1);
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.menu-item:hover{
+  opacity:.7;
+}
 </style>
 </head>
 <body>
@@ -336,6 +407,11 @@ button:active{
   </div>
 </div>
 
+<div class="mensagem-central">
+  <h3>Seu destino começa aqui.</h3>
+  <p>Escolha origem e destino e viaje com conforto, segurança e preço justo.</p>
+</div>
+
 <div class="card">
   <div class="titulo">Para onde vamos?</div>
 
@@ -365,6 +441,16 @@ button:active{
     <input type="text" id="busca" placeholder="Buscar local...">
     <div id="lista"></div>
   </div>
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="menu-drawer" id="menuDrawer">
+  <div class="menu-header">Menu</div>
+  <div class="menu-item">Minhas viagens</div>
+  <div class="menu-item">Carteira</div>
+  <div class="menu-item">Suporte</div>
+  <div class="menu-item">Configurações</div>
 </div>
 
 <script>
@@ -462,6 +548,20 @@ confirmarBtn.onclick=()=>{
     );
     window.location.href="selecionar.html";
   },1200);
+};
+
+const menuBtn=document.querySelector(".menu");
+const menuDrawer=document.getElementById("menuDrawer");
+const overlay=document.getElementById("overlay");
+
+menuBtn.onclick=()=>{
+  menuDrawer.classList.add("open");
+  overlay.style.display="block";
+};
+
+overlay.onclick=()=>{
+  menuDrawer.classList.remove("open");
+  overlay.style.display="none";
 };
 </script>
 
