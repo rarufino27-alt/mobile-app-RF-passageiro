@@ -30,7 +30,7 @@ body.dark{
 }
 
 body{
-  background:var(--rf-bg);
+  background:linear-gradient(180deg,#111 0%, #1a1a1a 40%, #f5f5f5 100%);
   height:100vh;
   overflow:hidden;
   transition:.3s ease;
@@ -272,6 +272,34 @@ button:disabled{
 .slide h2{
   font-size:1.1rem;
 }
+
+.input-box{
+  transition:.2s ease;
+}
+
+.input-box:active{
+  transform:scale(.97);
+}
+
+button{
+  position:relative;
+  overflow:hidden;
+  transition:.2s ease;
+}
+
+button:active{
+  transform:scale(.97);
+}
+
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+
+#btnLoader{
+  display:inline-block;
+  animation:spin 1s linear infinite;
+}
 </style>
 </head>
 <body>
@@ -333,8 +361,10 @@ button:disabled{
     <div class="preco-valor" id="precoValor">R$ 0,00</div>
   </div>
 
-  <button id="confirmar" disabled>Buscar Motorista</button>
-</div>
+  <button id="confirmar" disabled>
+  <span id="btnText">Buscar Motorista</span>
+  <span id="btnLoader" style="display:none;">⏳</span>
+</button>
 
 <div class="modal" id="modal">
   <div class="modal-content">
@@ -387,12 +417,24 @@ const slides = document.querySelectorAll(".slide");
 let currentSlide = 0;
 
 function trocarSlide(){
-  slides[currentSlide].classList.remove("active");
+  slides[currentSlide].style.transform="translateX(-100%)";
+  slides[currentSlide].style.opacity="0";
+
   currentSlide = (currentSlide + 1) % slides.length;
-  slides[currentSlide].classList.add("active");
+
+  slides[currentSlide].style.transform="translateX(0)";
+  slides[currentSlide].style.opacity="1";
 }
 
-setInterval(trocarSlide, 4000);
+slides.forEach(s=>{
+  s.style.transition="all .6s ease";
+  s.style.transform="translateX(100%)";
+});
+
+slides[0].style.transform="translateX(0)";
+slides[0].style.opacity="1";
+
+setInterval(trocarSlide,4000);
 
 function abrirModal(tipo){
   if(tipo==="destino" && !origem){
@@ -432,11 +474,18 @@ origemBtn.onclick=()=>abrirModal("origem");
 destinoBtn.onclick=()=>abrirModal("destino");
 
 confirmarBtn.onclick=()=>{
-  const valor=DataManager.buscarValor(origem,destino)||0;
-  localStorage.setItem("rf_corrida_temp",
-    JSON.stringify({origem,destino,valor})
-  );
-  window.location.href="selecionar.html";
+  document.getElementById("btnText").style.display="none";
+  document.getElementById("btnLoader").style.display="inline-block";
+
+  confirmarBtn.disabled=true;
+
+  setTimeout(()=>{
+    const valor=DataManager.buscarValor(origem,destino)||0;
+    localStorage.setItem("rf_corrida_temp",
+      JSON.stringify({origem,destino,valor})
+    );
+    window.location.href="selecionar.html";
+  },1200);
 };
 </script>
 
