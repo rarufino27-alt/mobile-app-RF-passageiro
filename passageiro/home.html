@@ -2,14 +2,26 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>RF – Viagem</title>
+<title>RF Passageiro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- CORE CORRETO PARA GITHUB PAGES -->
 <script src="/mobile-app-RF/core/datamanager.js"></script>
-<script src="/mobile-app-RF/core/global.js"></script>
 
 <style>
+:root{
+  --rf-yellow:#facc15;
+  --rf-dark:#111111;
+  --rf-card:#ffffff;
+  --rf-text:#000000;
+  --rf-bg:#f5f5f5;
+}
+
+body.dark{
+  --rf-card:#1c1c1c;
+  --rf-text:#ffffff;
+  --rf-bg:#0f0f0f;
+}
+
 *{
   margin:0;
   padding:0;
@@ -18,91 +30,89 @@
 }
 
 body{
-  background:linear-gradient(to bottom, #0f0f0f, #1a1a1a);
-  color:#ffffff;
+  background:var(--rf-bg);
   height:100vh;
   overflow:hidden;
+  transition:.3s ease;
+}
+
+/* MAPA (placeholder) */
+#map{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(135deg,#eaeaea,#d6d6d6);
+  z-index:1;
+}
+
+body.dark #map{
+  background:linear-gradient(135deg,#1a1a1a,#111);
 }
 
 /* HEADER */
-.top-white{
-  background:#ffffff;
-  padding:20px 20px 28px 20px;
+.top{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  padding:20px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  border-bottom-left-radius:32px;
-  border-bottom-right-radius:32px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  z-index:3;
 }
 
-.logo-area{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.logo-img{
-  height:60px;
-  width:auto;
-  border-radius:16px;
-}
-
-.logo-text-dark{
+.logo{
   font-weight:900;
-  letter-spacing:1px;
-  color:#000;
-  font-size:1.1rem;
+  font-size:1rem;
+  color:var(--rf-text);
 }
 
-.menu-btn-dark{
+.menu{
   font-size:24px;
   cursor:pointer;
-  color:#000;
+  color:var(--rf-text);
 }
 
-/* CENTRO */
-.center{
-  position:absolute;
-  top:52%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:90%;
-  max-width:420px;
-}
-
-.titulo-central{
-  text-align:center;
-  font-weight:700;
-  font-size:1.3rem;
-  margin-bottom:30px;
-}
-
+/* CARD INFERIOR */
 .card{
-  background:#1c1c1c;
-  border-radius:20px;
-  padding:20px;
-  box-shadow:0 15px 35px rgba(0,0,0,.5);
-  border:1px solid rgba(255,255,255,.05);
+  position:absolute;
+  bottom:0;
+  left:0;
+  right:0;
+  background:var(--rf-card);
+  border-top-left-radius:28px;
+  border-top-right-radius:28px;
+  padding:25px 20px 35px 20px;
+  box-shadow:0 -10px 40px rgba(0,0,0,.25);
+  z-index:2;
+  animation:slideUp .4s ease;
 }
 
-.campo{
+@keyframes slideUp{
+  from{ transform:translateY(100%); }
+  to{ transform:translateY(0); }
+}
+
+.titulo{
+  font-weight:700;
+  font-size:1.2rem;
+  margin-bottom:20px;
+  color:var(--rf-text);
+}
+
+.input-box{
+  background:#f0f0f0;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:12px;
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  padding:16px 0;
-  border-bottom:1px solid rgba(255,255,255,.08);
+  gap:10px;
   cursor:pointer;
 }
 
-.campo:last-child{
-  border-bottom:none;
-}
-
-.campo-left{
-  display:flex;
-  align-items:center;
-  gap:12px;
+body.dark .input-box{
+  background:#2a2a2a;
 }
 
 .dot{
@@ -112,50 +122,44 @@ body{
 }
 
 .origem{ background:#22c55e; }
-.parada{ background:#facc15; }
 .destino{ background:#ef4444; }
 
-.plus{
-  font-size:20px;
-  color:#facc15;
-}
-
-.bottom{
-  position:absolute;
-  bottom:30px;
-  left:20px;
-  right:20px;
+.texto{
+  color:var(--rf-text);
+  font-weight:500;
 }
 
 button{
   width:100%;
-  padding:18px;
+  margin-top:15px;
+  padding:16px;
   border:none;
-  border-radius:35px;
-  background:#facc15;
-  color:#000;
+  border-radius:30px;
+  background:var(--rf-yellow);
   font-weight:800;
   font-size:1rem;
   cursor:pointer;
 }
 
 button:disabled{
-  background:#333;
-  color:#777;
+  background:#ccc;
+  cursor:not-allowed;
 }
 
+/* MODAL */
 .modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.8);
+  background:rgba(0,0,0,.6);
   display:none;
   align-items:center;
   justify-content:center;
   padding:20px;
+  z-index:5;
 }
 
 .modal-content{
-  background:#1c1c1c;
+  background:var(--rf-card);
   width:100%;
   max-width:420px;
   border-radius:20px;
@@ -166,71 +170,51 @@ button:disabled{
 }
 
 .modal-content input{
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.1);
-  background:#111;
-  color:#fff;
-  margin-bottom:14px;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  margin-bottom:10px;
 }
 
 .lista{
-  overflow-y:auto;
+  overflow:auto;
   flex:1;
 }
 
 .lista div{
-  padding:12px;
-  border-radius:10px;
+  padding:10px;
+  border-radius:8px;
   cursor:pointer;
 }
 
 .lista div:hover{
-  background:#2a2a2a;
+  background:rgba(0,0,0,.05);
 }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<div class="top-white">
-  <div class="logo-area">
-    <!-- CAMINHO CORRIGIDO -->
-    <img src="/mobile-app-RF/assets/icons/icon-192.png" class="logo-img">
-    <span class="logo-text-dark">PASSAGEIRO RF</span>
-  </div>
-  <div class="menu-btn-dark">☰</div>
+<div id="map"></div>
+
+<div class="top">
+  <div class="logo">PASSAGEIRO RF</div>
+  <div class="menu">☰</div>
 </div>
 
-<div class="center">
+<div class="card">
+  <div class="titulo">Para onde vamos?</div>
 
-  <div class="titulo-central">
-    Para onde vamos hoje?
+  <div class="input-box" id="origemBtn">
+    <div class="dot origem"></div>
+    <div class="texto" id="origemTexto">Selecionar origem</div>
   </div>
 
-  <div class="card">
-
-    <div class="campo" id="origemBtn">
-      <div class="campo-left">
-        <div class="dot origem"></div>
-        <div id="origemTexto">Selecionar origem</div>
-      </div>
-    </div>
-
-    <div class="campo" id="destinoBtn">
-      <div class="campo-left">
-        <div class="dot destino"></div>
-        <div id="destinoTexto">Selecionar destino</div>
-      </div>
-    </div>
-
+  <div class="input-box" id="destinoBtn">
+    <div class="dot destino"></div>
+    <div class="texto" id="destinoTexto">Selecionar destino</div>
   </div>
 
-</div>
-
-<div class="bottom">
-  <button id="confirmar" disabled>Confirmar rota</button>
+  <button id="confirmar" disabled>Buscar Motorista</button>
 </div>
 
 <div class="modal" id="modal">
@@ -241,13 +225,31 @@ button:disabled{
 </div>
 
 <script>
-
 let origem=null, destino=null;
 
 const modal=document.getElementById("modal");
 const lista=document.getElementById("lista");
 const busca=document.getElementById("busca");
 const confirmarBtn=document.getElementById("confirmar");
+
+function aplicarTemaAutomatico(){
+  const agora=new Date();
+  const hora=agora.getHours();
+  const minuto=agora.getMinutes();
+  const total=hora*60+minuto;
+
+  const claro=5*60+30;
+  const escuro=17*60+30;
+
+  if(total>=claro && total<escuro){
+    document.body.classList.remove("dark");
+  }else{
+    document.body.classList.add("dark");
+  }
+}
+
+aplicarTemaAutomatico();
+setInterval(aplicarTemaAutomatico,60000);
 
 async function init(){
   await DataManager.carregar();
@@ -283,13 +285,12 @@ origemBtn.onclick=()=>abrirModal("origem");
 destinoBtn.onclick=()=>abrirModal("destino");
 
 confirmarBtn.onclick=()=>{
-  const valor = DataManager.buscarValor(origem,destino)||0;
+  const valor=DataManager.buscarValor(origem,destino)||0;
   localStorage.setItem("rf_corrida_temp",
     JSON.stringify({origem,destino,valor})
   );
   window.location.href="selecionar.html";
 };
-
 </script>
 
 </body>
