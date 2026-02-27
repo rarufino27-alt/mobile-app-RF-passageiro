@@ -5,13 +5,12 @@
 <title>RF Passageiro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="/mobile-app-RF/core/datamanager.js"></script>
+<!-- DATAMANAGER DO PASSAGEIRO -->
+<script src="/mobile-app-RF/passageiro/core/datamanager.js"></script>
 
 <style>
 :root{
   --rf-yellow:#facc15;
-  --rf-dark:#111;
-  --rf-light:#ffffff;
   --rf-bg:#f5f5f5;
   --rf-text:#000;
   --rf-card:#ffffff;
@@ -200,8 +199,9 @@ button:disabled{
 .modal-content input{
   padding:12px;
   border-radius:10px;
-  border:1px solid #ddd;
+  border:2px solid var(--rf-yellow);
   margin-bottom:10px;
+  outline:none;
 }
 
 .lista{
@@ -242,7 +242,6 @@ button:disabled{
     <div class="texto" id="destinoTexto">Selecionar destino</div>
   </div>
 
-  <!-- PREÇO -->
   <div class="preco-box" id="precoBox">
     <div class="preco-label">Valor estimado</div>
     <div class="preco-valor" id="precoValor">R$ 0,00</div>
@@ -298,6 +297,11 @@ function atualizarPreco(){
 }
 
 function abrirModal(tipo){
+  if(tipo==="destino" && !origem){
+    alert("Selecione a origem primeiro.");
+    return;
+  }
+
   modal.style.display="flex";
   const dados = tipo==="origem"
     ? DataManager.listarOrigens()
@@ -311,12 +315,16 @@ function abrirModal(tipo){
       if(tipo==="origem"){
         origem=item;
         origemTexto.innerText=item;
+        destino=null;
+        destinoTexto.innerText="Selecionar destino";
+        precoBox.style.display="none";
+        confirmarBtn.disabled=true;
       }else{
         destino=item;
         destinoTexto.innerText=item;
+        atualizarPreco();
       }
       modal.style.display="none";
-      atualizarPreco();
     };
     lista.appendChild(div);
   });
