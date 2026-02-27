@@ -1,78 +1,72 @@
 const DataManager = {
-  rotas: [],
-  carregado: false,
 
-  async carregar() {
-    if (this.carregado) return;
+  cache: {},
+  origemSelecionada: null,
 
-    try {
+  async carregarOrigens() {
 
-      const arquivos = [
-        "condominio-porto-do-cabo.json",
-        "gaibu.json",
-        "enseadas.json",
-        "setor-4.json",
-        "xareu.json",
-        "itapuama.json",
-        "calhetas.json",
-        "lote-garapu2-lote-dona-amara.json",
-        "cohab.json",
-        "centro-do-cabo.json",
-        "shopping-costa-dourada.json",
-        "aguia-american-club-br-101.json",
-        "empresas.json",
-        "engenhos.json",
-        "hospitais-clinicas.json",
-        "interurbanas.json",
-        "interestaduais.json",
-        "lazer-festa.json",
-        "locais.json",
-        "longas-locais.json",
-        "praias.json",
-        "bairro-sao-francisco-baixo.json"
-      ];
+    if (this.cache.origens) return this.cache.origens;
 
-      const respostas = await Promise.all(
-        arquivos.map(nome =>
-          fetch("data/" + nome)
-            .then(r => {
-              if (!r.ok) {
-                console.warn("Arquivo não encontrado:", nome);
-                return [];
-              }
-              return r.json();
-            })
-        )
-      );
+    const arquivos = [
+      "condominio-porto-do-cabo.json",
+      "gaibu.json",
+      "enseadas.json",
+      "setor-4.json",
+      "xareu.json",
+      "itapuama.json",
+      "calhetas.json",
+      "lote-garapu2-lote-dona-amara.json",
+      "cohab.json",
+      "centro-do-cabo.json",
+      "shopping-costa-dourada.json",
+      "aguia-american-club-br-101.json",
+      "empresas.json",
+      "engenhos.json",
+      "hospitais-clinicas.json",
+      "interurbanas.json",
+      "interestaduais.json",
+      "lazer-festa.json",
+      "locais.json",
+      "longas-locais.json",
+      "praias.json",
+      "bairro-sao-francisco-baixo.json"
+    ];
 
-      this.rotas = respostas.flat();
-      this.carregado = true;
+    const respostas = await Promise.all(
+      arquivos.map(nome =>
+        fetch("data/" + nome)
+          .then(r => r.ok ? r.json() : [])
+      )
+    );
 
-      console.log("ROTAS CARREGADAS:", this.rotas.length);
+    const rotas = respostas.flat();
+    this.cache.rotas = rotas;
 
-    } catch (e) {
-      console.error("ERRO NO CARREGAMENTO:", e);
-    }
-  },
+    const origens = [...new Set(rotas.map(r => r.origem))].sort();
+    this.cache.origens = origens;
 
-  listarOrigens() {
-    return [...new Set(this.rotas.map(r => r.origem))].sort();
+    return origens;
   },
 
   listarDestinos(origem) {
-    return this.rotas
+    if (!this.cache.rotas) return [];
+
+    return this.cache.rotas
       .filter(r => r.origem === origem)
       .map(r => r.destino);
   },
 
   buscarValor(origem, destino) {
-    const rota = this.rotas.find(r =>
+    if (!this.cache.rotas) return null;
+
+    const rota = this.cache.rotas.find(r =>
       (r.origem === origem && r.destino === destino) ||
       (r.origem === destino && r.destino === origem)
     );
 
     return rota ? Number(rota.valor) : null;
   }
+
 };
 
 window.DataManager = DataManager;
