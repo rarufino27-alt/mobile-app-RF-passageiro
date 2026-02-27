@@ -1,6 +1,12 @@
 window.DataManager = {
 
   /* =========================
+     CONFIGURAÇÃO GLOBAL
+  ========================== */
+
+  TAXA_PLATAFORMA: 0.15, // 15%
+
+  /* =========================
      CRÉDITOS
   ========================== */
 
@@ -24,6 +30,17 @@ window.DataManager = {
     this.setCreditos(novo);
   },
 
+  validarCreditoParaCorrida(valorCorrida){
+    const taxa = valorCorrida * this.TAXA_PLATAFORMA;
+    return this.getCreditos() >= taxa;
+  },
+
+  aplicarTaxaCorrida(valorCorrida){
+    const taxa = valorCorrida * this.TAXA_PLATAFORMA;
+    this.descontarCreditos(taxa);
+    return taxa;
+  },
+
   /* =========================
      STATUS ONLINE
   ========================== */
@@ -34,7 +51,7 @@ window.DataManager = {
 
   isOnline(){
     const status = localStorage.getItem("rf_online");
-    return status === "1"; // leitura direta e segura
+    return status === "1";
   },
 
   /* =========================
@@ -62,13 +79,37 @@ window.DataManager = {
   },
 
   /* =========================
-     CORRIDA
+     CORRIDA ATUAL (VERSÃO DEFINITIVA)
+  ========================== */
+
+  setCorridaAtual(dados){
+    localStorage.setItem("rf_corrida_atual", JSON.stringify(dados));
+  },
+
+  getCorridaAtual(){
+    const dados = localStorage.getItem("rf_corrida_atual");
+    return dados ? JSON.parse(dados) : null;
+  },
+
+  atualizarStatusCorridaAtual(status){
+    const corrida = this.getCorridaAtual();
+    if(!corrida) return;
+
+    corrida.status = status;
+    localStorage.setItem("rf_corrida_atual", JSON.stringify(corrida));
+  },
+
+  limparCorridaAtual(){
+    localStorage.removeItem("rf_corrida_atual");
+  },
+
+  /* =========================
+     CORRIDA SIMULADA (PARA HOME)
   ========================== */
 
   criarCorridaSimulada(){
 
-    // Impede duplicação
-    if(this.getCorrida()) return null;
+    if(this.getCorridaAtual()) return null;
 
     const corrida = {
       id: Date.now(),
@@ -78,25 +119,8 @@ window.DataManager = {
       status: "pendente"
     };
 
-    localStorage.setItem("rf_corrida", JSON.stringify(corrida));
+    this.setCorridaAtual(corrida);
     return corrida;
-  },
-
-  getCorrida(){
-    const dados = localStorage.getItem("rf_corrida");
-    return dados ? JSON.parse(dados) : null;
-  },
-
-  atualizarStatusCorrida(status){
-    const corrida = this.getCorrida();
-    if(!corrida) return;
-
-    corrida.status = status;
-    localStorage.setItem("rf_corrida", JSON.stringify(corrida));
-  },
-
-  limparCorrida(){
-    localStorage.removeItem("rf_corrida");
   }
 
 };
