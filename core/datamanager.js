@@ -5,6 +5,17 @@ const DataManager = {
     origens: null
   },
 
+  // ===== FUNÇÃO INTERNA DE NORMALIZAÇÃO =====
+  normalizar(texto){
+    return texto
+      ?.toString()
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  },
+
+  // ===== CARREGAR ORIGENS =====
   async carregarOrigens(){
 
     if(this.cache.origens){
@@ -36,58 +47,71 @@ const DataManager = {
       "bairro-sao-francisco-baixo.json"
     ];
 
-    const respostas = await Promise.all(
-      arquivos.map(nome =>
-        fetch("data/" + nome)
-          .then(r => r.ok ? r.json() : [])
-      )
-    );
+    try{
 
-    const rotas = respostas.flat();
+      const respostas = await Promise.all(
+        arquivos.map(async nome => {
+          const r = await fetch("data/" + nome);
+          if(!r.ok) return [];
+          return await r.json();
+        })
+      );
 
-    // Normaliza todos os textos removendo espaços invisíveis
-    this.cache.rotas = rotas.map(r => ({
-      origem: r.origem.trim(),
-      destino: r.destino.trim(),
-      valor: r.valor
-    }));
+      const rotasBrutas = respostas.flat();
 
-    const origens = [...new Set(
-      this.cache.rotas.map(r => r.origem)
-    )].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+      this.cache.rotas = rotasBrutas
+        .filter(r => r.origem && r.destino && r.valor)
+        .map(r => ({
+          origem: r.origem.trim(),
+          destino: r.destino.trim(),
+          origemKey: this.normalizar(r.origem),
+          destinoKey: this.normalizar(r.destino),
+          valor: Number(r.valor)
+        }));
 
-    this.cache.origens = origens;
+      const origens = [...new Set(
+        this.cache.rotas.map(r => r.origem)
+      )].sort((a,b)=>a.localeCompare(b,'pt-BR'));
 
-    return origens;
+      this.cache.origens = origens;
+
+      return origens;
+
+    }catch(e){
+      console.error("Erro ao carregar rotas:", e);
+      return [];
+    }
   },
 
+  // ===== LISTAR DESTINOS =====
   listarDestinos(origem){
 
-    if(!this.cache.rotas) return [];
+    if(!this.cache.rotas || !origem) return [];
 
-    const origemLimpa = origem.trim();
+    const origemKey = this.normalizar(origem);
 
     const destinos = this.cache.rotas
-      .filter(r => r.origem === origemLimpa)
+      .filter(r => r.origemKey === origemKey)
       .map(r => r.destino);
 
     return [...new Set(destinos)]
       .sort((a,b)=>a.localeCompare(b,'pt-BR'));
   },
 
-  buscarValor(origem,destino){
+  // ===== BUSCAR VALOR =====
+  buscarValor(origem, destino){
 
-    if(!this.cache.rotas) return null;
+    if(!this.cache.rotas || !origem || !destino) return null;
 
-    const o = origem.trim();
-    const d = destino.trim();
+    const o = this.normalizar(origem);
+    const d = this.normalizar(destino);
 
     const rota = this.cache.rotas.find(r =>
-      (r.origem === o && r.destino === d) ||
-      (r.origem === d && r.destino === o)
+      (r.origemKey === o && r.destinoKey === d) ||
+      (r.origemKey === d && r.destinoKey === o)
     );
 
-    return rota ? Number(rota.valor) : null;
+    return rota ? rota.valor : null;
   }
 
 };
