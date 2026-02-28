@@ -271,13 +271,34 @@ button:disabled{opacity:.4;}
 
 <script>
 
+/* REFERÊNCIAS DOM */
+const slideCard = document.getElementById("slideCard");
+const origemBtn = document.getElementById("origemBtn");
+const destinoBtn = document.getElementById("destinoBtn");
+const paradaBtn = document.getElementById("paradaBtn");
+const plusBtn = document.getElementById("plusBtn");
+const desvioRotaBtn = document.getElementById("desvioRotaBtn");
+const mercadoBtn = document.getElementById("mercadoBtn");
+const carro6Btn = document.getElementById("carro6Btn");
+const excessoBtn = document.getElementById("excessoBtn");
+const precoBox = document.getElementById("precoBox");
+const precoValor = document.getElementById("precoValor");
+const confirmar = document.getElementById("confirmar");
+const modal = document.getElementById("modal");
+const lista = document.getElementById("lista");
+const origemTexto = document.getElementById("origemTexto");
+const destinoTexto = document.getElementById("destinoTexto");
+const paradaTexto = document.getElementById("paradaTexto");
+
 /* SLIDES */
 const slides=[
  {t:"Transparência total",d:"Você sabe exatamente o que está pagando."},
  {t:"Motoristas verificados",d:"Segurança em cada viagem."},
  {t:"Solicite pelo aplicativo",d:"Mais organização e rapidez."}
 ];
+
 let s=0;
+
 setInterval(()=>{
  s=(s+1)%slides.length;
  slideCard.style.opacity=0;
@@ -295,7 +316,11 @@ let origem=null,destino=null,parada=null;
 let usarParada=false,desvioRota=false,usarMercado=false;
 let carro6=false,excesso=false;
 
-async function iniciar(){await DataManager.carregarOrigens();}
+async function iniciar(){
+ if(window.DataManager){
+   await DataManager.carregarOrigens();
+ }
+}
 iniciar();
 
 function calcular(valorBase){
@@ -359,7 +384,8 @@ async function abrir(tipo){
   const d=document.createElement("div");
   d.innerText=item;
   d.onclick=()=>{
-   if(tipo==="origem"){origem=item;destino=null;parada=null;
+   if(tipo==="origem"){
+    origem=item;destino=null;parada=null;
     origemTexto.innerText=item;
     destinoTexto.innerText="Selecionar destino";
     paradaTexto.innerText="Selecionar parada";
