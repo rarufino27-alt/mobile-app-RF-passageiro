@@ -62,7 +62,7 @@ line-height:1.2;
 letter-spacing:.5px;
 }
 
-/* HERO VISUAL (SLIDES) */
+/* HERO VISUAL */
 
 .hero-visual{
 position:relative;
@@ -90,8 +90,6 @@ height:100%;
 object-fit:cover;
 }
 
-/* overlay cinematic */
-
 .hero-slide::after{
 content:"";
 position:absolute;
@@ -101,6 +99,32 @@ to bottom,
 rgba(0,0,0,.15),
 rgba(0,0,0,.75)
 );
+}
+
+/* INDICADORES */
+
+.slider-dots{
+position:absolute;
+bottom:10px;
+left:0;
+right:0;
+display:flex;
+justify-content:center;
+gap:8px;
+z-index:5;
+}
+
+.dot-ind{
+width:8px;
+height:8px;
+border-radius:50%;
+background:rgba(255,255,255,.35);
+transition:.3s;
+}
+
+.dot-ind.active{
+background:var(--rf-gold);
+transform:scale(1.3);
 }
 
 /* PANEL */
@@ -125,7 +149,7 @@ flex-direction:column;
 gap:14px;
 }
 
-/* BOX HUD */
+/* BOX */
 
 .box{
 background:#12192A;
@@ -290,8 +314,6 @@ background:rgba(255,255,255,.08);
 Para onde vamos hoje?
 </div>
 
-<!-- HERO VISUAL -->
-
 <div class="hero-visual">
 
 <div class="hero-slide active">
@@ -306,9 +328,13 @@ Para onde vamos hoje?
 <img src="img/slide3.jpg">
 </div>
 
+<div class="slider-dots">
+<span class="dot-ind active"></span>
+<span class="dot-ind"></span>
+<span class="dot-ind"></span>
 </div>
 
-<!-- PANEL -->
+</div>
 
 <div class="panel">
 
@@ -373,19 +399,72 @@ Buscar motorista
 
 <script>
 
-/* HERO SLIDES */
+/* HERO SLIDER */
 
 const heroSlides=document.querySelectorAll(".hero-slide");
+const dots=document.querySelectorAll(".dot-ind");
+
 let heroIndex=0;
 
-setInterval(()=>{
-heroSlides[heroIndex].classList.remove("active");
-heroIndex=(heroIndex+1)%heroSlides.length;
-heroSlides[heroIndex].classList.add("active");
-},5000);
+function showSlide(i){
 
+heroSlides.forEach(s=>s.classList.remove("active"));
+dots.forEach(d=>d.classList.remove("active"));
 
-/* DOM */
+heroSlides[i].classList.add("active");
+dots[i].classList.add("active");
+
+}
+
+function nextSlide(){
+
+heroIndex++;
+
+if(heroIndex>=heroSlides.length){
+heroIndex=0;
+}
+
+showSlide(heroIndex);
+
+}
+
+setInterval(nextSlide,5000);
+
+/* SWIPE */
+
+let startX=0;
+
+const slider=document.querySelector(".hero-visual");
+
+slider.addEventListener("touchstart",(e)=>{
+startX=e.touches[0].clientX;
+});
+
+slider.addEventListener("touchend",(e)=>{
+
+let endX=e.changedTouches[0].clientX;
+
+if(startX-endX>50){
+
+heroIndex++;
+if(heroIndex>=heroSlides.length) heroIndex=0;
+
+showSlide(heroIndex);
+
+}
+
+if(endX-startX>50){
+
+heroIndex--;
+if(heroIndex<0) heroIndex=heroSlides.length-1;
+
+showSlide(heroIndex);
+
+}
+
+});
+
+/* RESTANTE DO SEU SCRIPT ORIGINAL */
 
 const origemBtn=document.getElementById("origemBtn");
 const destinoBtn=document.getElementById("destinoBtn");
@@ -410,8 +489,6 @@ const excessoBtn=document.getElementById("excessoBtn");
 const modal=document.getElementById("modal");
 const lista=document.getElementById("lista");
 
-/* VARS */
-
 let origem=null;
 let destino=null;
 let parada=null;
@@ -429,8 +506,6 @@ await DataManager.carregarOrigens();
 }
 iniciar();
 
-/* CALCULO */
-
 function calcular(base){
 
 if(desvio) base+=5;
@@ -440,8 +515,6 @@ let mult=(carro6||excesso)?1.5:1;
 
 return Number((base*mult).toFixed(2));
 }
-
-/* RECALCULAR */
 
 function recalcular(){
 
@@ -454,27 +527,19 @@ return;
 let base=0;
 
 if(usarParada&&parada){
-
 base=(DataManager.buscarValor(origem,parada)||0)
 +(DataManager.buscarValor(parada,destino)||0);
-
 }else{
-
 base=DataManager.buscarValor(origem,destino)||0;
-
 }
 
 const total=calcular(base);
 
 precoValor.innerText="R$ "+total.toFixed(2);
-
 precoBox.style.display="block";
-
 confirmar.disabled=false;
 
 }
-
-/* ABRIR LISTA */
 
 async function abrir(tipo){
 
@@ -484,9 +549,7 @@ lista.innerHTML="";
 let dados=[];
 
 if(tipo==="origem") dados=await DataManager.carregarOrigens();
-
-if(tipo==="destino"||tipo==="parada")
-dados=DataManager.listarDestinos(origem);
+if(tipo==="destino"||tipo==="parada") dados=DataManager.listarDestinos(origem);
 
 dados.forEach(item=>{
 
@@ -496,33 +559,24 @@ d.innerText=item;
 d.onclick=()=>{
 
 if(tipo==="origem"){
-
 origem=item;
 origemTexto.innerText=item;
-
 destinoBtn.style.display="flex";
 plusBtn.style.display="flex";
-
 }
 
 if(tipo==="destino"){
-
 destino=item;
 destinoTexto.innerText=item;
-
 optionsBox.style.display="flex";
-
 }
 
 if(tipo==="parada"){
-
 parada=item;
 paradaTexto.innerText=item;
-
 }
 
 modal.style.display="none";
-
 recalcular();
 
 };
@@ -537,14 +591,10 @@ origemBtn.onclick=()=>abrir("origem");
 destinoBtn.onclick=()=>abrir("destino");
 paradaBtn.onclick=()=>abrir("parada");
 
-/* PARADA */
-
 plusBtn.onclick=()=>{
 usarParada=!usarParada;
 paradaBtn.style.display=usarParada?"flex":"none";
 };
-
-/* OPTIONS */
 
 desvioBtn.onclick=()=>{
 desvio=!desvio;
@@ -573,8 +623,6 @@ excessoBtn.classList.add("active");
 carro6Btn.classList.remove("active");
 recalcular();
 };
-
-/* CONFIRMAR */
 
 confirmar.onclick=()=>{
 
