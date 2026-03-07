@@ -55,15 +55,11 @@ z-index:10;
 
 }
 
-/* LINHA */
-
 .row{
 display:flex;
 align-items:center;
 gap:10px;
 }
-
-/* DOT */
 
 .dot{
 width:10px;
@@ -75,43 +71,29 @@ border-radius:50%;
 .red{background:#ef4444}
 .blue{background:#3b82f6}
 
-/* INPUT */
-
 input{
-
 flex:1;
 padding:12px;
 border-radius:10px;
 border:none;
-
 background:#12192A;
 color:white;
 font-size:14px;
-
 outline:none;
-
 }
 
-/* BOTÃO + */
-
 .add-stop{
-
 width:40px;
 height:40px;
 border-radius:50%;
-
 display:flex;
 align-items:center;
 justify-content:center;
-
 font-size:20px;
 font-weight:bold;
-
 background:linear-gradient(135deg,var(--rf-gold),var(--rf-gold-strong));
-
 color:black;
 cursor:pointer;
-
 }
 
 /* RESUMO */
@@ -141,11 +123,9 @@ margin:0 0 10px 0;
 }
 
 .price{
-
 font-size:28px;
 font-weight:800;
 color:var(--rf-gold-strong);
-
 }
 
 </style>
@@ -155,42 +135,29 @@ color:var(--rf-gold-strong);
 
 <div id="map"></div>
 
-<!-- BUSCA -->
+<!-- CARD BUSCA -->
 
 <div class="search-card">
 
 <div class="row">
-
 <div class="dot green"></div>
-
 <input id="origemInput" placeholder="Detectando sua localização..." readonly>
-
 </div>
 
 <div class="row">
-
 <div class="dot red"></div>
-
 <input id="destinoInput" placeholder="Para onde vamos?">
-
 <div class="add-stop" onclick="addParada()">+</div>
-
 </div>
 
 <div class="row" id="stop1Row" style="display:none">
-
 <div class="dot blue"></div>
-
 <input id="stop1" placeholder="Adicionar parada">
-
 </div>
 
 <div class="row" id="stop2Row" style="display:none">
-
 <div class="dot blue"></div>
-
 <input id="stop2" placeholder="Adicionar parada">
-
 </div>
 
 </div>
@@ -220,6 +187,7 @@ let map
 let directionsService
 let directionsRenderer
 
+let marcadorUsuario
 let userLocation
 
 let stopCount=0
@@ -228,9 +196,8 @@ function initMap(){
 
 map=new google.maps.Map(document.getElementById("map"),{
 
-zoom:14,
+zoom:15,
 center:{lat:-8.283,lng:-35.032},
-
 disableDefaultUI:true
 
 })
@@ -238,38 +205,68 @@ disableDefaultUI:true
 directionsService=new google.maps.DirectionsService()
 directionsRenderer=new google.maps.DirectionsRenderer({map:map})
 
-pegarLocalizacao()
-
+iniciarLocalizacao()
 initAutocomplete()
 
 }
 
-function pegarLocalizacao(){
+/* LOCALIZAÇÃO EM TEMPO REAL */
 
-navigator.geolocation.getCurrentPosition(pos=>{
+function iniciarLocalizacao(){
 
-userLocation={
-
-lat:pos.coords.latitude,
-lng:pos.coords.longitude
-
+if(!navigator.geolocation){
+alert("GPS não suportado")
+return
 }
 
-map.setCenter(userLocation)
+navigator.geolocation.watchPosition(
 
-new google.maps.Marker({
+(pos)=>{
 
-position:userLocation,
+const posicao={
+lat:pos.coords.latitude,
+lng:pos.coords.longitude
+}
+
+userLocation=posicao
+
+if(!marcadorUsuario){
+
+marcadorUsuario=new google.maps.Marker({
+
+position:posicao,
 map:map,
 icon:"https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
 
 })
 
-document.getElementById("origemInput").value="Sua localização"
+map.setCenter(posicao)
 
-})
+}else{
+
+marcadorUsuario.setPosition(posicao)
 
 }
+
+document.getElementById("origemInput").value="Sua localização"
+
+},
+
+(err)=>{
+console.log("Erro GPS",err)
+},
+
+{
+enableHighAccuracy:true,
+maximumAge:0,
+timeout:5000
+}
+
+)
+
+}
+
+/* AUTOCOMPLETE DESTINO */
 
 function initAutocomplete(){
 
@@ -277,16 +274,16 @@ const destinoInput=document.getElementById("destinoInput")
 
 const autoDestino=new google.maps.places.Autocomplete(destinoInput,{
 componentRestrictions:{country:"br"},
-fields:["geometry"]
+fields:["geometry","name"]
 })
 
 autoDestino.addListener("place_changed",()=>{
-
 calcularRota()
-
 })
 
 }
+
+/* ADICIONAR PARADA */
 
 function addParada(){
 
@@ -294,14 +291,12 @@ if(stopCount==0){
 
 document.getElementById("stop1Row").style.display="flex"
 initStop("stop1")
-
 stopCount++
 
 }else if(stopCount==1){
 
 document.getElementById("stop2Row").style.display="flex"
 initStop("stop2")
-
 stopCount++
 
 }
@@ -318,35 +313,27 @@ fields:["geometry"]
 })
 
 auto.addListener("place_changed",()=>{
-
 calcularRota()
-
 })
 
 }
+
+/* CALCULAR ROTA */
 
 function calcularRota(){
 
 const destino=document.getElementById("destinoInput").value
 
-if(!destino)return
+if(!destino || !userLocation) return
 
 let waypoints=[]
 
 if(document.getElementById("stop1").value){
-
-waypoints.push({
-location:document.getElementById("stop1").value
-})
-
+waypoints.push({location:document.getElementById("stop1").value})
 }
 
 if(document.getElementById("stop2").value){
-
-waypoints.push({
-location:document.getElementById("stop2").value
-})
-
+waypoints.push({location:document.getElementById("stop2").value})
 }
 
 directionsService.route({
@@ -368,14 +355,11 @@ let distancia=0
 let tempo=0
 
 route.forEach(l=>{
-
 distancia+=l.distance.value
 tempo+=l.duration.value
-
 })
 
 distancia=distancia/1000
-
 tempo=Math.round(tempo/60)
 
 document.getElementById("dist").innerText=distancia.toFixed(1)+" km"
