@@ -77,15 +77,8 @@ animation-delay:1.5s;
 
 @keyframes pulse{
 
-0%{
-transform:scale(.8);
-opacity:.8;
-}
-
-100%{
-transform:scale(1.6);
-opacity:0;
-}
+0%{transform:scale(.8);opacity:.8;}
+100%{transform:scale(1.6);opacity:0;}
 
 }
 
@@ -95,24 +88,18 @@ opacity:0;
 position:absolute;
 width:90%;
 max-width:380px;
-padding:20px;
+height:160px;
 border-radius:20px;
-background:linear-gradient(145deg,#151B2B,#0F1422);
+overflow:hidden;
 border:1px solid rgba(214,184,95,.3);
-text-align:center;
 box-shadow:0 0 40px rgba(214,184,95,.25);
 transition:opacity .4s ease, transform .4s ease;
 }
 
-.slide-card h3{
-color:var(--rf-gold-strong);
-font-size:16px;
-}
-
-.slide-card p{
-font-size:13px;
-opacity:.85;
-margin-top:6px;
+.slide-card img{
+width:100%;
+height:100%;
+object-fit:cover;
 }
 
 /* CARD */
@@ -275,9 +262,8 @@ background:rgba(255,255,255,.08);
 
 <div class="radar"></div>
 
-<div class="slide-card" id="slideCard">
-<h3>Transparência total</h3>
-<p>Você sabe exatamente o que está pagando.</p>
+<div class="slide-card">
+<img id="slideImg" src="img/slide1.jpg">
 </div>
 
 </div>
@@ -304,23 +290,15 @@ background:rgba(255,255,255,.08);
 
 <div id="taxasBox" style="display:none;flex-direction:column;gap:10px;">
 
-<div class="option-btn" id="desvioRotaBtn">
-Desvio simples (+R$5)
-</div>
+<div class="option-btn" id="desvioRotaBtn">Desvio simples (+R$5)</div>
 
-<div class="option-btn" id="mercadoBtn">
-🛒 Saída Mercado (+R$3,89)
-</div>
+<div class="option-btn" id="mercadoBtn">🛒 Saída Mercado (+R$3,89)</div>
 
 <div class="radio-group">
 
-<div class="radio-option" id="carro6Btn">
-🚐 6 Lugares (+50%)
-</div>
+<div class="radio-option" id="carro6Btn">🚐 6 Lugares (+50%)</div>
 
-<div class="radio-option" id="excessoBtn">
-👥 Excesso (+50%)
-</div>
+<div class="radio-option" id="excessoBtn">👥 Excesso (+50%)</div>
 
 </div>
 
@@ -344,34 +322,7 @@ Buscar Motorista
 
 <script>
 
-/* REFERÊNCIAS */
-
-const slideCard = document.getElementById("slideCard");
-const origemBtn = document.getElementById("origemBtn");
-const destinoBtn = document.getElementById("destinoBtn");
-const paradaBtn = document.getElementById("paradaBtn");
-const plusBtn = document.getElementById("plusBtn");
-
-const desvioRotaBtn = document.getElementById("desvioRotaBtn");
-const mercadoBtn = document.getElementById("mercadoBtn");
-const carro6Btn = document.getElementById("carro6Btn");
-const excessoBtn = document.getElementById("excessoBtn");
-
-const taxasBox = document.getElementById("taxasBox");
-
-const precoBox = document.getElementById("precoBox");
-const precoValor = document.getElementById("precoValor");
-
-const confirmar = document.getElementById("confirmar");
-
-const modal = document.getElementById("modal");
-const lista = document.getElementById("lista");
-
-const origemTexto = document.getElementById("origemTexto");
-const destinoTexto = document.getElementById("destinoTexto");
-const paradaTexto = document.getElementById("paradaTexto");
-
-/* CONTROLE BOTÃO VOLTAR */
+/* BOTÃO VOLTAR */
 
 history.pushState(null,null,location.href);
 
@@ -387,35 +338,61 @@ window.location.href="index.html";
 
 });
 
-/* SLIDES */
+/* SLIDES COM IMAGEM */
 
 const slides=[
-{t:"Transparência total",d:"Você sabe exatamente o que está pagando."},
-{t:"Motoristas verificados",d:"Segurança em cada viagem."},
-{t:"Solicite pelo aplicativo",d:"Mais organização e rapidez."}
+"img/slide1.jpg",
+"img/slide2.jpg",
+"img/slide3.jpg"
 ];
 
-let s=0;
+let slideIndex=0;
+const slideImg=document.getElementById("slideImg");
 
 setInterval(()=>{
 
-s=(s+1)%slides.length;
+slideIndex++;
 
-slideCard.style.opacity=0;
-slideCard.style.transform="translateY(10px)";
+if(slideIndex>=slides.length){
+slideIndex=0;
+}
+
+slideImg.style.opacity=0;
 
 setTimeout(()=>{
 
-slideCard.innerHTML=`<h3>${slides[s].t}</h3><p>${slides[s].d}</p>`;
+slideImg.src=slides[slideIndex];
+slideImg.style.opacity=1;
 
-slideCard.style.opacity=1;
-slideCard.style.transform="translateY(0)";
-
-},200);
+},300);
 
 },4000);
 
-/* VARIÁVEIS */
+/* RESTANTE DO SCRIPT ORIGINAL */
+
+const origemBtn=document.getElementById("origemBtn");
+const destinoBtn=document.getElementById("destinoBtn");
+const paradaBtn=document.getElementById("paradaBtn");
+const plusBtn=document.getElementById("plusBtn");
+
+const desvioRotaBtn=document.getElementById("desvioRotaBtn");
+const mercadoBtn=document.getElementById("mercadoBtn");
+const carro6Btn=document.getElementById("carro6Btn");
+const excessoBtn=document.getElementById("excessoBtn");
+
+const taxasBox=document.getElementById("taxasBox");
+
+const precoBox=document.getElementById("precoBox");
+const precoValor=document.getElementById("precoValor");
+
+const confirmar=document.getElementById("confirmar");
+
+const modal=document.getElementById("modal");
+const lista=document.getElementById("lista");
+
+const origemTexto=document.getElementById("origemTexto");
+const destinoTexto=document.getElementById("destinoTexto");
+const paradaTexto=document.getElementById("paradaTexto");
 
 let origem=null;
 let destino=null;
@@ -428,19 +405,12 @@ let usarMercado=false;
 let carro6=false;
 let excesso=false;
 
-/* INICIAR */
-
 async function iniciar(){
-
 if(window.DataManager){
 await DataManager.carregarOrigens();
 }
-
 }
-
 iniciar();
-
-/* CALCULAR */
 
 function calcular(valorBase){
 
@@ -462,24 +432,18 @@ adicional=valorBase*0.35;
 }
 
 let subtotal=valorBase+adicional;
-
 let mult=(carro6||excesso)?1.5:1;
 
 return Number((subtotal*mult).toFixed(2));
 
 }
 
-/* RECALCULAR */
-
 function recalcular(){
 
 if(!origem||!destino){
-
 precoBox.style.display="none";
 confirmar.disabled=true;
-
 return;
-
 }
 
 let base=0;
@@ -501,7 +465,6 @@ if(usarMercado) base+=3.89;
 const total=calcular(base);
 
 precoValor.innerText="R$ "+total.toFixed(2);
-
 precoBox.style.display="block";
 confirmar.disabled=false;
 
@@ -509,15 +472,11 @@ window.valorFinal=total;
 
 }
 
-/* ABRIR LISTA */
-
 async function abrir(tipo){
 
 if((tipo==="destino"||tipo==="parada")&&!origem){
-
 alert("Selecione origem primeiro.");
 return;
-
 }
 
 modal.style.display="flex";
@@ -556,23 +515,17 @@ return;
 }
 
 if(tipo==="destino"){
-
 destino=item;
 destinoTexto.innerText=item;
-
 taxasBox.style.display="flex";
-
 }
 
 if(tipo==="parada"){
-
 parada=item;
 paradaTexto.innerText=item;
-
 }
 
 modal.style.display="none";
-
 recalcular();
 
 };
@@ -583,8 +536,6 @@ lista.appendChild(d);
 
 }
 
-/* EVENTOS */
-
 origemBtn.onclick=()=>abrir("origem");
 destinoBtn.onclick=()=>abrir("destino");
 paradaBtn.onclick=()=>abrir("parada");
@@ -592,7 +543,6 @@ paradaBtn.onclick=()=>abrir("parada");
 plusBtn.onclick=()=>{
 
 usarParada=!usarParada;
-
 paradaBtn.style.display=usarParada?"flex":"none";
 
 recalcular();
