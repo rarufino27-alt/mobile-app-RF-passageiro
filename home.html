@@ -252,15 +252,13 @@ Total estimado<br>
 </div>
 
 <div class="modal" id="modal">
-
 <div class="modal-content">
 
-<input type="text" id="busca" class="modal-search" placeholder="Buscar local...">
+<input id="busca" class="modal-search" placeholder="Buscar local...">
 
 <div id="lista"></div>
 
 </div>
-
 </div>
 
 <script>
@@ -299,13 +297,50 @@ const busca=document.getElementById("busca");
 
 const origemBtn=document.getElementById("origemBtn");
 const destinoBtn=document.getElementById("destinoBtn");
+const paradaBtn=document.getElementById("paradaBtn");
+const plusBtn=document.getElementById("plusBtn");
 
 const origemTexto=document.getElementById("origemTexto");
 const destinoTexto=document.getElementById("destinoTexto");
+const paradaTexto=document.getElementById("paradaTexto");
+
+const precoBox=document.getElementById("precoBox");
+const precoValor=document.getElementById("precoValor");
 
 let origem=null;
 let destino=null;
+let parada=null;
+let usarParada=false;
+
+let tipoAtual=null;
 let dadosAtuais=[];
+
+/* CALCULAR */
+
+function recalcular(){
+
+if(!origem || !destino){
+precoBox.style.display="none";
+return;
+}
+
+let base=0;
+
+if(usarParada && parada){
+
+base=(DataManager.buscarValor(origem,parada)||0)
++(DataManager.buscarValor(parada,destino)||0);
+
+}else{
+
+base=DataManager.buscarValor(origem,destino)||0;
+
+}
+
+precoValor.innerText="R$ "+base.toFixed(2);
+precoBox.style.display="block";
+
+}
 
 /* ABRIR MODAL */
 
@@ -316,6 +351,8 @@ alert("Carregando rotas...");
 return;
 }
 
+tipoAtual=tipo;
+
 modal.style.display="flex";
 busca.value="";
 
@@ -323,7 +360,7 @@ if(tipo==="origem"){
 dadosAtuais=await DataManager.carregarOrigens();
 }
 
-if(tipo==="destino"){
+if(tipo==="destino" || tipo==="parada"){
 
 if(!origem){
 alert("Selecione origem primeiro");
@@ -334,17 +371,17 @@ dadosAtuais=DataManager.listarDestinos(origem);
 
 }
 
-renderLista(tipo);
+renderLista(dadosAtuais);
 
 }
 
 /* RENDER LISTA */
 
-function renderLista(tipo){
+function renderLista(listaDados){
 
 lista.innerHTML="";
 
-dadosAtuais.forEach(item=>{
+listaDados.forEach(item=>{
 
 const d=document.createElement("div");
 d.className="modal-item";
@@ -352,19 +389,26 @@ d.innerText=item;
 
 d.onclick=()=>{
 
-if(tipo==="origem"){
+if(tipoAtual==="origem"){
 origem=item;
 origemTexto.innerText=item;
-modal.style.display="none";
-setTimeout(()=>abrir("destino"),200);
-return;
+destino=null;
+destinoTexto.innerText="Selecionar destino";
 }
 
-if(tipo==="destino"){
+if(tipoAtual==="destino"){
 destino=item;
 destinoTexto.innerText=item;
-modal.style.display="none";
 }
+
+if(tipoAtual==="parada"){
+parada=item;
+paradaTexto.innerText=item;
+}
+
+modal.style.display="none";
+
+recalcular();
 
 };
 
@@ -384,30 +428,7 @@ const filtrado=dadosAtuais.filter(l=>
 l.toLowerCase().includes(termo)
 );
 
-lista.innerHTML="";
-
-filtrado.forEach(item=>{
-
-const d=document.createElement("div");
-d.className="modal-item";
-d.innerText=item;
-
-d.onclick=()=>{
-if(!origem){
-origem=item;
-origemTexto.innerText=item;
-modal.style.display="none";
-setTimeout(()=>abrir("destino"),200);
-}else{
-destino=item;
-destinoTexto.innerText=item;
-modal.style.display="none";
-}
-};
-
-lista.appendChild(d);
-
-});
+renderLista(filtrado);
 
 });
 
@@ -415,6 +436,13 @@ lista.appendChild(d);
 
 origemBtn.onclick=()=>abrir("origem");
 destinoBtn.onclick=()=>abrir("destino");
+paradaBtn.onclick=()=>abrir("parada");
+
+plusBtn.onclick=()=>{
+usarParada=!usarParada;
+paradaBtn.style.display=usarParada?"flex":"none";
+recalcular();
+};
 
 modal.onclick=(e)=>{
 if(e.target===modal){
