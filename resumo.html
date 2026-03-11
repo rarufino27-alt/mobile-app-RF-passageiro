@@ -5,130 +5,136 @@
 <title>RF – Resumo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="core/taxas.js"></script>
-
 <style>
 
 :root{
---rf-yellow:#ffd600;
---rf-yellow-strong:#ffb800;
+  --rf-yellow:#ffd600;
+  --rf-yellow-strong:#ffb800;
 }
 
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
 
 body{
-background: radial-gradient(circle at top,#1a1a1a 0%,#000 70%);
-color:#fff;
+  background: radial-gradient(circle at top,#1a1a1a 0%,#000 70%);
+  color:#fff;
 }
 
 .header{
-padding:30px 25px 10px;
-font-size:22px;
-font-weight:900;
+  padding:30px 25px 10px;
+  font-size:22px;
+  font-weight:900;
 }
 
 .container{
-padding:10px 25px 140px;
-max-width:450px;
-margin:auto;
+  padding:10px 25px 140px;
+  max-width:450px;
+  margin:auto;
 }
 
 .card{
-background:rgba(255,255,255,.06);
-border-radius:26px;
-padding:22px;
-margin-bottom:22px;
-border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.06);
+  backdrop-filter:blur(20px);
+  border-radius:26px;
+  padding:22px;
+  margin-bottom:22px;
+  border:1px solid rgba(255,255,255,.08);
 }
 
 .card h3{
-margin-bottom:14px;
-font-size:15px;
-opacity:.8;
+  margin-bottom:14px;
+  font-size:15px;
+  opacity:.8;
 }
 
 .rota-item{
-margin-bottom:6px;
+  font-size:15px;
+  margin-bottom:6px;
+}
+
+.rota-item span{
+  opacity:.5;
 }
 
 textarea{
-width:100%;
-border-radius:16px;
-padding:14px;
-border:none;
-background:rgba(255,255,255,.08);
-color:#fff;
-height:90px;
+  width:100%;
+  border-radius:16px;
+  padding:14px;
+  border:none;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  resize:none;
+  height:90px;
 }
 
-.categoria{
-display:flex;
-gap:12px;
-}
-
-.cat{
-flex:1;
-padding:16px;
-border-radius:18px;
-text-align:center;
-cursor:pointer;
-background:rgba(255,255,255,.08);
-font-weight:600;
-}
-
-.cat.active{
-background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-strong));
-color:#000;
+.select{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  background:#111;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.1);
 }
 
 .linha{
-display:flex;
-justify-content:space-between;
-margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:8px;
+  font-size:14px;
+  opacity:.9;
 }
 
 .total{
-font-size:22px;
-font-weight:900;
-margin-top:14px;
-color:var(--rf-yellow);
+  font-size:22px;
+  font-weight:900;
+  margin-top:14px;
+  color:var(--rf-yellow);
+}
+
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:12px;
+  font-size:11px;
+  background:#ff3b30;
+  margin-top:8px;
 }
 
 .footer{
-position:fixed;
-bottom:0;
-left:0;
-width:100%;
-background:#000;
-padding:20px;
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#000;
+  padding:20px;
+  box-shadow:0 -10px 30px rgba(0,0,0,.8);
 }
 
 .footer-inner{
-max-width:450px;
-margin:auto;
-display:flex;
-justify-content:space-between;
-align-items:center;
+  max-width:450px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
 .valor{
-font-size:26px;
-font-weight:900;
-color:var(--rf-yellow);
+  font-size:26px;
+  font-weight:900;
+  color:var(--rf-yellow);
 }
 
 button{
-padding:14px 30px;
-border:none;
-border-radius:30px;
-background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-strong));
-font-weight:800;
-cursor:pointer;
+  padding:14px 30px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-strong));
+  font-weight:800;
+  cursor:pointer;
 }
 
 </style>
@@ -151,15 +157,37 @@ cursor:pointer;
 </div>
 
 <div class="card">
-<h3>Categoria</h3>
-
-<div class="categoria">
-
-<div class="cat active" id="cat4">Driver 4</div>
-<div class="cat" id="cat6">Driver 6 (+50%)</div>
-
+<h3>Forma de pagamento</h3>
+<select id="pagamento" class="select">
+<option value="dinheiro">Dinheiro</option>
+<option value="pix">Pix</option>
+<option value="debito">Cartão Débito</option>
+<option value="credito">Cartão Crédito</option>
+</select>
 </div>
 
+<div class="card">
+<h3>Taxa de Feira</h3>
+<select id="feira" class="select">
+<option value="0">Sem feira</option>
+<option value="5">1 carrinho (R$ 5.00)</option>
+<option value="7.99">2 carrinhos ou mais (R$ 7.99)</option>
+</select>
+</div>
+
+<div class="card">
+<h3>Transporte Animal</h3>
+<select id="animal" class="select">
+<option value="0">Nenhum</option>
+<option value="4.99">Pequeno (R$ 4.99)</option>
+<option value="7.99">Médio (R$ 7.99)</option>
+<option value="11.99">Grande (R$ 11.99)</option>
+</select>
+</div>
+
+<div class="card">
+<h3>Tempo de espera embarque (min)</h3>
+<input type="number" id="espera" class="select" value="0">
 </div>
 
 <div class="card">
@@ -170,164 +198,119 @@ cursor:pointer;
 </div>
 
 <div class="footer">
-
 <div class="footer-inner">
-
 <div class="valor" id="valorFinal">R$ 0,00</div>
-
-<button onclick="enviar()">Solicitar</button>
-
+<button onclick="confirmar()">Solicitar</button>
 </div>
-
 </div>
 
 <script>
 
 const corrida = JSON.parse(localStorage.getItem("rf_corrida_temp"));
+if(!corrida) window.location.href="home.html";
 
-if(!corrida){
-location.href="home.html";
-}
-
-let {
-origem,
-parada,
-destino,
-valor = 0,
-desvioRota = false,
-mercado = false
-} = corrida;
-
-let categoriaMult = 1;
+let { origem, parada, destino, valor } = corrida;
 
 function montarRota(){
-
-let html = `
-<div class="rota-item">Origem: ${origem}</div>
-`;
-
-if(parada){
-
-html += `<div class="rota-item">Parada: ${parada}</div>`;
-
+let html=`<div class="rota-item"><span>Origem:</span> ${origem}</div>`;
+if(parada) html+=`<div class="rota-item"><span>Parada:</span> ${parada}</div>`;
+html+=`<div class="rota-item"><span>Destino:</span> ${destino}</div>`;
+document.getElementById("rota").innerHTML=html;
 }
 
-html += `<div class="rota-item">Destino: ${destino}</div>`;
+function adicionalNoturno(base){
+const agora=new Date();
+const hora=agora.getHours()+agora.getMinutes()/60;
 
-document.getElementById("rota").innerHTML = html;
+if(hora>=22.5 || hora<=5){
+if(base<=24.99) return 4.99;
+return base*0.35;
+}
 
+return 0;
 }
 
 function calcular(){
 
-let base = Number(valor);
+let base=parseFloat(valor);
+let taxas=0;
+let detalhe="";
 
-let detalheHTML = "";
+detalhe+=`<div class="linha"><span>Rota</span><span>R$ ${base.toFixed(2)}</span></div>`;
 
-detalheHTML += `
-<div class="linha">
-<span>Base</span>
-<span>R$ ${base.toFixed(2)}</span>
-</div>
-`;
+const noturno=adicionalNoturno(base);
 
-let taxas = [];
+if(noturno>0){
+detalhe+=`<div class="linha"><span>Adicional Noturno</span><span>R$ ${noturno.toFixed(2)}</span></div>
+<div class="badge">Tarifa Noturna</div>`;
+base+=noturno;
+}
 
-const t1 = Taxas.noturno(base);
-if(t1) taxas.push(t1);
+const feira=parseFloat(document.getElementById("feira").value);
+const animal=parseFloat(document.getElementById("animal").value);
+const espera=parseFloat(document.getElementById("espera").value);
 
-const t2 = Taxas.desvio(desvioRota);
-if(t2) taxas.push(t2);
+if(feira>0){
+detalhe+=`<div class="linha"><span>Feira</span><span>R$ ${feira.toFixed(2)}</span></div>`;
+taxas+=feira;
+}
 
-const t3 = Taxas.mercado(mercado);
-if(t3) taxas.push(t3);
+if(animal>0){
+detalhe+=`<div class="linha"><span>Animal</span><span>R$ ${animal.toFixed(2)}</span></div>`;
+taxas+=animal;
+}
 
-const t4 = Taxas.praia(destino);
-if(t4) taxas.push(t4);
+if(espera>5){
+const taxaEspera=3 + ((espera-5)*0.60);
+detalhe+=`<div class="linha"><span>Espera</span><span>R$ ${taxaEspera.toFixed(2)}</span></div>`;
+taxas+=taxaEspera;
+}
 
-taxas.forEach(t =>{
+let subtotal=base+taxas;
 
-detalheHTML += `
-<div class="linha">
-<span>${t.nome}</span>
-<span>R$ ${t.valor.toFixed(2)}</span>
-</div>
-`;
+detalhe+=`<div class="linha"><span>Subtotal</span><span>R$ ${subtotal.toFixed(2)}</span></div>`;
 
-base += t.valor;
+let pagamento=document.getElementById("pagamento").value;
+let total=subtotal;
 
+if(pagamento==="debito"){
+total=subtotal/0.98;
+}
+
+if(pagamento==="credito"){
+total=subtotal/0.95;
+}
+
+detalhe+=`<div class="linha"><span>Pagamento</span><span>${pagamento}</span></div>`;
+
+detalhe+=`<div class="total">Total: R$ ${total.toFixed(2)}</div>`;
+
+document.getElementById("detalhe").innerHTML=detalhe;
+document.getElementById("valorFinal").innerText="R$ "+total.toFixed(2);
+
+localStorage.setItem("rf_total_final",total.toFixed(2));
+
+}
+
+document.querySelectorAll("select,input").forEach(e=>{
+e.addEventListener("change",calcular);
 });
 
-const categoria = Taxas.categoria(categoriaMult,base);
+function confirmar(){
 
-if(categoria){
+const final={
+...corrida,
+total:localStorage.getItem("rf_total_final"),
+observacao:document.getElementById("obs").value
+};
 
-detalheHTML += `
-<div class="linha">
-<span>${categoria.nome}</span>
-<span>R$ ${categoria.valor.toFixed(2)}</span>
-</div>
-`;
+localStorage.setItem("rf_corrida_confirmada",JSON.stringify(final));
 
-base += categoria.valor;
-
-}
-
-detalheHTML += `
-<div class="total">Total: R$ ${base.toFixed(2)}</div>
-`;
-
-document.getElementById("detalhe").innerHTML = detalheHTML;
-
-document.getElementById("valorFinal").innerText = "R$ "+base.toFixed(2);
-
-localStorage.setItem("rf_total_final",base.toFixed(2));
-
-}
-
-cat4.onclick=()=>{
-
-categoriaMult = 1;
-
-cat4.classList.add("active");
-cat6.classList.remove("active");
-
-calcular();
-
-}
-
-cat6.onclick=()=>{
-
-categoriaMult = 1.5;
-
-cat6.classList.add("active");
-cat4.classList.remove("active");
-
-calcular();
-
-}
-
-function enviar(){
-
-calcular();
-
-const total = localStorage.getItem("rf_total_final");
-
-const msg = `
-🚖 SOLICITAÇÃO RF
-
-Origem: ${origem}
-Destino: ${destino}
-
-Total: R$ ${Number(total).toFixed(2)}
-`;
-
-window.open("https://wa.me/?text="+encodeURIComponent(msg));
+window.location.href="procurando.html";
 
 }
 
 montarRota();
-
 calcular();
 
 </script>
