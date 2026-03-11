@@ -24,23 +24,17 @@ background: radial-gradient(circle at top,#1a1a1a 0%,#000 70%);
 color:#fff;
 }
 
-/* HEADER */
-
 .header{
 padding:30px 25px 10px;
 font-size:22px;
 font-weight:900;
 }
 
-/* CONTAINER */
-
 .container{
 padding:10px 25px 140px;
 max-width:450px;
 margin:auto;
 }
-
-/* CARD */
 
 .card{
 background:rgba(255,255,255,.06);
@@ -57,8 +51,6 @@ font-size:15px;
 opacity:.8;
 }
 
-/* ROTA */
-
 .rota-item{
 font-size:15px;
 margin-bottom:6px;
@@ -67,8 +59,6 @@ margin-bottom:6px;
 .rota-item span{
 opacity:.5;
 }
-
-/* OBS */
 
 textarea{
 width:100%;
@@ -80,8 +70,6 @@ color:#fff;
 resize:none;
 height:90px;
 }
-
-/* CATEGORIA */
 
 .categoria{
 display:flex;
@@ -105,14 +93,12 @@ color:#000;
 box-shadow:0 8px 30px rgba(255,214,0,.4);
 }
 
-/* DETALHAMENTO */
-
 .linha{
 display:flex;
 justify-content:space-between;
 margin-bottom:8px;
 font-size:14px;
-opacity:.85;
+opacity:.9;
 }
 
 .total{
@@ -130,8 +116,6 @@ font-size:11px;
 background:#ff3b30;
 margin-top:8px;
 }
-
-/* FOOTER */
 
 .footer{
 position:fixed;
@@ -210,38 +194,46 @@ cursor:pointer;
 <script>
 
 const corrida = JSON.parse(localStorage.getItem("rf_corrida_temp"));
+
 if(!corrida) window.location.href="home.html";
 
-let { origem, parada, destino, desvioRota, mercado, valor } = corrida;
+let {
+origem,
+parada,
+destino,
+valor = 0,
+desvioRota = false,
+mercado = false
+} = corrida;
 
 let categoriaMult = 1;
 
 function montarRota(){
 
-let html = `<div class="rota-item"><span>Origem:</span> ${origem}</div>`;
+let html=`<div class="rota-item"><span>Origem:</span> ${origem}</div>`;
 
 if(parada){
-html += `<div class="rota-item"><span>Parada:</span> ${parada}</div>`;
+html+=`<div class="rota-item"><span>Parada:</span> ${parada}</div>`;
 }
 
-html += `<div class="rota-item"><span>Destino:</span> ${destino}</div>`;
+html+=`<div class="rota-item"><span>Destino:</span> ${destino}</div>`;
 
-document.getElementById("rota").innerHTML = html;
+document.getElementById("rota").innerHTML=html;
 
 }
 
-/* ADICIONAL NOTURNO */
+/* NOTURNO */
 
 function adicionalNoturno(base){
 
-const agora = new Date();
-const hora = agora.getHours() + agora.getMinutes()/60;
+const agora=new Date();
+const hora=agora.getHours()+agora.getMinutes()/60;
 
-if(hora >= 22.5 || hora <= 5){
+if(hora>=22.5||hora<=5){
 
-if(base <= 24.99) return 4.99;
+if(base<=24.99) return 4.99;
 
-return base * 0.35;
+return base*0.35;
 
 }
 
@@ -249,26 +241,26 @@ return 0;
 
 }
 
-/* CALCULAR */
+/* CALCULO */
 
 function calcular(){
 
-let base = parseFloat(valor);
+let base=Number(valor);
 
-let detalheHTML="";
+let detalhe="";
 
-detalheHTML += `<div class="linha"><span>Base</span><span>R$ ${base.toFixed(2)}</span></div>`;
+detalhe+=`<div class="linha"><span>Base</span><span>R$ ${base.toFixed(2)}</span></div>`;
 
 /* NOTURNO */
 
-const noturno = adicionalNoturno(base);
+const noturno=adicionalNoturno(base);
 
 if(noturno>0){
 
-detalheHTML += `<div class="linha"><span>Adicional Noturno</span><span>R$ ${noturno.toFixed(2)}</span></div>
-<div class="badge">Tarifa Noturna Ativa</div>`;
+detalhe+=`<div class="linha"><span>Adicional Noturno</span><span>R$ ${noturno.toFixed(2)}</span></div>
+<div class="badge">Tarifa Noturna</div>`;
 
-base += noturno;
+base+=noturno;
 
 }
 
@@ -276,9 +268,9 @@ base += noturno;
 
 if(desvioRota){
 
-detalheHTML += `<div class="linha"><span>Desvio</span><span>R$ 5,00</span></div>`;
+detalhe+=`<div class="linha"><span>Desvio de rota</span><span>R$ 5.00</span></div>`;
 
-base += 5;
+base+=5;
 
 }
 
@@ -286,26 +278,23 @@ base += 5;
 
 if(mercado){
 
-detalheHTML += `<div class="linha"><span>Saída Mercado</span><span>R$ 3,89</span></div>`;
+detalhe+=`<div class="linha"><span>Saída mercado</span><span>R$ 3.89</span></div>`;
 
-base += 3.89;
+base+=3.89;
 
 }
 
-/* SAÍDA PRAIA */
+/* PRAIA */
 
-const praias = ["Gaibu","Calhetas","Itapuama","Enseada"];
+const praias=["Gaibu","Calhetas","Itapuama","Enseada"];
 
-const dia = new Date().getDay();
+const dia=new Date().getDay();
 
-if(praias.includes(destino) && (dia === 0 || dia === 6)){
+if(praias.includes(destino) && (dia===0||dia===6)){
 
-detalheHTML += `
-<div class="linha"><span>Saída de Praia</span><span>R$ 10,00</span></div>
-<div class="badge">Taxa válida sábados e domingos</div>
-`;
+detalhe+=`<div class="linha"><span>Saída de praia</span><span>R$ 10.00</span></div>`;
 
-base += 10;
+base+=10;
 
 }
 
@@ -313,57 +302,47 @@ base += 10;
 
 if(categoriaMult>1){
 
-const acrescimo = base * 0.5;
+const acrescimo=Number((base*0.5).toFixed(2));
 
-detalheHTML += `<div class="linha"><span>6 Lugares</span><span>R$ ${acrescimo.toFixed(2)}</span></div>`;
+detalhe+=`<div class="linha"><span>6 Lugares</span><span>R$ ${acrescimo.toFixed(2)}</span></div>`;
 
-base += acrescimo;
+base+=acrescimo;
 
 }
 
-detalheHTML += `<div class="total">Total: R$ ${base.toFixed(2)}</div>`;
+detalhe+=`<div class="total">Total: R$ ${base.toFixed(2)}</div>`;
 
-document.getElementById("detalhamento").innerHTML = detalheHTML;
+document.getElementById("detalhamento").innerHTML=detalhe;
 
-document.getElementById("valorFinal").innerText = "R$ "+base.toFixed(2);
+document.getElementById("valorFinal").innerText="R$ "+base.toFixed(2);
 
 localStorage.setItem("rf_total_final",base.toFixed(2));
 
 }
 
-/* CATEGORIA EVENTOS */
+/* EVENTOS CATEGORIA */
 
 cat4.onclick=()=>{
-
 categoriaMult=1;
-
 cat4.classList.add("active");
-
 cat6.classList.remove("active");
-
 calcular();
-
 }
 
 cat6.onclick=()=>{
-
 categoriaMult=1.5;
-
 cat6.classList.add("active");
-
 cat4.classList.remove("active");
-
 calcular();
-
 }
 
 /* WHATSAPP */
 
 function abrirEscolhaWhatsApp(msg){
 
-const texto = encodeURIComponent(msg);
+const texto=encodeURIComponent(msg);
 
-const modal = document.createElement("div");
+const modal=document.createElement("div");
 
 modal.style.position="fixed";
 modal.style.inset="0";
@@ -373,7 +352,7 @@ modal.style.alignItems="center";
 modal.style.justifyContent="center";
 modal.style.zIndex="9999";
 
-modal.innerHTML = `
+modal.innerHTML=`
 <div style="background:#111;padding:25px;border-radius:20px;text-align:center;max-width:300px">
 
 <h3 style="margin-bottom:15px">Enviar via</h3>
@@ -386,25 +365,18 @@ WhatsApp
 WhatsApp Business
 </button>
 
-</div>
-`;
+</div>`;
 
 document.body.appendChild(modal);
 
 document.getElementById("waNormal").onclick=()=>{
-
 window.open(`https://wa.me/?text=${texto}`,"_blank");
-
 modal.remove();
-
 };
 
 document.getElementById("waBusiness").onclick=()=>{
-
 window.open(`https://api.whatsapp.com/send?text=${texto}`,"_blank");
-
 modal.remove();
-
 };
 
 }
@@ -415,81 +387,38 @@ function solicitar(){
 
 calcular();
 
-const agora = new Date();
+const agora=new Date();
 
-const dataFormatada = agora.toLocaleDateString("pt-BR");
+const data=agora.toLocaleDateString("pt-BR");
 
-const horaFormatada = agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+const hora=agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
 
-const observacao = document.getElementById("observacaoInput").value.trim();
+const obs=document.getElementById("observacaoInput").value.trim();
 
-const detalhamentoDiv = document.getElementById("detalhamento");
+const total=localStorage.getItem("rf_total_final");
 
-let linhas=[];
+let msg=`🚖 *SOLICITAÇÃO RF*
 
-detalhamentoDiv.querySelectorAll(".linha").forEach(linha=>{
+${data} ${hora}
 
-const spans = linha.querySelectorAll("span");
-
-if(spans.length===2){
-
-linhas.push(`${spans[0].innerText}: ${spans[1].innerText}`);
-
-}
-
-});
-
-const detalhamentoTexto = linhas.join("\n");
-
-const totalFinal = Number(localStorage.getItem("rf_total_final")) || 0;
-
-let blocoObservacao="";
-
-if(observacao){
-
-blocoObservacao = `
-_____________________________
-*Observações*
-${observacao}`;
-
-}
-
-let blocoItinerario = `
-📍 Origem:
-${origem}
+📍 Origem: ${origem}
 `;
 
-if(parada){
-
-blocoItinerario += `
-🛑 Parada:
-${parada}
+if(parada) msg+=`🛑 Parada: ${parada}
 `;
+
+msg+=`🏁 Destino: ${destino}
+
+💰 Total: R$ ${Number(total).toFixed(2)}
+`;
+
+if(obs){
+
+msg+=`
+📝 Observação:
+${obs}`;
 
 }
-
-blocoItinerario += `
-🏁 Destino:
-${destino}
-`;
-
-const msg =
-`*RECIBO DE VIAGEM RF*
-${dataFormatada}
-${horaFormatada}
-${blocoObservacao}
-_____________________________
-*Detalhamento da viagem*
-
-${detalhamentoTexto}
-_____________________________
-*ITINERÁRIO*
-${blocoItinerario}
-_____________________________
-💰 *Total: R$ ${totalFinal.toFixed(2)}*
-
-_GRUPO RF_
-58.615.336/0001-49`;
 
 abrirEscolhaWhatsApp(msg);
 
