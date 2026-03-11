@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+
 :root{
   --rf-yellow:#ffd600;
   --rf-yellow-strong:#ffb800;
@@ -23,21 +24,18 @@ body{
   color:#fff;
 }
 
-/* HEADER */
 .header{
   padding:30px 25px 10px;
   font-size:22px;
   font-weight:900;
 }
 
-/* CONTAINER */
 .container{
   padding:10px 25px 140px;
   max-width:450px;
   margin:auto;
 }
 
-/* GLASS CARD */
 .card{
   background:rgba(255,255,255,.06);
   backdrop-filter:blur(20px);
@@ -53,7 +51,6 @@ body{
   opacity:.8;
 }
 
-/* ROTA */
 .rota-item{
   font-size:15px;
   margin-bottom:6px;
@@ -63,7 +60,6 @@ body{
   opacity:.5;
 }
 
-/* OBS */
 textarea{
   width:100%;
   border-radius:16px;
@@ -73,39 +69,23 @@ textarea{
   color:#fff;
   resize:none;
   height:90px;
-  font-size:14px;
 }
 
-/* CATEGORIA */
-.categoria{
-  display:flex;
-  gap:12px;
+.select{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  background:#111;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.1);
 }
 
-.cat{
-  flex:1;
-  padding:16px;
-  border-radius:18px;
-  text-align:center;
-  cursor:pointer;
-  background:rgba(255,255,255,.08);
-  transition:.25s;
-  font-weight:600;
-}
-
-.cat.active{
-  background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-strong));
-  color:#000;
-  box-shadow:0 8px 30px rgba(255,214,0,.4);
-}
-
-/* DETALHAMENTO */
 .linha{
   display:flex;
   justify-content:space-between;
   margin-bottom:8px;
   font-size:14px;
-  opacity:.85;
+  opacity:.9;
 }
 
 .total{
@@ -115,7 +95,6 @@ textarea{
   color:var(--rf-yellow);
 }
 
-/* BADGE NOTURNO */
 .badge{
   display:inline-block;
   padding:6px 10px;
@@ -125,7 +104,6 @@ textarea{
   margin-top:8px;
 }
 
-/* FOOTER */
 .footer{
   position:fixed;
   bottom:0;
@@ -157,8 +135,8 @@ button{
   background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-strong));
   font-weight:800;
   cursor:pointer;
-  box-shadow:0 10px 30px rgba(255,214,0,.5);
 }
+
 </style>
 </head>
 
@@ -169,35 +147,61 @@ button{
 <div class="container">
 
 <div class="card">
-  <h3>Rota</h3>
-  <div id="rota"></div>
+<h3>Rota</h3>
+<div id="rota"></div>
 </div>
 
 <div class="card">
-  <h3>Observação ao motorista</h3>
-  <textarea id="obs"></textarea>
+<h3>Observação ao motorista</h3>
+<textarea id="obs"></textarea>
 </div>
 
 <div class="card">
-  <h3>Categoria</h3>
-  <div class="categoria">
-    <div class="cat active" id="cat4">Driver 4</div>
-    <div class="cat" id="cat6">Driver 6 (+50%)</div>
-  </div>
+<h3>Forma de pagamento</h3>
+<select id="pagamento" class="select">
+<option value="dinheiro">Dinheiro</option>
+<option value="pix">Pix</option>
+<option value="debito">Cartão Débito</option>
+<option value="credito">Cartão Crédito</option>
+</select>
 </div>
 
 <div class="card">
-  <h3>Detalhamento</h3>
-  <div id="detalhe"></div>
+<h3>Taxa de Feira</h3>
+<select id="feira" class="select">
+<option value="0">Sem feira</option>
+<option value="5">1 carrinho (R$ 5.00)</option>
+<option value="7.99">2 carrinhos ou mais (R$ 7.99)</option>
+</select>
+</div>
+
+<div class="card">
+<h3>Transporte Animal</h3>
+<select id="animal" class="select">
+<option value="0">Nenhum</option>
+<option value="4.99">Pequeno (R$ 4.99)</option>
+<option value="7.99">Médio (R$ 7.99)</option>
+<option value="11.99">Grande (R$ 11.99)</option>
+</select>
+</div>
+
+<div class="card">
+<h3>Tempo de espera embarque (min)</h3>
+<input type="number" id="espera" class="select" value="0">
+</div>
+
+<div class="card">
+<h3>Detalhamento</h3>
+<div id="detalhe"></div>
 </div>
 
 </div>
 
 <div class="footer">
-  <div class="footer-inner">
-    <div class="valor" id="valorFinal">R$ 0,00</div>
-    <button onclick="confirmar()">Solicitar</button>
-  </div>
+<div class="footer-inner">
+<div class="valor" id="valorFinal">R$ 0,00</div>
+<button onclick="confirmar()">Solicitar</button>
+</div>
 </div>
 
 <script>
@@ -205,94 +209,105 @@ button{
 const corrida = JSON.parse(localStorage.getItem("rf_corrida_temp"));
 if(!corrida) window.location.href="home.html";
 
-let { origem, parada, destino, desvioRota, mercado, valor } = corrida;
-
-let categoriaMult = 1;
+let { origem, parada, destino, valor } = corrida;
 
 function montarRota(){
-  let html = `
-    <div class="rota-item"><span>Origem:</span> ${origem}</div>
-  `;
-  if(parada){
-    html += `<div class="rota-item"><span>Parada:</span> ${parada}</div>`;
-  }
-  html += `<div class="rota-item"><span>Destino:</span> ${destino}</div>`;
-  document.getElementById("rota").innerHTML = html;
+let html=`<div class="rota-item"><span>Origem:</span> ${origem}</div>`;
+if(parada) html+=`<div class="rota-item"><span>Parada:</span> ${parada}</div>`;
+html+=`<div class="rota-item"><span>Destino:</span> ${destino}</div>`;
+document.getElementById("rota").innerHTML=html;
 }
 
 function adicionalNoturno(base){
-  const agora = new Date();
-  const hora = agora.getHours() + agora.getMinutes()/60;
+const agora=new Date();
+const hora=agora.getHours()+agora.getMinutes()/60;
 
-  if(hora >= 22.5){
-    if(base <= 24.99) return 4.99;
-    return base * 0.35;
-  }
-  return 0;
+if(hora>=22.5 || hora<=5){
+if(base<=24.99) return 4.99;
+return base*0.35;
+}
+
+return 0;
 }
 
 function calcular(){
 
-  let base = parseFloat(valor);
-  let detalheHTML="";
+let base=parseFloat(valor);
+let taxas=0;
+let detalhe="";
 
-  detalheHTML += `<div class="linha"><span>Base</span><span>R$ ${base.toFixed(2)}</span></div>`;
+detalhe+=`<div class="linha"><span>Rota</span><span>R$ ${base.toFixed(2)}</span></div>`;
 
-  const noturno = adicionalNoturno(base);
+const noturno=adicionalNoturno(base);
 
-  if(noturno>0){
-    detalheHTML += `<div class="linha"><span>Adicional Noturno</span><span>R$ ${noturno.toFixed(2)}</span></div>
-                    <div class="badge">Tarifa Noturna Ativa</div>`;
-    base += noturno;
-  }
-
-  if(desvioRota){
-    detalheHTML += `<div class="linha"><span>Desvio</span><span>R$ 5,00</span></div>`;
-    base += 5;
-  }
-
-  if(mercado){
-    detalheHTML += `<div class="linha"><span>Saída Mercado</span><span>R$ 3,89</span></div>`;
-    base += 3.89;
-  }
-
-  if(categoriaMult>1){
-    const acrescimo = base*0.5;
-    detalheHTML += `<div class="linha"><span>6 Lugares</span><span>R$ ${acrescimo.toFixed(2)}</span></div>`;
-    base += acrescimo;
-  }
-
-  detalheHTML += `<div class="total">Total: R$ ${base.toFixed(2)}</div>`;
-
-  document.getElementById("detalhe").innerHTML = detalheHTML;
-  document.getElementById("valorFinal").innerText = "R$ "+base.toFixed(2);
-
-  localStorage.setItem("rf_total_final",base.toFixed(2));
+if(noturno>0){
+detalhe+=`<div class="linha"><span>Adicional Noturno</span><span>R$ ${noturno.toFixed(2)}</span></div>
+<div class="badge">Tarifa Noturna</div>`;
+base+=noturno;
 }
 
-document.getElementById("cat4").onclick=()=>{
-  categoriaMult=1;
-  cat4.classList.add("active");
-  cat6.classList.remove("active");
-  calcular();
-};
+const feira=parseFloat(document.getElementById("feira").value);
+const animal=parseFloat(document.getElementById("animal").value);
+const espera=parseFloat(document.getElementById("espera").value);
 
-document.getElementById("cat6").onclick=()=>{
-  categoriaMult=1.5;
-  cat6.classList.add("active");
-  cat4.classList.remove("active");
-  calcular();
-};
+if(feira>0){
+detalhe+=`<div class="linha"><span>Feira</span><span>R$ ${feira.toFixed(2)}</span></div>`;
+taxas+=feira;
+}
+
+if(animal>0){
+detalhe+=`<div class="linha"><span>Animal</span><span>R$ ${animal.toFixed(2)}</span></div>`;
+taxas+=animal;
+}
+
+if(espera>5){
+const taxaEspera=3 + ((espera-5)*0.60);
+detalhe+=`<div class="linha"><span>Espera</span><span>R$ ${taxaEspera.toFixed(2)}</span></div>`;
+taxas+=taxaEspera;
+}
+
+let subtotal=base+taxas;
+
+detalhe+=`<div class="linha"><span>Subtotal</span><span>R$ ${subtotal.toFixed(2)}</span></div>`;
+
+let pagamento=document.getElementById("pagamento").value;
+let total=subtotal;
+
+if(pagamento==="debito"){
+total=subtotal/0.98;
+}
+
+if(pagamento==="credito"){
+total=subtotal/0.95;
+}
+
+detalhe+=`<div class="linha"><span>Pagamento</span><span>${pagamento}</span></div>`;
+
+detalhe+=`<div class="total">Total: R$ ${total.toFixed(2)}</div>`;
+
+document.getElementById("detalhe").innerHTML=detalhe;
+document.getElementById("valorFinal").innerText="R$ "+total.toFixed(2);
+
+localStorage.setItem("rf_total_final",total.toFixed(2));
+
+}
+
+document.querySelectorAll("select,input").forEach(e=>{
+e.addEventListener("change",calcular);
+});
 
 function confirmar(){
-  const final={
-    ...corrida,
-    categoria: categoriaMult===1?"Driver 4":"Driver 6",
-    observacao:document.getElementById("obs").value,
-    total:localStorage.getItem("rf_total_final")
-  };
-  localStorage.setItem("rf_corrida_confirmada",JSON.stringify(final));
-  window.location.href="procurando.html";
+
+const final={
+...corrida,
+total:localStorage.getItem("rf_total_final"),
+observacao:document.getElementById("obs").value
+};
+
+localStorage.setItem("rf_corrida_confirmada",JSON.stringify(final));
+
+window.location.href="procurando.html";
+
 }
 
 montarRota();
