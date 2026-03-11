@@ -5,6 +5,8 @@
 <title>RF – Resumo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<script src="core/taxas.js"></script>
+
 <style>
 
 :root{
@@ -38,7 +40,6 @@ margin:auto;
 
 .card{
 background:rgba(255,255,255,.06);
-backdrop-filter:blur(20px);
 border-radius:26px;
 padding:22px;
 margin-bottom:22px;
@@ -52,12 +53,7 @@ opacity:.8;
 }
 
 .rota-item{
-font-size:15px;
 margin-bottom:6px;
-}
-
-.rota-item span{
-opacity:.5;
 }
 
 textarea{
@@ -67,7 +63,6 @@ padding:14px;
 border:none;
 background:rgba(255,255,255,.08);
 color:#fff;
-resize:none;
 height:90px;
 }
 
@@ -83,22 +78,18 @@ border-radius:18px;
 text-align:center;
 cursor:pointer;
 background:rgba(255,255,255,.08);
-transition:.25s;
 font-weight:600;
 }
 
 .cat.active{
 background:linear-gradient(135deg,var(--rf-yellow),var(--rf-yellow-strong));
 color:#000;
-box-shadow:0 8px 30px rgba(255,214,0,.4);
 }
 
 .linha{
 display:flex;
 justify-content:space-between;
 margin-bottom:8px;
-font-size:14px;
-opacity:.9;
 }
 
 .total{
@@ -108,15 +99,6 @@ margin-top:14px;
 color:var(--rf-yellow);
 }
 
-.badge{
-display:inline-block;
-padding:6px 10px;
-border-radius:12px;
-font-size:11px;
-background:#ff3b30;
-margin-top:8px;
-}
-
 .footer{
 position:fixed;
 bottom:0;
@@ -124,7 +106,6 @@ left:0;
 width:100%;
 background:#000;
 padding:20px;
-box-shadow:0 -10px 30px rgba(0,0,0,.8);
 }
 
 .footer-inner{
@@ -166,36 +147,47 @@ cursor:pointer;
 
 <div class="card">
 <h3>Observação ao motorista</h3>
-<textarea id="observacaoInput"></textarea>
+<textarea id="obs"></textarea>
 </div>
 
 <div class="card">
 <h3>Categoria</h3>
+
 <div class="categoria">
+
 <div class="cat active" id="cat4">Driver 4</div>
 <div class="cat" id="cat6">Driver 6 (+50%)</div>
+
 </div>
+
 </div>
 
 <div class="card">
 <h3>Detalhamento</h3>
-<div id="detalhamento"></div>
+<div id="detalhe"></div>
 </div>
 
 </div>
 
 <div class="footer">
+
 <div class="footer-inner">
+
 <div class="valor" id="valorFinal">R$ 0,00</div>
-<button onclick="solicitar()">Solicitar</button>
+
+<button onclick="enviar()">Solicitar</button>
+
 </div>
+
 </div>
 
 <script>
 
 const corrida = JSON.parse(localStorage.getItem("rf_corrida_temp"));
 
-if(!corrida) window.location.href="home.html";
+if(!corrida){
+location.href="home.html";
+}
 
 let {
 origem,
@@ -210,217 +202,127 @@ let categoriaMult = 1;
 
 function montarRota(){
 
-let html=`<div class="rota-item"><span>Origem:</span> ${origem}</div>`;
+let html = `
+<div class="rota-item">Origem: ${origem}</div>
+`;
 
 if(parada){
-html+=`<div class="rota-item"><span>Parada:</span> ${parada}</div>`;
-}
 
-html+=`<div class="rota-item"><span>Destino:</span> ${destino}</div>`;
-
-document.getElementById("rota").innerHTML=html;
+html += `<div class="rota-item">Parada: ${parada}</div>`;
 
 }
 
-/* NOTURNO */
+html += `<div class="rota-item">Destino: ${destino}</div>`;
 
-function adicionalNoturno(base){
-
-const agora=new Date();
-const hora=agora.getHours()+agora.getMinutes()/60;
-
-if(hora>=22.5||hora<=5){
-
-if(base<=24.99) return 4.99;
-
-return base*0.35;
+document.getElementById("rota").innerHTML = html;
 
 }
-
-return 0;
-
-}
-
-/* CALCULO */
 
 function calcular(){
 
-let base=Number(valor);
+let base = Number(valor);
 
-let detalhe="";
+let detalheHTML = "";
 
-detalhe+=`<div class="linha"><span>Base</span><span>R$ ${base.toFixed(2)}</span></div>`;
+detalheHTML += `
+<div class="linha">
+<span>Base</span>
+<span>R$ ${base.toFixed(2)}</span>
+</div>
+`;
 
-/* NOTURNO */
+let taxas = [];
 
-const noturno=adicionalNoturno(base);
+const t1 = Taxas.noturno(base);
+if(t1) taxas.push(t1);
 
-if(noturno>0){
+const t2 = Taxas.desvio(desvioRota);
+if(t2) taxas.push(t2);
 
-detalhe+=`<div class="linha"><span>Adicional Noturno</span><span>R$ ${noturno.toFixed(2)}</span></div>
-<div class="badge">Tarifa Noturna</div>`;
+const t3 = Taxas.mercado(mercado);
+if(t3) taxas.push(t3);
 
-base+=noturno;
+const t4 = Taxas.praia(destino);
+if(t4) taxas.push(t4);
 
-}
+taxas.forEach(t =>{
 
-/* DESVIO */
+detalheHTML += `
+<div class="linha">
+<span>${t.nome}</span>
+<span>R$ ${t.valor.toFixed(2)}</span>
+</div>
+`;
 
-if(desvioRota){
+base += t.valor;
 
-detalhe+=`<div class="linha"><span>Desvio de rota</span><span>R$ 5.00</span></div>`;
+});
 
-base+=5;
+const categoria = Taxas.categoria(categoriaMult,base);
 
-}
+if(categoria){
 
-/* MERCADO */
+detalheHTML += `
+<div class="linha">
+<span>${categoria.nome}</span>
+<span>R$ ${categoria.valor.toFixed(2)}</span>
+</div>
+`;
 
-if(mercado){
-
-detalhe+=`<div class="linha"><span>Saída mercado</span><span>R$ 3.89</span></div>`;
-
-base+=3.89;
-
-}
-
-/* PRAIA */
-
-const praias=["Gaibu","Calhetas","Itapuama","Enseada"];
-
-const dia=new Date().getDay();
-
-if(praias.includes(destino) && (dia===0||dia===6)){
-
-detalhe+=`<div class="linha"><span>Saída de praia</span><span>R$ 10.00</span></div>`;
-
-base+=10;
-
-}
-
-/* CATEGORIA */
-
-if(categoriaMult>1){
-
-const acrescimo=Number((base*0.5).toFixed(2));
-
-detalhe+=`<div class="linha"><span>6 Lugares</span><span>R$ ${acrescimo.toFixed(2)}</span></div>`;
-
-base+=acrescimo;
+base += categoria.valor;
 
 }
 
-detalhe+=`<div class="total">Total: R$ ${base.toFixed(2)}</div>`;
+detalheHTML += `
+<div class="total">Total: R$ ${base.toFixed(2)}</div>
+`;
 
-document.getElementById("detalhamento").innerHTML=detalhe;
+document.getElementById("detalhe").innerHTML = detalheHTML;
 
-document.getElementById("valorFinal").innerText="R$ "+base.toFixed(2);
+document.getElementById("valorFinal").innerText = "R$ "+base.toFixed(2);
 
 localStorage.setItem("rf_total_final",base.toFixed(2));
 
 }
 
-/* EVENTOS CATEGORIA */
-
 cat4.onclick=()=>{
-categoriaMult=1;
+
+categoriaMult = 1;
+
 cat4.classList.add("active");
 cat6.classList.remove("active");
+
 calcular();
+
 }
 
 cat6.onclick=()=>{
-categoriaMult=1.5;
+
+categoriaMult = 1.5;
+
 cat6.classList.add("active");
 cat4.classList.remove("active");
-calcular();
-}
-
-/* WHATSAPP */
-
-function abrirEscolhaWhatsApp(msg){
-
-const texto=encodeURIComponent(msg);
-
-const modal=document.createElement("div");
-
-modal.style.position="fixed";
-modal.style.inset="0";
-modal.style.background="rgba(0,0,0,.7)";
-modal.style.display="flex";
-modal.style.alignItems="center";
-modal.style.justifyContent="center";
-modal.style.zIndex="9999";
-
-modal.innerHTML=`
-<div style="background:#111;padding:25px;border-radius:20px;text-align:center;max-width:300px">
-
-<h3 style="margin-bottom:15px">Enviar via</h3>
-
-<button id="waNormal" style="width:100%;margin-bottom:10px;padding:12px;border-radius:10px;">
-WhatsApp
-</button>
-
-<button id="waBusiness" style="width:100%;padding:12px;border-radius:10px;">
-WhatsApp Business
-</button>
-
-</div>`;
-
-document.body.appendChild(modal);
-
-document.getElementById("waNormal").onclick=()=>{
-window.open(`https://wa.me/?text=${texto}`,"_blank");
-modal.remove();
-};
-
-document.getElementById("waBusiness").onclick=()=>{
-window.open(`https://api.whatsapp.com/send?text=${texto}`,"_blank");
-modal.remove();
-};
-
-}
-
-/* SOLICITAR */
-
-function solicitar(){
 
 calcular();
 
-const agora=new Date();
-
-const data=agora.toLocaleDateString("pt-BR");
-
-const hora=agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-
-const obs=document.getElementById("observacaoInput").value.trim();
-
-const total=localStorage.getItem("rf_total_final");
-
-let msg=`🚖 *SOLICITAÇÃO RF*
-
-${data} ${hora}
-
-📍 Origem: ${origem}
-`;
-
-if(parada) msg+=`🛑 Parada: ${parada}
-`;
-
-msg+=`🏁 Destino: ${destino}
-
-💰 Total: R$ ${Number(total).toFixed(2)}
-`;
-
-if(obs){
-
-msg+=`
-📝 Observação:
-${obs}`;
-
 }
 
-abrirEscolhaWhatsApp(msg);
+function enviar(){
+
+calcular();
+
+const total = localStorage.getItem("rf_total_final");
+
+const msg = `
+🚖 SOLICITAÇÃO RF
+
+Origem: ${origem}
+Destino: ${destino}
+
+Total: R$ ${Number(total).toFixed(2)}
+`;
+
+window.open("https://wa.me/?text="+encodeURIComponent(msg));
 
 }
 
