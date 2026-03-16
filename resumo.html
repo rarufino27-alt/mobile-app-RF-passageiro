@@ -5,212 +5,10 @@
 <title>RF – Resumo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+<link rel="stylesheet" href="theme/theme.css">
+<link rel="stylesheet" href="theme/layout.css">
+<link rel="stylesheet" href="theme/components.css">
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-}
-
-body{
-background:linear-gradient(to bottom,#0f0f0f,#1a1a1a);
-color:#fff;
-min-height:100vh;
-}
-
-/* HEADER */
-
-.top-white{
-background:#fff;
-padding:20px 20px 28px 20px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-border-bottom-left-radius:32px;
-border-bottom-right-radius:32px;
-box-shadow:0 10px 30px rgba(0,0,0,.25);
-}
-
-.logo-area{
-display:flex;
-align-items:center;
-gap:14px;
-}
-
-.logo-img{
-height:60px;
-border-radius:16px;
-}
-
-.logo-text-dark{
-font-weight:900;
-letter-spacing:1px;
-color:#000;
-font-size:1.1rem;
-}
-
-.menu-btn-dark{
-font-size:24px;
-cursor:pointer;
-color:#000;
-}
-
-/* MENU */
-
-.menu-overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,.6);
-display:none;
-z-index:99;
-}
-
-.menu{
-position:fixed;
-top:0;
-left:-260px;
-width:260px;
-height:100%;
-background:#1a1a1a;
-transition:left .3s ease;
-z-index:100;
-padding:20px;
-}
-
-.menu.ativo{
-left:0;
-}
-
-.menu h3{
-margin-bottom:20px;
-color:#facc15;
-}
-
-.menu-item{
-padding:14px 0;
-border-bottom:1px solid rgba(255,255,255,.08);
-cursor:pointer;
-}
-
-.menu-item:hover{
-color:#facc15;
-}
-
-/* CONTAINER */
-
-.container{
-padding:30px 25px 140px;
-max-width:450px;
-margin:auto;
-}
-
-/* CARD */
-
-.card{
-background:#1c1c1c;
-border-radius:20px;
-padding:20px;
-margin-bottom:22px;
-border:1px solid rgba(255,255,255,.05);
-box-shadow:0 15px 35px rgba(0,0,0,.5);
-}
-
-.card h3{
-margin-bottom:14px;
-font-size:15px;
-opacity:.8;
-}
-
-.rota-item{
-font-size:15px;
-margin-bottom:6px;
-}
-
-.rota-item span{
-opacity:.5;
-}
-
-textarea{
-width:100%;
-border-radius:16px;
-padding:14px;
-border:none;
-background:#111;
-color:#fff;
-resize:none;
-height:90px;
-}
-
-.select{
-width:100%;
-padding:12px;
-border-radius:12px;
-background:#111;
-color:#fff;
-border:1px solid rgba(255,255,255,.1);
-}
-
-.linha{
-display:flex;
-justify-content:space-between;
-margin-bottom:8px;
-font-size:14px;
-}
-
-.total{
-font-size:22px;
-font-weight:900;
-margin-top:14px;
-color:#facc15;
-}
-
-.badge{
-display:inline-block;
-padding:6px 10px;
-border-radius:12px;
-font-size:11px;
-background:#ff3b30;
-margin-top:8px;
-}
-
-/* FOOTER */
-
-.footer{
-position:fixed;
-bottom:0;
-left:0;
-width:100%;
-background:#000;
-padding:20px;
-}
-
-.footer-inner{
-max-width:450px;
-margin:auto;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.valor{
-font-size:26px;
-font-weight:900;
-color:#facc15;
-}
-
-button{
-padding:14px 30px;
-border:none;
-border-radius:30px;
-background:#facc15;
-color:#000;
-font-weight:800;
-cursor:pointer;
-}
-
-</style>
 </head>
 
 <body>
@@ -218,16 +16,28 @@ cursor:pointer;
 <div class="menu-overlay" id="menuOverlay" onclick="fecharMenu()"></div>
 
 <div class="menu" id="menu">
+
 <h3>Menu</h3>
-<div class="menu-item" onclick="irPara('home.html')">Nova viagem</div>
-<div class="menu-item" onclick="irPara('termos.html')">Regras do grupo</div>
+
+<div class="menu-item" onclick="irPara('home.html')">
+🚗 Nova viagem
+</div>
+
+<div class="menu-item" onclick="irPara('termos.html')">
+📜 Regras do grupo
+</div>
+
+<div class="menu-item" onclick="irPara('configuracoes.html')">
+⚙️ Configurações
+</div>
+
 </div>
 
 <div class="top-white">
 
 <div class="logo-area">
-<img src="icons/icon-192.png" class="logo-img">
-<span class="logo-text-dark">GRUPO RF</span>
+<img src="icons/icon-512.png" class="logo-img">
+<span class="logo-text-dark">RF MOTORISTA</span>
 </div>
 
 <div class="menu-btn-dark" onclick="abrirMenu()">☰</div>
@@ -237,13 +47,13 @@ cursor:pointer;
 <div class="container">
 
 <div class="card">
-<h3>Rota</h3>
+<h3>Resumo da viagem</h3>
 <div id="rota"></div>
 </div>
 
 <div class="card">
 <h3>Observação ao motorista</h3>
-<textarea id="obs"></textarea>
+<textarea id="obs" placeholder="Alguma observação para o motorista?"></textarea>
 </div>
 
 <div class="card">
@@ -257,63 +67,60 @@ cursor:pointer;
 </div>
 
 <div class="card">
-<h3>Taxa de Feira</h3>
+
+<h3>Adicionais da corrida</h3>
+
+<label>Taxa de Feira</label>
 <select id="feira" class="select">
 <option value="0">Sem feira</option>
 <option value="5">1 carrinho (R$ 5.00)</option>
 <option value="7.99">2 carrinhos ou mais (R$ 7.99)</option>
 </select>
-</div>
 
-<div class="card">
-<h3>Transporte Animal</h3>
+<label>Transporte Animal</label>
 <select id="animal" class="select">
 <option value="0">Nenhum</option>
 <option value="4.99">Pequeno (R$ 4.99)</option>
 <option value="7.99">Médio (R$ 7.99)</option>
 <option value="11.99">Grande (R$ 11.99)</option>
 </select>
-</div>
 
-<div class="card">
-<h3>Tempo de espera embarque (min)</h3>
+<label>Tempo de espera embarque (min)</label>
 <input type="number" id="espera" class="select" value="0">
-</div>
 
-<div class="card">
-<h3>Saída de Praia</h3>
-
+<label>Saída de Praia</label>
 <select id="saidaPraia" class="select">
 <option value="0">Não</option>
 <option value="10">Sim (+ R$ 10,00)</option>
 </select>
 
-<p style="font-size:12px;opacity:.7;margin-top:8px">
-Taxa válida para saídas de praia aos sábados, domingos e feriados.
-</p>
-
 </div>
 
 <div class="card">
-<h3>Detalhamento</h3>
+<h3>Resumo de valores</h3>
 <div id="detalhe"></div>
 </div>
 
 </div>
 
 <div class="footer">
-
 <div class="footer-inner">
-
 <div class="valor" id="valorFinal">R$ 0,00</div>
-
-<button onclick="confirmar()">Solicitar</button>
-
+<div class="cta-area">
+<button onclick="solicitar()">Enviar recibo via Whatsapp</button>
 </div>
-
+</div>
 </div>
 
 <script>
+
+(function(){
+
+const temaSalvo = localStorage.getItem("rf_theme") || "dark";
+
+document.body.setAttribute("data-theme", temaSalvo);
+
+})();
 
 function abrirMenu(){
 document.getElementById("menu").classList.add("ativo");
@@ -333,6 +140,8 @@ const corrida = JSON.parse(localStorage.getItem("rf_corrida_temp"));
 if(!corrida) window.location.href="home.html";
 
 let { origem, parada, destino, valor, categoria = 1 } = corrida;
+
+let detalhamentoRecibo = "";
 
 function montarRota(){
 
@@ -369,11 +178,13 @@ return 0;
 
 function calcular(){
 
-let base=parseFloat(valor);
+let base=parseFloat(valor)||0;
 let taxas=0;
 let detalhe="";
+let recibo="";
 
 detalhe+=`<div class="linha"><span>Rota</span><span>R$ ${base.toFixed(2)}</span></div>`;
+recibo+=`Valor base: R$ ${base.toFixed(2)}\n`;
 
 const noturno=adicionalNoturno(base);
 
@@ -382,38 +193,45 @@ if(noturno>0){
 detalhe+=`<div class="linha"><span>Adicional Noturno</span><span>R$ ${noturno.toFixed(2)}</span></div>
 <div class="badge">Tarifa Noturna</div>`;
 
+recibo+=`Adicional Noturno: R$ ${noturno.toFixed(2)}\n`;
+
 base+=noturno;
 
 }
 
-const saidaPraia=parseFloat(document.getElementById("saidaPraia").value);
+const saidaPraia=parseFloat(document.getElementById("saidaPraia").value)||0;
 
 if(saidaPraia>0){
 detalhe+=`<div class="linha"><span>Saída de Praia</span><span>R$ ${saidaPraia.toFixed(2)}</span></div>`;
+recibo+=`Saída de Praia: R$ ${saidaPraia.toFixed(2)}\n`;
 taxas+=saidaPraia;
 }
 
-const feira=parseFloat(document.getElementById("feira").value);
+const feira=parseFloat(document.getElementById("feira").value)||0;
 
 if(feira>0){
 detalhe+=`<div class="linha"><span>Feira</span><span>R$ ${feira.toFixed(2)}</span></div>`;
+recibo+=`Taxa de Feira: R$ ${feira.toFixed(2)}\n`;
 taxas+=feira;
 }
 
-const animal=parseFloat(document.getElementById("animal").value);
+const animal=parseFloat(document.getElementById("animal").value)||0;
 
 if(animal>0){
 detalhe+=`<div class="linha"><span>Animal</span><span>R$ ${animal.toFixed(2)}</span></div>`;
+recibo+=`Transporte Animal: R$ ${animal.toFixed(2)}\n`;
 taxas+=animal;
 }
 
-const espera=parseFloat(document.getElementById("espera").value);
+const espera=parseFloat(document.getElementById("espera").value)||0;
 
 if(espera>5){
 
 const taxaEspera=3 + ((espera-5)*0.60);
 
 detalhe+=`<div class="linha"><span>Espera</span><span>R$ ${taxaEspera.toFixed(2)}</span></div>`;
+recibo+=`Tempo de Espera: R$ ${taxaEspera.toFixed(2)}\n`;
+
 taxas+=taxaEspera;
 
 }
@@ -425,6 +243,8 @@ if(categoria>1){
 const acrescimo=subtotal*(categoria-1);
 
 detalhe+=`<div class="linha"><span>Categoria 6 lugares</span><span>R$ ${acrescimo.toFixed(2)}</span></div>`;
+
+recibo+=`Acréscimo 6 lugares: R$ ${acrescimo.toFixed(2)}\n`;
 
 subtotal=subtotal*categoria;
 
@@ -450,6 +270,8 @@ detalhe+=`<div class="total">Total: R$ ${total.toFixed(2)}</div>`;
 document.getElementById("detalhe").innerHTML=detalhe;
 document.getElementById("valorFinal").innerText="R$ "+total.toFixed(2);
 
+detalhamentoRecibo = recibo;
+
 localStorage.setItem("rf_total_final",total.toFixed(2));
 
 }
@@ -458,17 +280,118 @@ document.querySelectorAll("select,input").forEach(e=>{
 e.addEventListener("change",calcular);
 });
 
-function confirmar(){
+function solicitar(){
 
-const final={
-...corrida,
-total:localStorage.getItem("rf_total_final"),
-observacao:document.getElementById("obs").value
-};
+const agora = new Date();
 
-localStorage.setItem("rf_corrida_confirmada",JSON.stringify(final));
+const data = agora.toLocaleDateString("pt-BR");
+const hora = agora.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
 
-window.location.href="procurando.html";
+const total = parseFloat(localStorage.getItem("rf_total_final")) || 0;
+
+const pagamento = document.getElementById("pagamento").value;
+
+let categoriaTexto = "Driver 4 Lugares";
+
+if(categoria > 1){
+categoriaTexto = "Driver 6 Lugares";
+}
+
+let base = parseFloat(valor) || 0;
+let taxas = 0;
+
+const saidaPraia = parseFloat(document.getElementById("saidaPraia").value)||0;
+taxas += saidaPraia;
+
+const feira = parseFloat(document.getElementById("feira").value)||0;
+taxas += feira;
+
+const animal = parseFloat(document.getElementById("animal").value)||0;
+taxas += animal;
+
+const espera = parseFloat(document.getElementById("espera").value)||0;
+
+if(espera > 5){
+taxas += 3 + ((espera-5)*0.60);
+}
+
+const noturno = adicionalNoturno(base);
+base += noturno;
+
+let subtotal = base + taxas;
+
+if(categoria > 1){
+subtotal = subtotal * categoria;
+}
+
+let taxaCartao = 0;
+let blocoPagamento = "";
+
+if(pagamento === "debito"){
+taxaCartao = total - subtotal;
+
+blocoPagamento = `
+Acréscimo cartão: R$ ${taxaCartao.toFixed(2)}
+Forma de pagamento: Débito
+`;
+}
+
+if(pagamento === "credito"){
+taxaCartao = total - subtotal;
+
+blocoPagamento = `
+Acréscimo cartão: R$ ${taxaCartao.toFixed(2)}
+Forma de pagamento: Crédito
+`;
+}
+
+let itinerario = `📍 Origem:
+${origem}
+
+`;
+
+if(parada){
+itinerario += `🛑 Parada:
+${parada}
+
+`;
+}
+
+itinerario += `🏁 Destino:
+${destino}`;
+
+const msg =
+`*RECIBO DE VIAGEM RF*
+${data}
+${hora}
+
+_____________________________
+*Detalhamento da viagem*
+
+Categoria: ${categoriaTexto}
+
+${detalhamentoRecibo}
+
+Subtotal: R$ ${subtotal.toFixed(2)}
+
+${blocoPagamento}
+
+Total Geral: R$ ${total.toFixed(2)}
+
+_____________________________
+*ITINERÁRIO*
+
+${itinerario}
+
+_____________________________
+💰 *Total: R$ ${total.toFixed(2)}*
+
+_GRUPO RF_
+58.615.336/0001-49`;
+
+const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+window.location.href = url;
 
 }
 
