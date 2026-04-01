@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Nova Corrida</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="core/datamanager.js"></script>
+
+<style>
+body{font-family:system-ui;padding:15px;background:#111;color:#fff;}
+input,select{width:100%;padding:12px;margin-bottom:10px;border-radius:8px;border:none;}
+button{width:100%;padding:14px;border:none;border-radius:10px;background:#facc15;font-weight:bold;}
+</style>
+
+</head>
+
+<body>
+
+<h2>🚗 Nova Corrida</h2>
+
+<input id="grupo" placeholder="Grupo">
+<input id="solicitante" placeholder="Passageiro">
+<input id="telefone" placeholder="Telefone">
+<input id="origem" placeholder="Origem">
+<input id="destino" placeholder="Destino">
+<input id="valor" type="number" placeholder="Valor">
+<input id="motorista" placeholder="Motorista">
+
+<select id="status">
+  <option value="finalizada">Finalizada</option>
+  <option value="cancelada">Cancelada</option>
+</select>
+
+<input id="motivo" placeholder="Motivo cancelamento">
+
+<button onclick="salvar()">Salvar</button>
+
+<script>
+
+function salvar(){
+
+  const corrida = {
+    id: Date.now(),
+    grupo: grupo.value,
+    solicitante: solicitante.value,
+    telefone: telefone.value,
+    origem: origem.value,
+    destino: destino.value,
+    valor: Number(valor.value),
+    motorista: motorista.value,
+    status: status.value,
+    motivoCancelamento: motivo.value,
+    data: new Date().toISOString()
+  };
+
+  DataManager.adicionarCorrida(corrida);
+
+  alert("Salvo!");
+  location.reload();
+}
+
+</script>
+
+</body>
+</html>
