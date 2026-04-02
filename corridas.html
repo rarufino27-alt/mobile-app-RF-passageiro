@@ -10,7 +10,6 @@
 <script src="core/supabase.js"></script>
 
 <style>
-
 body{
   margin:0;
   font-family:system-ui;
@@ -54,7 +53,7 @@ input{
 }
 
 .btn{
-  margin-top:10px;
+  margin-top:8px;
   padding:10px;
   border:none;
   border-radius:8px;
@@ -62,15 +61,8 @@ input{
   font-weight:bold;
 }
 
-.edit{
-  background:#3b82f6;
-  color:#fff;
-}
-
-.delete{
-  background:#ef4444;
-  color:#fff;
-}
+.edit{ background:#3b82f6; color:#fff; }
+.delete{ background:#ef4444; color:#fff; }
 
 /* MODAL */
 .modal{
@@ -92,7 +84,6 @@ input{
   width:90%;
   max-width:400px;
 }
-
 </style>
 
 </head>
@@ -118,8 +109,9 @@ input{
 
     <h3>Editar Corrida</h3>
 
-    <input id="editValor" type="number">
-    
+    <input id="editValor" type="number" placeholder="Valor">
+    <input id="editHora" type="time">
+
     <select id="editStatus">
       <option value="finalizada">Finalizada</option>
       <option value="cancelada">Cancelada</option>
@@ -143,12 +135,7 @@ async function carregar(){
   const { data, error } = await window.supabaseClient
     .from("corridas")
     .select(`
-      id,
-      valor,
-      status,
-      data,
-      origem,
-      destino,
+      *,
       motoristas(nome)
     `)
     .order("data", { ascending:false });
@@ -182,22 +169,32 @@ function render(){
 
       const nome = c.motoristas?.nome || "";
 
-      if(busca && !nome.toLowerCase().includes(busca)){
-        return false;
-      }
+      if(busca && !nome.toLowerCase().includes(busca)) return false;
 
-      if(inicio && new Date(c.data) < new Date(inicio)){
-        return false;
-      }
+      if(inicio && new Date(c.data) < new Date(inicio)) return false;
 
-      if(fim && new Date(c.data) > new Date(fim + "T23:59")){
-        return false;
-      }
+      if(fim && new Date(c.data) > new Date(fim + "T23:59")) return false;
 
       return true;
 
     })
     .forEach(c => {
+
+      let rota = `${c.origem} → ${c.destino}`;
+
+      if(c.parada){
+        rota = `${c.origem} → 🛑 ${c.parada} → ${c.destino}`;
+      }
+
+      let extras = "";
+
+      if(c.taxas > 0){
+        extras += `💲 Taxas: R$ ${c.taxas.toFixed(2)}<br>`;
+      }
+
+      if(c.noturno > 0){
+        extras += `🌙 Noturno: R$ ${c.noturno.toFixed(2)}<br>`;
+      }
 
       const div = document.createElement("div");
       div.className = "card";
@@ -205,23 +202,22 @@ function render(){
       div.innerHTML = `
         <strong>${c.motoristas?.nome || "Sem motorista"}</strong>
 
-        <div class="small">
-          ${c.origem} → ${c.destino}
-        </div>
+        <div class="small">${rota}</div>
+
+        <div class="small">💰 Total: R$ ${c.valor.toFixed(2)}</div>
+
+        <div class="small">${extras}</div>
+
+        <div class="small">🕒 Viagem: ${c.hora_viagem || "-"}</div>
 
         <div class="small">
-          💰 R$ ${c.valor.toFixed(2)}
+          📅 Registro: ${new Date(c.data).toLocaleString()}
         </div>
 
-        <div class="small">
-          📅 ${new Date(c.data).toLocaleString()}
-        </div>
+        <div class="small">Status: ${c.status}</div>
 
-        <div class="small">
-          Status: ${c.status}
-        </div>
-
-        <button class="btn edit" onclick="abrirEditar('${c.id}', ${c.valor}, '${c.status}')">
+        <button class="btn edit"
+          onclick="abrirEditar('${c.id}', ${c.valor}, '${c.status}', '${c.hora_viagem || ""}')">
           Editar
         </button>
 
@@ -239,12 +235,13 @@ function render(){
 /* =========================
 EDITAR
 ========================= */
-function abrirEditar(id, valor, status){
+function abrirEditar(id, valor, status, hora){
 
   editId = id;
 
-  document.getElementById("editValor").value = valor;
-  document.getElementById("editStatus").value = status;
+  editValor.value = valor;
+  editStatus.value = status;
+  editHora.value = hora;
 
   modal.style.display = "flex";
 
@@ -252,12 +249,17 @@ function abrirEditar(id, valor, status){
 
 async function salvarEdicao(){
 
-  const valor = Number(document.getElementById("editValor").value);
-  const status = document.getElementById("editStatus").value;
+  const valor = Number(editValor.value);
+  const status = editStatus.value;
+  const hora = editHora.value;
 
   const { error } = await window.supabaseClient
     .from("corridas")
-    .update({ valor, status })
+    .update({
+      valor,
+      status,
+      hora_viagem: hora
+    })
     .eq("id", editId);
 
   if(error){
