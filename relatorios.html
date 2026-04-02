@@ -3,40 +3,44 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Painel Administrador RF - Relatórios</title>
+<title>Relatórios RF</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="core/supabase.js"></script>
 
 <style>
 
-/* BASE */
 body{
   font-family:system-ui;
   margin:0;
   background:#0f172a;
-  color:#e5e7eb;
+  color:#fff;
 }
 
-/* HEADER */
 .header{
   padding:15px;
-  background:#1e293b;
   text-align:center;
+  background:#1e293b;
   font-weight:700;
-  border-bottom:1px solid #334155;
 }
 
-/* CONTAINER */
 .container{
   padding:15px;
   max-width:700px;
   margin:auto;
 }
 
-/* CARD */
+select{
+  width:100%;
+  padding:10px;
+  margin-bottom:15px;
+  border-radius:8px;
+  background:#020617;
+  color:#fff;
+  border:1px solid #334155;
+}
+
 .card{
   background:#1e293b;
   padding:15px;
@@ -45,22 +49,15 @@ body{
   border:1px solid #334155;
 }
 
-/* TOP */
-.top{
-  display:flex;
-  justify-content:space-between;
+.title{
   font-weight:700;
+  margin-bottom:8px;
 }
 
-/* TEXTO */
 .small{
   font-size:13px;
   color:#94a3b8;
 }
-
-/* STATUS */
-.good{ color:#22c55e; }
-.bad{ color:#ef4444; }
 
 </style>
 
@@ -68,97 +65,180 @@ body{
 
 <body>
 
-<div class="header">
-📊 Painel Administrador RF
-</div>
+<div class="header">📊 Relatórios</div>
 
 <div class="container">
 
-<h2>Relatório por Grupo</h2>
+<select id="periodo" onchange="carregar()">
+  <option value="geral">Geral</option>
+  <option value="semana">Semana (Seg–Sáb)</option>
+  <option value="domingo">Domingo</option>
+  <option value="mes">Mês atual</option>
+</select>
 
-<div id="lista"></div>
+<div id="resumo"></div>
+<div id="motoristas"></div>
+<div id="grupos"></div>
 
 </div>
 
 <script>
 
-if(localStorage.getItem("admin_logado") !== "true"){
-  window.location.href = "login.html";
+function filtrarPeriodo(dados){
+
+  const tipo = document.getElementById("periodo").value;
+  const hoje = new Date();
+
+  return dados.filter(c => {
+
+    const data = new Date(c.data);
+
+    if(tipo === "mes"){
+      return data.getMonth() === hoje.getMonth() &&
+             data.getFullYear() === hoje.getFullYear();
+    }
+
+    if(tipo === "domingo"){
+      return data.getDay() === 0;
+    }
+
+    if(tipo === "semana"){
+      const dia = data.getDay();
+      return dia >= 1 && dia <= 6;
+    }
+
+    return true;
+
+  });
+
 }
-  
+
 async function carregar(){
 
-  const lista = document.getElementById("lista");
-
-  lista.innerHTML = "Carregando...";
-
-  // BUSCAR CORRIDAS
-  const { data: corridas, error } = await supabase
+  const { data, error } = await window.supabaseClient
     .from("corridas")
-    .select("*");
+    .select(`
+      *,
+      motoristas ( nome )
+    `);
 
   if(error){
-    lista.innerHTML = "Erro ao carregar dados";
+    alert("Erro ao carregar");
     return;
   }
 
-  const grupos = {};
+  const filtrado = filtrarPeriodo(data);
 
-  corridas.forEach(c => {
+  renderResumo(filtrado);
+  renderMotoristas(filtrado);
+  renderGrupos(filtrado);
 
-    const grupo = c.grupo || "Sem grupo";
+}
 
-    if(!grupos[grupo]){
-      grupos[grupo] = {
-        nome: grupo,
-        total: 0,
-        faturamento: 0,
-        canceladas: 0
+function renderResumo(data){
+
+  let total = data.length;
+  let faturamento = 0;
+
+  data.forEach(c => {
+    if(c.status === "finalizada"){
+      faturamento += c.valor;
+    }
+  });
+
+  const media = total ? faturamento / total : 0;
+
+  document.getElementById("resumo").innerHTML = `
+    <div class="card">
+      <div class="title">Resumo</div>
+      <div>Total de corridas: ${total}</div>
+      <div>Faturamento: R$ ${faturamento.toFixed(2)}</div>
+      <div>Média por corrida: R$ ${media.toFixed(2)}</div>
+    </div>
+  `;
+
+}
+
+function renderMotoristas(data){
+
+  const map = {};
+
+  data.forEach(c => {
+
+    const nome = c.motoristas?.nome || "Sem nome";
+
+    if(!map[nome]){
+      map[nome] = { total:0, valor:0 };
+    }
+
+    if(c.status === "finalizada"){
+      map[nome].total++;
+      map[nome].valor += c.valor;
+    }
+
+  });
+
+  const arr = Object.entries(map)
+    .sort((a,b)=> b[1].total - a[1].total);
+
+  let html = `<div class="card"><div class="title">Por Motorista</div>`;
+
+  arr.forEach(([nome, d]) => {
+    html += `
+      <div>${nome} — ${d.total} corridas (R$ ${d.valor.toFixed(2)})</div>
+    `;
+  });
+
+  html += `</div>`;
+
+  document.getElementById("motoristas").innerHTML = html;
+
+}
+
+function renderGrupos(data){
+
+  const map = {};
+
+  data.forEach(c => {
+
+    if(!map[c.grupo]){
+      map[c.grupo] = {
+        total:0,
+        valor:0,
+        canceladas:0
       };
     }
 
-    grupos[grupo].total++;
+    map[c.grupo].total++;
 
     if(c.status === "finalizada"){
-      grupos[grupo].faturamento += Number(c.valor);
-    } else {
-      grupos[grupo].canceladas++;
+      map[c.grupo].valor += c.valor;
+    }else{
+      map[c.grupo].canceladas++;
     }
 
   });
 
-  const arr = Object.values(grupos)
-    .sort((a,b) => b.faturamento - a.faturamento);
+  let html = `<div class="card"><div class="title">Por Grupo</div>`;
 
-  lista.innerHTML = "";
+  for(let g in map){
 
-  arr.forEach(g => {
+    const m = map[g];
+    const media = m.total ? m.valor / m.total : 0;
 
-    const taxa = g.total
-      ? ((g.canceladas / g.total) * 100)
-      : 0;
-
-    const div = document.createElement("div");
-    div.className = "card";
-
-    div.innerHTML = `
-      <div class="top">
-        <span>${g.nome}</span>
-        <span>${g.total} corridas</span>
-      </div>
-
-      <div class="small">💰 R$ ${g.faturamento.toFixed(2)}</div>
-
-      <div class="small">❌ Canceladas: ${g.canceladas}</div>
-
-      <div class="small ${taxa > 30 ? "bad" : "good"}">
-        Taxa de cancelamento: ${taxa.toFixed(1)}%
-      </div>
+    html += `
+      <div>
+        <strong>${g}</strong><br>
+        Corridas: ${m.total} | R$ ${m.valor.toFixed(2)}<br>
+        Média: R$ ${media.toFixed(2)}<br>
+        Canceladas: ${m.canceladas}
+      </div><br>
     `;
+  }
 
-    lista.appendChild(div);
+  html += `</div>`;
 
-  });
+  document.getElementById("grupos").innerHTML = html;
 
 }
 
