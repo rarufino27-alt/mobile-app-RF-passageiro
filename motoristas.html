@@ -39,7 +39,7 @@ body{
   border:1px solid #334155;
 }
 
-input, select{
+input{
   width:100%;
   padding:12px;
   margin-bottom:10px;
@@ -69,6 +69,13 @@ button{
   color:#94a3b8;
 }
 
+.section{
+  margin-top:10px;
+  font-weight:600;
+  font-size:14px;
+  opacity:0.8;
+}
+
 </style>
 
 </head>
@@ -88,9 +95,11 @@ button{
 
 <input id="nome" placeholder="Nome completo">
 <input id="cpf" placeholder="CPF">
-<input id="telefone" placeholder="Telefone">
 
-<h4>Veículo</h4>
+<input id="telefone1" placeholder="Telefone principal">
+<input id="telefone2" placeholder="Telefone secundário (opcional)">
+
+<div class="section">Veículo</div>
 
 <input id="modelo" placeholder="Modelo / Marca">
 <input id="ano" placeholder="Ano">
@@ -111,7 +120,9 @@ async function salvar(){
 
   const nome = document.getElementById("nome").value.trim();
   const cpf = document.getElementById("cpf").value.trim();
-  const telefone = document.getElementById("telefone").value.trim();
+  const telefone1 = document.getElementById("telefone1").value.trim();
+  const telefone2 = document.getElementById("telefone2").value.trim();
+
   const modelo = document.getElementById("modelo").value.trim();
   const ano = document.getElementById("ano").value.trim();
   const placa = document.getElementById("placa").value.trim();
@@ -126,20 +137,28 @@ async function salvar(){
     .insert([{
       nome,
       cpf,
-      telefone,
+      telefone1,
+      telefone2,
       modelo,
       ano,
-      placa
+      placa,
+
+      // CAMPOS EXISTENTES NA TABELA (evita erro 400)
+      rg: "",
+      endereco: "",
+      cnh: "",
+      ear: "",
+      chassi: "",
+      cor: ""
     }]);
 
   if(error){
-    alert("Erro ao salvar");
     console.log(error);
+    alert("Erro ao salvar");
     return;
   }
 
   alert("Motorista cadastrado");
-
   location.reload();
 }
 
@@ -160,8 +179,11 @@ async function carregar(){
 
     div.innerHTML = `
       <strong>${m.nome}</strong>
+
       <div class="small">CPF: ${m.cpf || "-"}</div>
-      <div class="small">Tel: ${m.telefone || "-"}</div>
+
+      <div class="small">📞 ${m.telefone1 || "-"}</div>
+      ${m.telefone2 ? `<div class="small">📞 ${m.telefone2}</div>` : ""}
 
       <div class="small">
         🚗 ${m.modelo || "-"} (${m.ano || "-"})
