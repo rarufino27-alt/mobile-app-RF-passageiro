@@ -334,7 +334,7 @@ async function salvar(){
     taxas: taxas,
     noturno: noturno,
     hora_viagem: hora_viagem,
-    status: status.value,
+    status: status.value || "finalizada",
     data: new Date().toISOString()
   };
 
