@@ -1,67 +1,179 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+
 <meta charset="UTF-8">
-<title>Nova Corrida</title>
+<title>Painel Administrador RF - Nova Corrida</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="core/datamanager.js"></script>
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="core/supabase.js"></script>
 
 <style>
-body{font-family:system-ui;padding:15px;background:#111;color:#fff;}
-input,select{width:100%;padding:12px;margin-bottom:10px;border-radius:8px;border:none;}
-button{width:100%;padding:14px;border:none;border-radius:10px;background:#facc15;font-weight:bold;}
+
+/* BASE */
+body{
+  font-family:system-ui;
+  margin:0;
+  background:#0f172a;
+  color:#e5e7eb;
+}
+
+/* HEADER */
+.header{
+  padding:15px;
+  background:#1e293b;
+  text-align:center;
+  font-weight:700;
+  font-size:18px;
+  border-bottom:1px solid #334155;
+}
+
+/* CONTAINER */
+.container{
+  padding:20px;
+  max-width:600px;
+  margin:auto;
+}
+
+/* CARD */
+.card{
+  background:#1e293b;
+  padding:20px;
+  border-radius:12px;
+  border:1px solid #334155;
+}
+
+/* INPUTS */
+input, select{
+  width:100%;
+  padding:12px;
+  margin-bottom:12px;
+  border-radius:8px;
+  border:1px solid #334155;
+  background:#0f172a;
+  color:#fff;
+}
+
+/* BOTÃO */
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:10px;
+  background:#3b82f6;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<h2>🚗 Nova Corrida</h2>
+<div class="header">
+🚗 Painel Administrador RF
+</div>
+
+<div class="container">
+
+<h2>Nova Corrida</h2>
+
+<div class="card">
 
 <input id="grupo" placeholder="Grupo">
-<input id="solicitante" placeholder="Passageiro">
-<input id="telefone" placeholder="Telefone">
+
 <input id="origem" placeholder="Origem">
 <input id="destino" placeholder="Destino">
-<input id="valor" type="number" placeholder="Valor">
-<input id="motorista" placeholder="Motorista">
+
+<input id="valor" type="number" placeholder="Valor da viagem">
+
+<!-- MOTORISTA AGORA É SELECT -->
+<select id="motorista">
+  <option value="">Carregando motoristas...</option>
+</select>
 
 <select id="status">
   <option value="finalizada">Finalizada</option>
   <option value="cancelada">Cancelada</option>
 </select>
 
-<input id="motivo" placeholder="Motivo cancelamento">
+<input id="motivo" placeholder="Motivo (se cancelada)">
 
-<button onclick="salvar()">Salvar</button>
+<button onclick="salvar()">Registrar Corrida</button>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="core/supabase.js"></script>
-  
+</div>
+
+</div>
+
 <script>
 
-function salvar(){
+/* =========================
+CARREGAR MOTORISTAS
+========================= */
+async function carregarMotoristas(){
 
-  const corrida = {
-    id: Date.now(),
-    grupo: grupo.value,
-    solicitante: solicitante.value,
-    telefone: telefone.value,
-    origem: origem.value,
-    destino: destino.value,
-    valor: Number(valor.value),
-    motorista: motorista.value,
-    status: status.value,
-    motivoCancelamento: motivo.value,
-    data: new Date().toISOString()
-  };
+  const { data, error } = await supabase
+    .from("motoristas")
+    .select("*");
 
-  DataManager.adicionarCorrida(corrida);
+  const select = document.getElementById("motorista");
 
-  alert("Salvo!");
+  if(error){
+    select.innerHTML = "<option>Erro ao carregar</option>";
+    return;
+  }
+
+  select.innerHTML = "<option value=''>Selecione o motorista</option>";
+
+  data.forEach(m => {
+    select.innerHTML += `<option value="${m.id}">${m.nome}</option>`;
+  });
+
+}
+
+/* =========================
+SALVAR CORRIDA
+========================= */
+async function salvar(){
+
+  if(!motorista.value){
+    alert("Selecione um motorista");
+    return;
+  }
+
+  const { error } = await supabase
+    .from("corridas")
+    .insert([{
+      motorista_id: motorista.value,
+      grupo: grupo.value,
+      origem: origem.value,
+      destino: destino.value,
+      valor: Number(valor.value),
+      status: status.value,
+      motivo: motivo.value,
+      data: new Date()
+    }]);
+
+  if(error){
+    alert("Erro: " + error.message);
+    return;
+  }
+
+  alert("Corrida registrada com sucesso!");
+
   location.reload();
 }
+
+/* INIT */
+carregarMotoristas();
 
 </script>
 
