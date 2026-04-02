@@ -3,99 +3,129 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Relatórios RF</title>
+<title>Painel Administrador RF - Relatórios</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="core/datamanager.js"></script>
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="core/supabase.js"></script>
 
 <style>
+
+/* BASE */
 body{
   font-family:system-ui;
   margin:0;
-  background:#111;
-  color:#fff;
+  background:#0f172a;
+  color:#e5e7eb;
 }
 
+/* HEADER */
+.header{
+  padding:15px;
+  background:#1e293b;
+  text-align:center;
+  font-weight:700;
+  border-bottom:1px solid #334155;
+}
+
+/* CONTAINER */
 .container{
   padding:15px;
-}
-
-h1{
-  text-align:center;
+  max-width:700px;
+  margin:auto;
 }
 
 /* CARD */
 .card{
-  background:#1c1c1c;
+  background:#1e293b;
   padding:15px;
   border-radius:12px;
-  margin-bottom:10px;
+  margin-bottom:12px;
+  border:1px solid #334155;
 }
 
+/* TOP */
 .top{
   display:flex;
   justify-content:space-between;
-  font-weight:bold;
+  font-weight:700;
 }
 
+/* TEXTO */
 .small{
   font-size:13px;
-  opacity:0.7;
+  color:#94a3b8;
 }
 
+/* STATUS */
 .good{ color:#22c55e; }
 .bad{ color:#ef4444; }
+
 </style>
 
 </head>
 
 <body>
 
+<div class="header">
+📊 Painel Administrador RF
+</div>
+
 <div class="container">
 
-<h1>📊 Relatório por Grupo</h1>
+<h2>Relatório por Grupo</h2>
 
 <div id="lista"></div>
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="core/supabase.js"></script>
-  
 <script>
 
-function carregar(){
+async function carregar(){
 
-  const data = DataManager.get();
+  const lista = document.getElementById("lista");
+
+  lista.innerHTML = "Carregando...";
+
+  // BUSCAR CORRIDAS
+  const { data: corridas, error } = await supabase
+    .from("corridas")
+    .select("*");
+
+  if(error){
+    lista.innerHTML = "Erro ao carregar dados";
+    return;
+  }
 
   const grupos = {};
 
-  data.corridas.forEach(c => {
+  corridas.forEach(c => {
 
-    if(!grupos[c.grupo]){
-      grupos[c.grupo] = {
-        nome: c.grupo,
+    const grupo = c.grupo || "Sem grupo";
+
+    if(!grupos[grupo]){
+      grupos[grupo] = {
+        nome: grupo,
         total: 0,
         faturamento: 0,
         canceladas: 0
       };
     }
 
-    grupos[c.grupo].total++;
+    grupos[grupo].total++;
 
     if(c.status === "finalizada"){
-      grupos[c.grupo].faturamento += c.valor;
+      grupos[grupo].faturamento += Number(c.valor);
     } else {
-      grupos[c.grupo].canceladas++;
+      grupos[grupo].canceladas++;
     }
 
   });
 
-  // TRANSFORMAR EM ARRAY
   const arr = Object.values(grupos)
     .sort((a,b) => b.faturamento - a.faturamento);
 
-  const lista = document.getElementById("lista");
   lista.innerHTML = "";
 
   arr.forEach(g => {
@@ -113,16 +143,12 @@ function carregar(){
         <span>${g.total} corridas</span>
       </div>
 
-      <div class="small">
-        💰 R$ ${g.faturamento.toFixed(2)}
-      </div>
+      <div class="small">💰 R$ ${g.faturamento.toFixed(2)}</div>
 
-      <div class="small">
-        ❌ Canceladas: ${g.canceladas}
-      </div>
+      <div class="small">❌ Canceladas: ${g.canceladas}</div>
 
       <div class="small ${taxa > 30 ? "bad" : "good"}">
-        Taxa cancelamento: ${taxa.toFixed(1)}%
+        Taxa de cancelamento: ${taxa.toFixed(1)}%
       </div>
     `;
 
