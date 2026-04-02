@@ -52,14 +52,10 @@ button{
 
 <h2>🚗 Nova Corrida</h2>
 
-<input id="grupo" placeholder="Grupo (Ex: RF Manhã)">
-<input id="solicitante" placeholder="Quem solicitou">
-<input id="telefone" placeholder="Telefone">
-
 <input id="origem" placeholder="Origem">
 <input id="destino" placeholder="Destino">
 
-<input id="valor" type="number" placeholder="Valor da corrida">
+<input id="valor" type="number" placeholder="Valor">
 
 <!-- MOTORISTA -->
 <select id="motorista">
@@ -67,17 +63,16 @@ button{
 </select>
 
 <!-- STATUS -->
-<select id="status" onchange="toggleMotivo()">
+<select id="status">
   <option value="finalizada">Finalizada</option>
   <option value="cancelada">Cancelada</option>
 </select>
 
-<!-- MOTIVO -->
-<input id="motivo" class="hidden" placeholder="Motivo do cancelamento">
-
 <button onclick="salvar()">Salvar Corrida</button>
 
 <script>
+
+let motoristasMap = {}; // id → nome
 
 async function carregarMotoristas(){
 
@@ -89,48 +84,39 @@ async function carregarMotoristas(){
   const select = document.getElementById("motorista");
 
   data.forEach(m => {
+
+    motoristasMap[m.id] = m.nome;
+
     const opt = document.createElement("option");
-    opt.value = m.nome;
+    opt.value = m.id; // 🔥 AQUI É O SEGREDO
     opt.innerText = m.nome;
+
     select.appendChild(opt);
   });
 
 }
 
-function toggleMotivo(){
-  const status = document.getElementById("status").value;
-  const motivo = document.getElementById("motivo");
-
-  if(status === "cancelada"){
-    motivo.classList.remove("hidden");
-  }else{
-    motivo.classList.add("hidden");
-  }
-}
-
 async function salvar(){
 
-  const data = {
-    grupo: grupo.value.trim(),
-    solicitante: solicitante.value.trim(),
-    telefone: telefone.value.trim(),
-    origem: origem.value.trim(),
-    destino: destino.value.trim(),
-    valor: Number(valor.value),
-    motorista: motorista.value,
-    status: status.value,
-    motivoCancelamento: motivo.value.trim(),
-    data: new Date().toISOString()
-  };
+  const motorista_id = document.getElementById("motorista").value;
 
-  if(!data.motorista){
-    alert("Selecione um motorista");
+  if(!motorista_id){
+    alert("Selecione o motorista");
     return;
   }
 
+  const corrida = {
+    motorista_id: motorista_id,
+    origem: origem.value.trim(),
+    destino: destino.value.trim(),
+    valor: Number(valor.value),
+    status: status.value,
+    data: new Date().toISOString()
+  };
+
   const { error } = await window.supabaseClient
     .from("corridas")
-    .insert([data]);
+    .insert([corrida]);
 
   if(error){
     console.log(error);
@@ -138,7 +124,7 @@ async function salvar(){
     return;
   }
 
-  alert("Corrida registrada");
+  alert("Corrida cadastrada com sucesso");
   location.reload();
 
 }
