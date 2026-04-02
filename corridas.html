@@ -214,7 +214,7 @@ function render(){
           📅 Registro: ${new Date(c.data).toLocaleString()}
         </div>
 
-        <div class="small">Status: ${c.status}</div>
+        <div class="small">Status: ${c.status || "finalizada"}</div>
 
         <button class="btn edit"
           onclick="abrirEditar('${c.id}', ${c.valor}, '${c.status}', '${c.hora_viagem || ""}')">
