@@ -315,11 +315,25 @@ async function salvar(){
 
   const total = parseFloat(document.getElementById("total").innerText);
 
+  const taxas = Number(document.getElementById("taxas").value) || 0;
+  const noturno = Number(document.getElementById("noturno").innerText) || 0;
+
+  const hora_viagem = prompt("Informe o horário da viagem (HH:MM)");
+
+  if(!hora_viagem){
+    alert("Informe o horário da viagem");
+    return;
+  }
+
   const corrida = {
     motorista_id,
     origem: origemSelecionada,
     destino: destino.value,
+    parada: paradaSelecionada || null,
     valor: total,
+    taxas: taxas,
+    noturno: noturno,
+    hora_viagem: hora_viagem,
     status: status.value,
     data: new Date().toISOString()
   };
@@ -338,7 +352,6 @@ async function salvar(){
   location.reload();
 
 }
-
 /* =========================
 EVENTOS
 ========================= */
