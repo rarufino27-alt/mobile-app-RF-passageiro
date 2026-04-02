@@ -3,86 +3,119 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Dashboard RF</title>
+<title>Painel Administrador RF</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="core/datamanager.js"></script>
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="core/supabase.js"></script>
 
 <style>
+
+/* BASE */
 body{
   font-family:system-ui;
   margin:0;
-  background:#111;
-  color:#fff;
+  background:#0f172a;
+  color:#e5e7eb;
 }
 
+/* HEADER */
+.header{
+  padding:15px;
+  background:#1e293b;
+  text-align:center;
+  font-weight:700;
+  font-size:18px;
+  border-bottom:1px solid #334155;
+}
+
+/* CONTAINER */
 .container{
   padding:15px;
+  max-width:700px;
+  margin:auto;
 }
 
-h1{
-  text-align:center;
-  margin-bottom:20px;
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
 }
 
+/* CARD */
 .card{
-  background:#1c1c1c;
-  padding:20px;
-  border-radius:16px;
-  margin-bottom:15px;
+  background:#1e293b;
+  padding:15px;
+  border-radius:12px;
   text-align:center;
-  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  border:1px solid #334155;
+}
+
+.card.full{
+  grid-column:1 / -1;
 }
 
 .valor{
-  font-size:24px;
+  font-size:22px;
   font-weight:bold;
-  margin-top:10px;
-  color:#facc15;
+  margin-top:8px;
+  color:#3b82f6;
 }
 
+/* BOTÕES */
 .btn{
   width:100%;
   padding:14px;
   border:none;
   border-radius:10px;
-  background:#facc15;
-  font-weight:bold;
+  background:#3b82f6;
+  color:#fff;
+  font-weight:600;
   margin-top:10px;
+  cursor:pointer;
 }
+
 </style>
 
 </head>
 
 <body>
 
+<div class="header">
+📊 Painel Administrador RF
+</div>
+
 <div class="container">
 
-<h1>📊 Dashboard RF</h1>
+<div class="grid">
 
 <div class="card">
-  <div>Total de Corridas</div>
+  <div>Total Corridas</div>
   <div class="valor" id="totalCorridas">0</div>
 </div>
 
 <div class="card">
-  <div>Faturamento Total</div>
-  <div class="valor" id="faturamento">R$ 0</div>
-</div>
-
-<div class="card">
-  <div>Corridas Canceladas</div>
+  <div>Canceladas</div>
   <div class="valor" id="canceladas">0</div>
 </div>
 
 <div class="card">
+  <div>Faturamento</div>
+  <div class="valor" id="faturamento">R$ 0</div>
+</div>
+
+<div class="card">
+  <div>Média</div>
+  <div class="valor" id="media">R$ 0</div>
+</div>
+
+<div class="card full">
   <div>🏆 Top Motorista</div>
   <div class="valor" id="topMotorista">-</div>
 </div>
 
-<div class="card">
-  <div>Média por Corrida</div>
-  <div class="valor" id="media">R$ 0</div>
 </div>
 
 <button class="btn" onclick="ir('cadastrar.html')">
@@ -90,25 +123,31 @@ h1{
 </button>
 
 <button class="btn" onclick="ir('corridas.html')">
-📋 Ver Corridas
+📋 Corridas
 </button>
 
 <button class="btn" onclick="ir('motoristas.html')">
 👤 Motoristas
 </button>
 
+<button class="btn" onclick="ir('relatorios.html')">
+📊 Relatórios
+</button>
+
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script src="core/supabase.js"></script>
-  
 <script>
 
-function carregar(){
+async function carregar(){
 
-  const data = DataManager.get();
+  // BUSCAR DADOS
+  const { data: corridas } = await supabase
+    .from("corridas")
+    .select("*");
 
-  const corridas = data.corridas;
+  const { data: motoristas } = await supabase
+    .from("motoristas")
+    .select("*");
 
   let total = corridas.length;
   let faturamento = 0;
@@ -116,20 +155,25 @@ function carregar(){
 
   const ranking = {};
 
+  // MAP MOTORISTAS
+  const map = {};
+  motoristas.forEach(m => map[m.id] = m.nome);
+
+  // PROCESSAR
   corridas.forEach(c => {
 
     if(c.status === "finalizada"){
-      faturamento += c.valor;
+      faturamento += Number(c.valor);
     } else {
       canceladas++;
     }
 
-    if(!ranking[c.motorista]){
-      ranking[c.motorista] = 0;
+    if(!ranking[c.motorista_id]){
+      ranking[c.motorista_id] = 0;
     }
 
     if(c.status === "finalizada"){
-      ranking[c.motorista]++;
+      ranking[c.motorista_id]++;
     }
 
   });
@@ -138,10 +182,10 @@ function carregar(){
   let topNome = "-";
   let topQtd = 0;
 
-  for(let nome in ranking){
-    if(ranking[nome] > topQtd){
-      topQtd = ranking[nome];
-      topNome = nome + " ("+topQtd+")";
+  for(let id in ranking){
+    if(ranking[id] > topQtd){
+      topQtd = ranking[id];
+      topNome = `${map[id] || "Desconhecido"} (${topQtd})`;
     }
   }
 
@@ -149,10 +193,10 @@ function carregar(){
 
   // RENDER
   document.getElementById("totalCorridas").innerText = total;
-  document.getElementById("faturamento").innerText = "R$ " + faturamento.toFixed(2);
   document.getElementById("canceladas").innerText = canceladas;
-  document.getElementById("topMotorista").innerText = topNome;
+  document.getElementById("faturamento").innerText = "R$ " + faturamento.toFixed(2);
   document.getElementById("media").innerText = "R$ " + media.toFixed(2);
+  document.getElementById("topMotorista").innerText = topNome;
 
 }
 
