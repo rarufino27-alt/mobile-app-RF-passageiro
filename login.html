@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<title>Login - RF Admin</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="core/supabase.js"></script>
+
+<style>
+body{
+  font-family:system-ui;
+  background:#0f172a;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+
+.card{
+  background:#1e293b;
+  padding:30px;
+  border-radius:12px;
+  width:300px;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:8px;
+  border:none;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  background:#3b82f6;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  font-weight:bold;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>🔐 Painel RF</h2>
+
+<input id="email" placeholder="Email do administrador">
+
+<button onclick="login()">Entrar</button>
+
+</div>
+
+<script>
+
+async function login(){
+
+  const email = document.getElementById("email").value;
+
+  const { data } = await supabase
+    .from("admins")
+    .select("*")
+    .eq("email", email)
+    .single();
+
+  if(!data){
+    alert("Acesso negado");
+    return;
+  }
+
+  localStorage.setItem("admin_logado", "true");
+
+  window.location.href = "index.html";
+
+}
+
+</script>
+
+</body>
+</html>
