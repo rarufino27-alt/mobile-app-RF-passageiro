@@ -10,6 +10,7 @@
 <script src="core/supabase.js"></script>
 
 <style>
+
 body{
   margin:0;
   font-family:system-ui;
@@ -22,6 +23,27 @@ body{
   text-align:center;
   font-weight:bold;
   background:#1e293b;
+}
+
+/* RESUMO */
+.resumo{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:10px;
+}
+
+.box{
+  background:#1e293b;
+  padding:12px;
+  border-radius:10px;
+  text-align:center;
+}
+
+.valor{
+  font-size:20px;
+  font-weight:bold;
+  color:#facc15;
 }
 
 .container{
@@ -40,16 +62,34 @@ input{
   color:#fff;
 }
 
+/* CARD */
 .card{
   background:#1e293b;
   padding:15px;
   border-radius:12px;
   margin-bottom:10px;
+  border-left:5px solid transparent;
+}
+
+/* STATUS CORES */
+.finalizada{
+  border-left:5px solid #22c55e;
+}
+
+.cancelada{
+  border-left:5px solid #ef4444;
 }
 
 .small{
   font-size:13px;
   color:#94a3b8;
+}
+
+.valor-card{
+  font-size:18px;
+  font-weight:bold;
+  color:#facc15;
+  margin-top:5px;
 }
 
 .btn{
@@ -84,6 +124,7 @@ input{
   width:90%;
   max-width:400px;
 }
+
 </style>
 
 </head>
@@ -91,6 +132,29 @@ input{
 <body>
 
 <div class="header">📋 Corridas RF</div>
+
+<!-- RESUMO -->
+<div class="resumo">
+  <div class="box">
+    <div>Total</div>
+    <div class="valor" id="totalFaturado">R$ 0</div>
+  </div>
+
+  <div class="box">
+    <div>Corridas</div>
+    <div class="valor" id="totalCorridas">0</div>
+  </div>
+
+  <div class="box">
+    <div>Canceladas</div>
+    <div class="valor" id="totalCanceladas">0</div>
+  </div>
+
+  <div class="box">
+    <div>Média</div>
+    <div class="valor" id="media">R$ 0</div>
+  </div>
+</div>
 
 <div class="container">
 
@@ -109,7 +173,7 @@ input{
 
     <h3>Editar Corrida</h3>
 
-    <input id="editValor" type="number" placeholder="Valor">
+    <input id="editValor" type="number">
     <input id="editHora" type="time">
 
     <select id="editStatus">
@@ -132,22 +196,41 @@ CARREGAR
 ========================= */
 async function carregar(){
 
-  const { data, error } = await window.supabaseClient
+  const { data } = await window.supabaseClient
     .from("corridas")
-    .select(`
-      *,
-      motoristas(nome)
-    `)
+    .select(`*, motoristas(nome)`)
     .order("data", { ascending:false });
 
-  if(error){
-    console.log(error);
-    alert("Erro ao carregar corridas");
-    return;
-  }
-
   corridas = data;
+  calcularResumo();
   render();
+
+}
+
+/* =========================
+RESUMO
+========================= */
+function calcularResumo(){
+
+  let total = 0;
+  let canceladas = 0;
+
+  corridas.forEach(c => {
+
+    if(c.status === "finalizada"){
+      total += c.valor;
+    }else{
+      canceladas++;
+    }
+
+  });
+
+  const media = corridas.length ? total / corridas.length : 0;
+
+  totalFaturado.innerText = "R$ " + total.toFixed(2);
+  totalCorridas.innerText = corridas.length;
+  totalCanceladas.innerText = canceladas;
+  media.innerText = "R$ " + media.toFixed(2);
 
 }
 
@@ -159,25 +242,10 @@ function render(){
   const lista = document.getElementById("lista");
   const busca = document.getElementById("busca").value.toLowerCase();
 
-  const inicio = document.getElementById("dataInicio").value;
-  const fim = document.getElementById("dataFim").value;
-
   lista.innerHTML = "";
 
   corridas
-    .filter(c => {
-
-      const nome = c.motoristas?.nome || "";
-
-      if(busca && !nome.toLowerCase().includes(busca)) return false;
-
-      if(inicio && new Date(c.data) < new Date(inicio)) return false;
-
-      if(fim && new Date(c.data) > new Date(fim + "T23:59")) return false;
-
-      return true;
-
-    })
+    .filter(c => (c.motoristas?.nome || "").toLowerCase().includes(busca))
     .forEach(c => {
 
       let rota = `${c.origem} → ${c.destino}`;
@@ -186,32 +254,22 @@ function render(){
         rota = `${c.origem} → 🛑 ${c.parada} → ${c.destino}`;
       }
 
-      let extras = "";
-
-      if(c.taxas > 0){
-        extras += `💲 Taxas: R$ ${c.taxas.toFixed(2)}<br>`;
-      }
-
-      if(c.noturno > 0){
-        extras += `🌙 Noturno: R$ ${c.noturno.toFixed(2)}<br>`;
-      }
+      const classeStatus = c.status === "cancelada"
+        ? "cancelada"
+        : "finalizada";
 
       const div = document.createElement("div");
-      div.className = "card";
+      div.className = "card " + classeStatus;
 
       div.innerHTML = `
         <strong>${c.motoristas?.nome || "Sem motorista"}</strong>
 
         <div class="small">${rota}</div>
 
-        <div class="small">💰 Total: R$ ${c.valor.toFixed(2)}</div>
-
-        <div class="small">${extras}</div>
-
-        <div class="small">🕒 Viagem: ${c.hora_viagem || "-"}</div>
+        <div class="valor-card">R$ ${c.valor.toFixed(2)}</div>
 
         <div class="small">
-          📅 Registro: ${new Date(c.data).toLocaleString()}
+          🕒 ${c.hora_viagem || "-"} | 📅 ${new Date(c.data).toLocaleDateString()}
         </div>
 
         <div class="small">Status: ${c.status || "finalizada"}</div>
@@ -240,7 +298,7 @@ function abrirEditar(id, valor, status, hora){
   editId = id;
 
   editValor.value = valor;
-  editStatus.value = status;
+  editStatus.value = status || "finalizada";
   editHora.value = hora;
 
   modal.style.display = "flex";
@@ -253,7 +311,7 @@ async function salvarEdicao(){
   const status = editStatus.value;
   const hora = editHora.value;
 
-  const { error } = await window.supabaseClient
+  await window.supabaseClient
     .from("corridas")
     .update({
       valor,
@@ -261,12 +319,6 @@ async function salvarEdicao(){
       hora_viagem: hora
     })
     .eq("id", editId);
-
-  if(error){
-    console.log(error);
-    alert("Erro ao editar");
-    return;
-  }
 
   modal.style.display = "none";
   carregar();
@@ -293,8 +345,6 @@ async function excluir(id){
 EVENTOS
 ========================= */
 busca.oninput = render;
-dataInicio.onchange = render;
-dataFim.onchange = render;
 
 /* =========================
 START
