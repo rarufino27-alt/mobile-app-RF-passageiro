@@ -11,8 +11,6 @@
 <script src="core/datamanager.js"></script>
 
 <style>
-
-/* BASE PREMIUM */
 body{
   margin:0;
   font-family:system-ui;
@@ -20,8 +18,6 @@ body{
   color:#e5e7eb;
   padding:16px;
 }
-
-/* CARD */
 .card{
   background:rgba(30,41,59,.6);
   border:1px solid rgba(255,255,255,.05);
@@ -29,8 +25,6 @@ body{
   padding:14px;
   margin-bottom:12px;
 }
-
-/* INPUT */
 input, select{
   width:100%;
   padding:12px;
@@ -40,21 +34,15 @@ input, select{
   color:#fff;
   margin-bottom:10px;
 }
-
-/* TITULO */
 h2{
   text-align:center;
   margin-bottom:16px;
 }
-
-/* VALORES */
 .valor{
   font-size:18px;
   color:#22c55e;
   font-weight:bold;
 }
-
-/* BOTÃO */
 button{
   width:100%;
   padding:16px;
@@ -65,11 +53,9 @@ button{
   font-size:16px;
   color:#000;
 }
-
 button:active{
   transform:scale(0.97);
 }
-
 </style>
 
 </head>
@@ -78,39 +64,10 @@ button:active{
 
 <h2>🚗 Nova Corrida</h2>
 
-<!-- GRUPO -->
+<!-- GRUPO DINÂMICO -->
 <div class="card">
 <select id="grupo">
-  <option value="RF Principal">Grupo 01</option>
-  <option value="RF Principal">Grupo 02</option>
-  <option value="RF Principal">Grupo 03</option>
-  <option value="RF Principal">Grupo 04</option>
-  <option value="RF Principal">Grupo 05</option>
-  <option value="RF Principal">Grupo 06</option>
-  <option value="RF Principal">Grupo 07</option>
-  <option value="RF Principal">Grupo 08</option>
-  <option value="RF Principal">Grupo 09</option>
-  <option value="RF Principal">Grupo 10</option>
-  <option value="RF Principal">Grupo 11</option>
-  <option value="RF Principal">Grupo 12</option>
-  <option value="RF Principal">Grupo 13</option>
-  <option value="RF Principal">Grupo 14</option>
-  <option value="RF Principal">Grupo 15</option>
-  <option value="RF Principal">Grupo 16</option>
-  <option value="RF Principal">Grupo 17</option>
-  <option value="RF Principal">Grupo 18</option>
-  <option value="RF Principal">Grupo 19</option>
-  <option value="RF Principal">Grupo 20</option>
-  <option value="RF Principal">Grupo 21</option>
-  <option value="RF Principal">Grupo 22</option>
-  <option value="RF Principal">Grupo 23</option>
-  <option value="RF Principal">Grupo 24</option>
-  <option value="RF Principal">Grupo 25</option>
-  <option value="RF Principal">Grupo 26</option>
-  <option value="RF Principal">Grupo 27</option>
-  <option value="RF Principal">Grupo 28</option>
-  <option value="RF Principal">Grupo 29</option>
-  <option value="RF Principal">Grupo 30</option>
+  <option value="">Carregando grupos...</option>
 </select>
 </div>
 
@@ -174,13 +131,38 @@ async function iniciar(){
   await DataManager.carregar();
   popularOrigens();
   carregarMotoristas();
+  carregarGrupos(); // 🔥 NOVO
+}
+
+/* 🔥 CARREGAR GRUPOS DO SUPABASE */
+async function carregarGrupos(){
+
+  const select = document.getElementById("grupo");
+
+  const { data, error } = await window.supabaseClient
+    .from("grupos")
+    .select("id,nome")
+    .eq("ativo", true)
+    .order("nome");
+
+  if(error){
+    console.error(error);
+    select.innerHTML = '<option>Erro ao carregar</option>';
+    return;
+  }
+
+  select.innerHTML = '<option value="">Selecione o grupo</option>';
+
+  data.forEach(g=>{
+    select.innerHTML += `<option value="${g.id}">${g.nome}</option>`;
+  });
+
 }
 
 /* ORIGENS */
 function popularOrigens(){
   const origens = DataManager.listarOrigens();
   origem.innerHTML = '<option value="">Selecione origem</option>';
-
   origens.forEach(o=>{
     origem.innerHTML += `<option value="${o}">${o}</option>`;
   });
@@ -189,14 +171,12 @@ function popularOrigens(){
 /* DESTINOS */
 function atualizarDestinos(){
   origemSelecionada = origem.value;
-
   parada.style.display = "none";
   paradaSelecionada = null;
 
   const destinos = DataManager.listarDestinos(origemSelecionada);
 
   destino.innerHTML = '<option value="">Selecione destino</option>';
-
   destinos.forEach(d=>{
     destino.innerHTML += `<option value="${d}">${d}</option>`;
   });
@@ -211,7 +191,6 @@ function ativarParada(){
   const destinos = DataManager.listarDestinos(origemSelecionada);
 
   parada.innerHTML = '<option value="">Selecione parada</option>';
-
   destinos.forEach(d=>{
     parada.innerHTML += `<option value="${d}">${d}</option>`;
   });
@@ -223,13 +202,12 @@ parada.onchange = ()=>{
   const destinos = DataManager.listarDestinos(paradaSelecionada);
 
   destino.innerHTML = '<option value="">Selecione destino</option>';
-
   destinos.forEach(d=>{
     destino.innerHTML += `<option value="${d}">${d}</option>`;
   });
 };
 
-/* CALCULAR BASE */
+/* CALCULO */
 function calcular(){
 
   if(!origem.value || !destino.value) return;
@@ -251,28 +229,20 @@ function calcular(){
   calcularTotal();
 }
 
-/* NOTURNO AUTOMÁTICO */
+/* NOTURNO */
 function calcularNoturno(){
 
-  const hora = document.getElementById("horaViagem").value;
-
+  const hora = horaViagem.value;
   if(!hora) return 0;
 
   const [h,m] = hora.split(":").map(Number);
   const minutos = h * 60 + m;
 
-  const ehNoturno =
-    (minutos >= 1350) || // 22:30+
-    (minutos < 300);     // até 05:00
+  const ehNoturno = (minutos >= 1350) || (minutos < 300);
 
   if(!ehNoturno) return 0;
 
-  if(valorBase <= 24.99){
-    return 5;
-  }else{
-    return valorBase * 0.35;
-  }
-
+  return valorBase <= 24.99 ? 5 : valorBase * 0.35;
 }
 
 /* TOTAL */
@@ -286,7 +256,6 @@ function calcularTotal(){
   const total = valorBase + taxasVal + noturnoVal;
 
   totalEl.innerText = total.toFixed(2);
-
 }
 
 /* MOTORISTAS */
@@ -300,11 +269,15 @@ async function carregarMotoristas(){
   data.forEach(m=>{
     motorista.innerHTML += `<option value="${m.id}">${m.nome}</option>`;
   });
-
 }
 
-/* SALVAR */
+/* 🔥 SALVAR CORRIDA CORRETO */
 async function salvar(){
+
+  if(!grupo.value){
+    alert("Selecione o grupo");
+    return;
+  }
 
   if(!dataViagem.value || !horaViagem.value){
     alert("Preencha data e horário");
@@ -312,7 +285,7 @@ async function salvar(){
   }
 
   const corrida = {
-    grupo: grupo.value,
+    grupo_id: Number(grupo.value), // 🔥 CORRETO
     motorista_id: motorista.value || null,
     origem: origem.value,
     destino: destino.value,
@@ -322,7 +295,7 @@ async function salvar(){
     hora_viagem: horaViagem.value,
     taxas: Number(taxas.value || 0),
     adicional_noturno: Number(noturno.innerText),
-    data: new Date().toISOString()
+    created_at: new Date().toISOString()
   };
 
   const { error } = await window.supabaseClient
@@ -337,7 +310,6 @@ async function salvar(){
 
   alert("Corrida salva com sucesso");
   location.reload();
-
 }
 
 /* EVENTOS */
