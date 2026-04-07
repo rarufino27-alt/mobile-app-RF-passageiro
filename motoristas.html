@@ -55,19 +55,13 @@ button{
   padding:12px;
   border:none;
   border-radius:8px;
-  background:#3b82f6;
-  color:#fff;
   font-weight:700;
   margin-top:5px;
 }
 
-.btn-del{
-  background:#ef4444;
-}
-
-.btn-edit{
-  background:#f59e0b;
-}
+.btn-save{ background:#22c55e; color:#000; }
+.btn-del{ background:#ef4444; color:#fff; }
+.btn-edit{ background:#3b82f6; color:#fff; }
 
 .small{
   font-size:13px;
@@ -93,11 +87,12 @@ button{
 <input id="telefone" placeholder="Telefone">
 <input id="endereco" placeholder="Endereço">
 
-<input id="veiculo" placeholder="Modelo / Marca">
+<input id="marca" placeholder="Marca">
+<input id="modelo" placeholder="Modelo">
 <input id="cor" placeholder="Cor do veículo">
 <input id="placa" placeholder="Placa">
 
-<button onclick="salvar()">Salvar</button>
+<button class="btn-save" onclick="salvar()">Salvar</button>
 
 </div>
 
@@ -111,7 +106,7 @@ button{
 let editandoId = null;
 
 /* =========================
-SALVAR OU EDITAR
+SALVAR / EDITAR
 ========================= */
 async function salvar(){
 
@@ -119,7 +114,8 @@ async function salvar(){
     nome: nome.value.trim(),
     telefone: telefone.value.trim(),
     endereco: endereco.value.trim(),
-    veiculo: veiculo.value.trim(),
+    marca: marca.value.trim(),
+    modelo: modelo.value.trim(),
     cor: cor.value.trim(),
     placa: placa.value.trim()
   };
@@ -137,6 +133,7 @@ async function salvar(){
       .eq("id", editandoId);
 
     if(error){
+      console.log(error);
       alert("Erro ao atualizar");
       return;
     }
@@ -144,7 +141,7 @@ async function salvar(){
     alert("Motorista atualizado");
 
     editandoId = null;
-    document.getElementById("tituloForm").innerText = "Cadastrar Motorista";
+    tituloForm.innerText = "Cadastrar Motorista";
 
   }else{
 
@@ -153,6 +150,7 @@ async function salvar(){
       .insert([data]);
 
     if(error){
+      console.log(error);
       alert("Erro ao salvar");
       return;
     }
@@ -166,16 +164,21 @@ async function salvar(){
 }
 
 /* =========================
-CARREGAR LISTA
+CARREGAR
 ========================= */
 async function carregar(){
 
-  const { data } = await window.supabaseClient
+  const { data, error } = await window.supabaseClient
     .from("motoristas")
     .select("*")
     .order("nome");
 
-  const lista = document.getElementById("lista");
+  if(error){
+    console.log(error);
+    alert("Erro ao carregar");
+    return;
+  }
+
   lista.innerHTML = "";
 
   data.forEach(m => {
@@ -186,14 +189,14 @@ async function carregar(){
     div.innerHTML = `
       <strong>${m.nome}</strong>
 
-      <div class="small">📞 ${m.telefone || "-"}</div>
+      <div class="small">📞 ${m.telefone}</div>
       <div class="small">📍 ${m.endereco || "-"}</div>
 
-      <div class="small">🚗 ${m.veiculo || "-"}</div>
+      <div class="small">🚗 ${m.marca || ""} ${m.modelo || ""}</div>
       <div class="small">🎨 ${m.cor || "-"}</div>
       <div class="small">🔖 ${m.placa || "-"}</div>
 
-      <button class="btn-edit" onclick="editar(${JSON.stringify(m).replace(/"/g, '&quot;')})">
+      <button class="btn-edit" onclick="editar(${JSON.stringify(m).replace(/"/g,'&quot;')})">
         Editar
       </button>
 
@@ -219,14 +222,14 @@ function editar(m){
   telefone.value = m.telefone || "";
   endereco.value = m.endereco || "";
 
-  veiculo.value = m.veiculo || "";
+  marca.value = m.marca || "";
+  modelo.value = m.modelo || "";
   cor.value = m.cor || "";
   placa.value = m.placa || "";
 
-  document.getElementById("tituloForm").innerText = "Editando Motorista";
+  tituloForm.innerText = "Editando Motorista";
 
-  window.scrollTo({ top: 0, behavior: "smooth" });
-
+  window.scrollTo({ top:0, behavior:"smooth" });
 }
 
 /* =========================
@@ -236,10 +239,16 @@ async function excluir(id){
 
   if(!confirm("Excluir motorista?")) return;
 
-  await window.supabaseClient
+  const { error } = await window.supabaseClient
     .from("motoristas")
     .delete()
     .eq("id", id);
+
+  if(error){
+    console.log(error);
+    alert("Erro ao excluir");
+    return;
+  }
 
   carregar();
 }
@@ -251,7 +260,8 @@ function limpar(){
   nome.value = "";
   telefone.value = "";
   endereco.value = "";
-  veiculo.value = "";
+  marca.value = "";
+  modelo.value = "";
   cor.value = "";
   placa.value = "";
 }
