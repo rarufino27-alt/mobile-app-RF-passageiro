@@ -290,7 +290,7 @@ async function salvar(){
     origem: origem.value,
     destino: destino.value,
     valor: Number(totalEl.innerText),
-    status: status.value,
+    status: String(status.value).toLowerCase().trim(),
     data_viagem: dataViagem.value,
     hora_viagem: horaViagem.value,
     taxas: Number(taxas.value || 0),
