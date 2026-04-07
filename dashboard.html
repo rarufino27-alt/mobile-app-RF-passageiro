@@ -19,6 +19,7 @@ body{
   color:#e5e7eb;
 }
 
+/* HEADER */
 .header{
   padding:15px;
   background:#1e293b;
@@ -41,12 +42,58 @@ body{
   color:#94a3b8;
 }
 
+/* MENU SUPERIOR */
+.menu-top{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.menu-btn{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  background:#020617;
+  border:1px solid #334155;
+  text-align:center;
+  font-size:13px;
+  cursor:pointer;
+}
+
+.menu-btn:hover{
+  background:#0f172a;
+}
+
+/* CONTAINER */
 .container{
   padding:15px;
   max-width:900px;
   margin:auto;
 }
 
+/* AÇÕES */
+.acoes{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.acao{
+  padding:16px;
+  border-radius:12px;
+  background:#020617;
+  border:1px solid #334155;
+  text-align:center;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.acao:hover{
+  background:#0f172a;
+}
+
+/* GRID DASH */
 .grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -76,22 +123,6 @@ canvas{
   margin-top:10px;
 }
 
-.btn{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:10px;
-  background:#3b82f6;
-  color:#fff;
-  font-weight:600;
-  margin-top:10px;
-  cursor:pointer;
-}
-
-.logout{
-  background:#ef4444;
-}
-
 </style>
 
 </head>
@@ -103,10 +134,31 @@ canvas{
     <div class="titulo">📊 Painel RF</div>
     <div class="usuario" id="usuarioNome">Olá...</div>
   </div>
+
+  <!-- MENU SUPERIOR -->
+  <div class="menu-top">
+    <div class="menu-btn" onclick="ir('corridas.html')">📋 Corridas</div>
+    <div class="menu-btn" onclick="ir('motoristas.html')">👤 Motoristas</div>
+    <div class="menu-btn" onclick="ir('relatorios.html')">📊 Relatórios</div>
+    <div class="menu-btn" onclick="logout()">🚪 Sair</div>
+  </div>
+
 </div>
 
 <div class="container">
 
+<!-- AÇÕES RÁPIDAS -->
+<div class="acoes">
+  <div class="acao" onclick="ir('cadastrar.html')">
+    ➕ Nova Corrida
+  </div>
+
+  <div class="acao" onclick="ir('motoristas.html')">
+    👤 Cadastrar Motorista
+  </div>
+</div>
+
+<!-- DASHBOARD -->
 <div class="grid">
 
 <div class="card">
@@ -141,19 +193,11 @@ canvas{
 
 </div>
 
-<button class="btn" onclick="ir('cadastrar.html')">➕ Nova Corrida</button>
-<button class="btn" onclick="ir('corridas.html')">📋 Corridas</button>
-<button class="btn" onclick="ir('motoristas.html')">👤 Motoristas</button>
-<button class="btn" onclick="ir('relatorios.html')">📊 Relatórios</button>
-<button class="btn logout" onclick="logout()">Sair</button>
-
 </div>
 
 <script>
 
-/* =========================
-LOGIN
-========================= */
+/* LOGIN */
 if(localStorage.getItem("admin_logado") !== "true"){
   window.location.href = "login.html";
 }
@@ -163,9 +207,7 @@ function logout(){
   window.location.href = "login.html";
 }
 
-/* =========================
-NOME DO ADMIN (NOVO)
-========================= */
+/* USUÁRIO */
 async function carregarUsuario(){
 
   const { data: { user } } = await window.supabaseClient.auth.getUser();
@@ -177,9 +219,7 @@ async function carregarUsuario(){
 
 }
 
-/* =========================
-DASHBOARD
-========================= */
+/* DASHBOARD */
 let chart;
 
 async function carregar(){
@@ -204,7 +244,7 @@ async function carregar(){
 
   corridas.forEach(c => {
 
-    const data = new Date(c.data).toLocaleDateString();
+    const data = new Date(c.data_viagem).toLocaleDateString();
 
     if(!porDia[data]) porDia[data] = 0;
 
@@ -243,8 +283,6 @@ async function carregar(){
   document.getElementById("media").innerText = "R$ " + media.toFixed(2);
   document.getElementById("topMotorista").innerText = topNome;
 
-  /* ===== GRÁFICO ===== */
-
   const labels = Object.keys(porDia);
   const valores = Object.values(porDia);
 
@@ -263,14 +301,10 @@ async function carregar(){
 
 }
 
-/* =========================
-AUTO UPDATE
-========================= */
+/* AUTO UPDATE */
 setInterval(carregar, 5000);
 
-/* =========================
-NAVEGAÇÃO
-========================= */
+/* NAV */
 function ir(p){
   window.location.href = p;
 }
