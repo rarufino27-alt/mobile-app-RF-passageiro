@@ -14,67 +14,126 @@
 body{
   margin:0;
   font-family:system-ui;
-  background:#0f172a;
-  color:#fff;
+  background: radial-gradient(circle at top,#0b1220,#020617);
+  color:#e5e7eb;
 }
 
+/* HEADER */
 .header{
-  padding:15px;
+  padding:16px;
   text-align:center;
   font-weight:bold;
-  background:#1e293b;
+  font-size:18px;
+  background:rgba(30,41,59,.8);
+  border-bottom:1px solid rgba(255,255,255,.05);
 }
 
+/* CONTAINER */
 .container{
-  padding:15px;
-  max-width:700px;
+  padding:16px;
+  max-width:800px;
   margin:auto;
 }
 
+/* INPUTS */
 input, select{
   width:100%;
-  padding:10px;
+  padding:12px;
   margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #334155;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.08);
   background:#020617;
   color:#fff;
 }
 
-.card{
-  background:#1e293b;
-  padding:15px;
-  border-radius:12px;
+/* BOTÃO */
+.btn{
   margin-bottom:10px;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  width:100%;
+  font-weight:bold;
+}
+
+.refresh{
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:#000;
+}
+
+/* CARD */
+.card{
+  background:rgba(30,41,59,.6);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px;
   border-left:5px solid transparent;
 }
 
+/* STATUS */
 .finalizada{ border-left:5px solid #22c55e; }
 .cancelada{ border-left:5px solid #ef4444; }
+.nao_atendida{ border-left:5px solid #f59e0b; }
 
-.small{
+/* LINHAS */
+.topo{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+
+.motorista{
+  font-weight:bold;
+  font-size:15px;
+}
+
+.grupo{
+  font-size:12px;
+  background:#020617;
+  padding:4px 8px;
+  border-radius:8px;
+  color:#38bdf8;
+}
+
+.rota{
   font-size:13px;
   color:#94a3b8;
+  margin-bottom:6px;
 }
 
 .valor{
-  font-size:18px;
+  font-size:20px;
   font-weight:bold;
-  color:#facc15;
+  color:#22c55e;
+  margin-bottom:6px;
 }
 
-.btn{
-  margin-top:6px;
+.info{
+  font-size:12px;
+  color:#94a3b8;
+  display:flex;
+  justify-content:space-between;
+}
+
+/* FOOTER */
+.footer{
+  margin-top:8px;
+  display:flex;
+  gap:6px;
+}
+
+.footer button{
+  flex:1;
   padding:8px;
   border:none;
   border-radius:8px;
-  width:100%;
   font-weight:bold;
 }
 
 .edit{ background:#3b82f6; color:#fff; }
 .delete{ background:#ef4444; color:#fff; }
-.refresh{ background:#22c55e; color:#000; }
 
 </style>
 
@@ -82,7 +141,7 @@ input, select{
 
 <body>
 
-<div class="header">📋 Corridas RF</div>
+<div class="header">📊 Corridas RF</div>
 
 <div class="container">
 
@@ -94,6 +153,7 @@ input, select{
   <option value="">Todos</option>
   <option value="finalizada">Finalizadas</option>
   <option value="cancelada">Canceladas</option>
+  <option value="nao_atendida">Não atendidas</option>
 </select>
 
 <div id="lista"></div>
@@ -104,16 +164,14 @@ input, select{
 
 let corridas = [];
 
-/* =========================
-CARREGAR (SEM CACHE)
-========================= */
 async function carregar(){
 
   const { data, error } = await window.supabaseClient
     .from("corridas")
     .select(`
       *,
-      motoristas(nome)
+      motoristas(nome),
+      grupos(nome)
     `)
     .order("data_viagem", { ascending:false });
 
@@ -124,14 +182,10 @@ async function carregar(){
   }
 
   corridas = data;
-
   render();
-
 }
 
-/* =========================
-RENDER COMPLETO
-========================= */
+/* RENDER */
 function render(){
 
   const lista = document.getElementById("lista");
@@ -146,11 +200,9 @@ function render(){
       const nome = c.motoristas?.nome || "";
 
       if(busca && !nome.toLowerCase().includes(busca)) return false;
-
       if(statusFiltro && c.status !== statusFiltro) return false;
 
       return true;
-
     })
     .forEach(c => {
 
@@ -160,36 +212,35 @@ function render(){
         rota = `${c.origem} → 🛑 ${c.parada} → ${c.destino}`;
       }
 
-      const taxas = c.taxas ? `💸 Taxas: R$ ${c.taxas.toFixed(2)}` : "";
-      const noturno = c.noturno ? `🌙 Noturno: R$ ${c.noturno.toFixed(2)}` : "";
-
       const div = document.createElement("div");
       div.className = "card " + (c.status || "finalizada");
 
       div.innerHTML = `
-        <strong>${c.motoristas?.nome || "Sem motorista"}</strong>
-
-        <div class="small">${rota}</div>
-
-        <div class="valor">R$ ${c.valor.toFixed(2)}</div>
-
-        <div class="small">📅 ${c.data_viagem || "-"}</div>
-        <div class="small">🕒 ${c.hora_viagem || "-"}</div>
-
-        ${taxas ? `<div class="small">${taxas}</div>` : ""}
-        ${noturno ? `<div class="small">${noturno}</div>` : ""}
-
-        <div class="small">
-          Status: ${c.status || "finalizada"}
+        <div class="topo">
+          <div class="motorista">${c.motoristas?.nome || "Sem motorista"}</div>
+          <div class="grupo">${c.grupos?.nome || "Sem grupo"}</div>
         </div>
 
-        <button class="btn edit" onclick="editar('${c.id}')">
-          Editar
-        </button>
+        <div class="rota">${rota}</div>
 
-        <button class="btn delete" onclick="excluir('${c.id}')">
-          Excluir
-        </button>
+        <div class="valor">R$ ${Number(c.valor).toFixed(2)}</div>
+
+        <div class="info">
+          <span>📅 ${c.data_viagem || "-"}</span>
+          <span>🕒 ${c.hora_viagem || "-"}</span>
+        </div>
+
+        ${c.taxas ? `<div class="info">💸 Taxas: R$ ${Number(c.taxas).toFixed(2)}</div>` : ""}
+        ${c.adicional_noturno ? `<div class="info">🌙 Noturno: R$ ${Number(c.adicional_noturno).toFixed(2)}</div>` : ""}
+
+        <div class="info">
+          <strong>Status:</strong> ${c.status || "finalizada"}
+        </div>
+
+        <div class="footer">
+          <button class="edit" onclick="editar('${c.id}')">Editar</button>
+          <button class="delete" onclick="excluir('${c.id}')">Excluir</button>
+        </div>
       `;
 
       lista.appendChild(div);
@@ -198,9 +249,7 @@ function render(){
 
 }
 
-/* =========================
-EXCLUIR
-========================= */
+/* EXCLUIR */
 async function excluir(id){
 
   if(!confirm("Excluir corrida?")) return;
@@ -211,21 +260,15 @@ async function excluir(id){
     .eq("id", id);
 
   carregar();
-
 }
 
-/* =========================
-EVENTOS
-========================= */
+/* EVENTOS */
 busca.oninput = render;
 filtroStatus.onchange = render;
 
-/* =========================
-AUTO REFRESH (A CADA 5s)
-========================= */
+/* AUTO REFRESH */
 setInterval(carregar, 5000);
 
-/* START */
 carregar();
 
 </script>
