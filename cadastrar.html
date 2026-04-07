@@ -290,7 +290,9 @@ async function salvar(){
     origem: origem.value,
     destino: destino.value,
     valor: Number(totalEl.innerText),
-    status: document.getElementById("status").value || "finalizada",
+    status: String(document.getElementById("status").value || "finalizada")
+  .toLowerCase()
+  .trim(),
     data_viagem: dataViagem.value,
     hora_viagem: horaViagem.value,
     taxas: Number(taxas.value || 0),
