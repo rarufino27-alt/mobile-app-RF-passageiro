@@ -374,24 +374,54 @@ async function carregarMotoristas(){
 /* SALVAR */
 async function salvar(){
 
-  let motorista_id = motorista.value || null;
-  let status = status.value;
+  const motoristaSelect = document.getElementById("motorista");
+  const statusSelect = document.getElementById("status");
+  const dataInput = document.getElementById("data");
+  const horaInput = document.getElementById("hora");
 
+  const motorista_id = motoristaSelect.value || null;
+
+  let status = statusSelect.value;
+
+  // 🔥 REGRA: sem motorista = não atendida
   if(!motorista_id){
     status = "nao_atendida";
   }
 
-  await window.supabaseClient.from("corridas").insert([{
+  if(!origem || !destino){
+    alert("Selecione origem e destino");
+    return;
+  }
+
+  if(!dataInput.value || !horaInput.value){
+    alert("Preencha data e horário");
+    return;
+  }
+
+  const corrida = {
     motorista_id,
     origem,
     destino,
-    valor:Number(total.innerText),
+    valor: Number(document.getElementById("total").innerText),
     status,
-    data_viagem:data.value,
-    hora_viagem:hora.value
-  }]);
+    data_viagem: dataInput.value,
+    hora_viagem: horaInput.value,
+    created_at: new Date().toISOString()
+  };
 
-  alert("Salvo");
+  console.log("SALVANDO:", corrida);
+
+  const { error } = await window.supabaseClient
+    .from("corridas")
+    .insert([corrida]);
+
+  if(error){
+    console.error(error);
+    alert("Erro ao salvar");
+    return;
+  }
+
+  alert("Corrida salva com sucesso");
   location.reload();
 }
 
