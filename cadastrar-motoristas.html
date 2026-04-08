@@ -146,9 +146,6 @@ body{
 
 </div>
 
-<!-- ÚLTIMO CADASTRO -->
-<div id="ultimo"></div>
-
 </div>
 
 <!-- BOTÃO FIXO -->
@@ -191,36 +188,6 @@ async function salvar(){
   alert("Motorista cadastrado");
 
   limpar();
-  carregarUltimo();
-}
-
-/* =========================
-ÚLTIMO CADASTRO
-========================= */
-async function carregarUltimo(){
-
-  const { data } = await window.supabaseClient
-    .from("motoristas")
-    .select("*")
-    .order("id", { ascending:false })
-    .limit(1);
-
-  if(!data || data.length === 0) return;
-
-  const m = data[0];
-
-  ultimo.innerHTML = `
-    <div class="card-modern">
-      <strong>${m.nome}</strong>
-
-      <div class="small">📞 ${m.telefone}</div>
-      <div class="small">📍 ${m.endereco || "-"}</div>
-
-      <div class="small">🚗 ${m.marca || ""} ${m.modelo || ""}</div>
-      <div class="small">🎨 ${m.cor || "-"}</div>
-      <div class="small">🔖 ${m.placa || "-"}</div>
-    </div>
-  `;
 }
 
 /* =========================
@@ -235,9 +202,6 @@ function limpar(){
   cor.value = "";
   placa.value = "";
 }
-
-/* START */
-carregarUltimo();
 
 </script>
 
