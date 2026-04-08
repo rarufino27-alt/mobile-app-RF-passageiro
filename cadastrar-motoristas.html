@@ -3,7 +3,7 @@
 <head>
 
 <meta charset="UTF-8">
-<title>Cadastro Motorista RF</title>
+<title>RF – Cadastro Motorista</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -11,54 +11,86 @@
 
 <style>
 
+/* BASE */
 body{
   margin:0;
   font-family:system-ui;
-  background:#020617;
-  color:#fff;
+  background:#0f172a;
+  color:#e5e7eb;
 }
 
-.header{
-  padding:15px;
-  text-align:center;
-  background:#0f172a;
+/* HEADER */
+.top-white{
+  display:flex;
+  align-items:center;
+  padding:14px;
+  background:#1e293b;
+  border-bottom:1px solid #334155;
   font-weight:700;
 }
 
-.container{
-  padding:15px;
+/* CONTAINER */
+.app-container{
+  padding:14px;
   max-width:600px;
   margin:auto;
 }
 
-.card{
-  background:#0f172a;
-  padding:15px;
-  border-radius:12px;
+/* CARD */
+.card-modern{
+  background:#1e293b;
+  border:1px solid #334155;
+  border-radius:14px;
+  padding:14px;
   margin-bottom:12px;
-  border:1px solid #1e293b;
 }
 
-input{
-  width:100%;
-  padding:12px;
+/* INPUT */
+.input-box{
+  padding:14px;
+  border-radius:10px;
   margin-bottom:10px;
-  border-radius:8px;
-  border:1px solid #1e293b;
   background:#020617;
+  border:1px solid #334155;
   color:#fff;
 }
 
-button{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:8px;
-  background:#22c55e;
-  color:#000;
-  font-weight:bold;
+/* LABEL */
+.label{
+  font-size:13px;
+  opacity:.7;
+  margin-bottom:6px;
 }
 
+/* GRID VEÍCULO */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+/* BOTÃO FIXO */
+.cta-box{
+  position:fixed;
+  bottom:0;
+  width:100%;
+  padding:10px;
+  background:#020617;
+  border-top:1px solid #334155;
+}
+
+.cta-box button{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:12px;
+  background:#22c55e;
+  font-weight:bold;
+  font-size:16px;
+  color:#000;
+}
+
+/* SMALL */
 .small{
   font-size:13px;
   color:#94a3b8;
@@ -70,23 +102,41 @@ button{
 
 <body>
 
-<div class="header">🚗 Novo Motorista</div>
+<!-- HEADER -->
+<div class="top-white">
+  🚗 Cadastro de Motorista
+</div>
 
-<div class="container">
+<div class="app-container">
 
-<!-- FORM -->
-<div class="card">
+<!-- DADOS PESSOAIS -->
+<div class="card-modern">
 
-<input id="nome" placeholder="Nome">
-<input id="telefone" placeholder="Telefone">
-<input id="endereco" placeholder="Endereço">
+  <div class="label">Nome</div>
+  <input id="nome" class="input-box" placeholder="Nome completo">
 
-<input id="marca" placeholder="Marca">
-<input id="modelo" placeholder="Modelo">
-<input id="cor" placeholder="Cor">
-<input id="placa" placeholder="Placa">
+  <div class="label">Telefone</div>
+  <input id="telefone" class="input-box" placeholder="Telefone">
 
-<button onclick="salvar()">Salvar</button>
+  <div class="label">Endereço</div>
+  <input id="endereco" class="input-box" placeholder="Endereço">
+
+</div>
+
+<!-- VEÍCULO -->
+<div class="card-modern">
+
+  <div class="label">Veículo</div>
+
+  <div class="grid">
+    <input id="marca" class="input-box" placeholder="Marca">
+    <input id="modelo" class="input-box" placeholder="Modelo">
+  </div>
+
+  <div class="grid">
+    <input id="cor" class="input-box" placeholder="Cor">
+    <input id="placa" class="input-box" placeholder="Placa">
+  </div>
 
 </div>
 
@@ -95,8 +145,16 @@ button{
 
 </div>
 
+<!-- BOTÃO FIXO -->
+<div class="cta-box">
+  <button onclick="salvar()">Salvar Motorista</button>
+</div>
+
 <script>
 
+/* =========================
+SALVAR
+========================= */
 async function salvar(){
 
   const data = {
@@ -119,19 +177,19 @@ async function salvar(){
     .insert([data]);
 
   if(error){
-    console.log(error);
+    console.error(error);
     alert("Erro ao salvar");
     return;
   }
 
-  alert("Salvo com sucesso");
+  alert("Motorista cadastrado");
 
   limpar();
   carregarUltimo();
 }
 
 /* =========================
-MOSTRAR ÚLTIMO CADASTRO
+ÚLTIMO CADASTRO
 ========================= */
 async function carregarUltimo(){
 
@@ -146,10 +204,12 @@ async function carregarUltimo(){
   const m = data[0];
 
   ultimo.innerHTML = `
-    <div class="card">
+    <div class="card-modern">
       <strong>${m.nome}</strong>
+
       <div class="small">📞 ${m.telefone}</div>
       <div class="small">📍 ${m.endereco || "-"}</div>
+
       <div class="small">🚗 ${m.marca || ""} ${m.modelo || ""}</div>
       <div class="small">🎨 ${m.cor || "-"}</div>
       <div class="small">🔖 ${m.placa || "-"}</div>
