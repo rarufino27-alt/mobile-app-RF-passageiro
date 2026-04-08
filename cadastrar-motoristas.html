@@ -69,6 +69,13 @@ body{
   gap:10px;
 }
 
+/* MOBILE AJUSTE AUTOMÁTICO */
+@media(max-width:480px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+}
+
 /* BOTÃO FIXO */
 .cta-box{
   position:fixed;
@@ -124,14 +131,13 @@ body{
 </div>
 
 <!-- VEÍCULO -->
-<div class="card-modern">
+  <div class="card-modern">
 
   <div class="label">Veículo</div>
 
-  <div class="grid">
-    <input id="marca" class="input-box" placeholder="Marca">
-    <input id="modelo" class="input-box" placeholder="Modelo">
-  </div>
+  <input id="marca" class="input-box" placeholder="Marca">
+
+  <input id="modelo" class="input-box" placeholder="Modelo">
 
   <div class="grid">
     <input id="cor" class="input-box" placeholder="Cor">
